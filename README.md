@@ -1,33 +1,49 @@
-# Botfusion-AI
+# 🤖 BotFusion AI
 
-Botfusion is a modern AI chat application that allows users to interact with OpenAI's API through a sleek, responsive interface. It includes features like account login, profile management, new chat sessions, chat history, and customizable settings.
-
----
-
-## Features
-
-- **New Chat**: Start fresh conversations with the AI.
-- **Chat History**: Save and view previous chats.
-- **User Account**: Login/signup and manage your profile.
-- **Settings**: Adjust themes, notification preferences, and other configurations.
-- **OpenAI API Integration**: Powered by OpenAI for intelligent and context-aware responses.
-- **Responsive UI**: Works on both desktop and mobile devices.
-- **Dark & Light Modes**: Switch between color themes for comfort.
+BotFusion AI is a modern, dark-themed, full-stack AI chat application inspired by professional AI assistants.  
+It supports real-time chat, image generation, chat history, user accounts, and a clean, responsive UI — all built with a scalable architecture suitable for **public launch**.
 
 ---
 
-## Tech Stack
+## 🌐 Live Demo
+🔗 **Frontend (GitHub Pages):**  
+https://botfusion12-lang.github.io/Botfusion-AI/
 
-- **Frontend**: HTML, CSS, JavaScript
-- **Backend**: Node.js / Express (or your backend stack)
-- **Database**: [Specify if using Firebase, MongoDB, or other]
-- **API**: OpenAI API
+> ⚠️ Backend must be running separately (Vercel / Railway / Render) for full functionality.
 
 ---
 
-## Installation
+## ✨ Features
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/botfusion.git
-   cd botfusion
+### 🧠 AI Chat
+- Conversational AI powered by **OpenAI API**
+- Context-aware responses
+- Smooth typing experience
+- Error handling & fallback messages
+
+### 🎨 Image Generation
+- Generate AI images from text prompts
+- Displays images directly in chat
+- Supports future image download feature
+
+### 🌓 Dark Grey Modern UI
+- Clean dark-grey theme
+- Inspired by premium AI tools
+- Mobile-first responsive design
+- Classy bottom-fixed input bar
+
+### 🗂️ Chat Management
+- New Chat button
+- Chat history sidebar
+- Multiple conversations support (extensible)
+- Clear chat functionality
+
+### 👤 Account & Settings
+- Account icon
+- Profile placeholder
+- Settings panel (UI ready)
+- Designed for future authentication integration
+
+---
+
+## 🧩 Project Structure
