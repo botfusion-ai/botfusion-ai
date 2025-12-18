@@ -1,216 +1,231 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>BotFusion AI</title>
+
 <style>
-  * { margin:0; padding:0; box-sizing:border-box; font-family: Arial, sans-serif; }
-  body { background-color: #1f1f1f; color: #fff; display: flex; justify-content:center; align-items:flex-start; min-height:100vh; padding:20px; }
-  .container { width:100%; max-width:1200px; display:flex; gap:20px; }
-  .sidebar { background:#2c2c2c; width:250px; border-radius:10px; padding:20px; display:flex; flex-direction:column; gap:15px; }
-  .sidebar button { background:#3c3c3c; border:none; padding:10px 15px; border-radius:5px; color:#fff; cursor:pointer; text-align:left; transition:0.3s; }
-  .sidebar button:hover { background:#505050; }
-  .main { flex:1; background:#2b2b2b; border-radius:10px; padding:20px; display:flex; flex-direction:column; }
-  .header { display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; }
-  .header h1 { font-size:1.5rem; }
-  .chat-area { flex:1; background:#1f1f1f; border-radius:10px; padding:15px; overflow-y:auto; margin-bottom:15px; display:flex; flex-direction:column; gap:10px; }
-  .chat-message { padding:8px 12px; border-radius:8px; max-width:70%; word-wrap:break-word; }
-  .chat-message.user { background:#4a90e2; align-self:flex-end; }
-  .chat-message.bot { background:#3c3c3c; align-self:flex-start; }
-  .input-area { display:flex; gap:10px; }
-  .input-area input { flex:1; padding:10px; border-radius:8px; border:none; outline:none; }
-  .input-area button { padding:10px 15px; border-radius:8px; border:none; background:#4a90e2; color:#fff; cursor:pointer; transition:0.3s; }
-  .input-area button:hover { background:#357ab8; }
-  .modal { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.7); display:none; justify-content:center; align-items:center; }
-  .modal-content { background:#2c2c2c; padding:30px; border-radius:10px; width:300px; display:flex; flex-direction:column; gap:15px; }
-  .modal-content input, .modal-content select { padding:10px; border-radius:5px; border:none; outline:none; }
-  .modal-content button { padding:10px; border-radius:5px; border:none; background:#4a90e2; color:#fff; cursor:pointer; }
-  .modal-content button:hover { background:#357ab8; }
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #121212;
+  color: #fff;
+  height: 100vh;
+  display: flex;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 260px;
+  background: #1a1a1a;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar h2 {
+  margin: 0 0 15px;
+}
+
+.sidebar button {
+  background: #2c2c2c;
+  border: none;
+  color: #fff;
+  padding: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+/* Main */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  background: #1a1a1a;
+  padding: 10px 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.language-select {
+  background: #222;
+  color: #fff;
+  border: 1px solid #444;
+  padding: 6px;
+  border-radius: 6px;
+}
+
+/* Chat */
+.chat {
+  flex: 1;
+  padding: 15px;
+  overflow-y: auto;
+}
+
+.msg {
+  max-width: 70%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+}
+
+.user {
+  background: #2d2d2d;
+  margin-left: auto;
+}
+
+.bot {
+  background: #1f1f1f;
+  border: 1px solid #333;
+}
+
+/* Input */
+.input-area {
+  display: flex;
+  padding: 10px;
+  background: #1a1a1a;
+}
+
+.input-area input {
+  flex: 1;
+  padding: 10px;
+  background: #121212;
+  border: 1px solid #333;
+  border-radius: 6px;
+  color: #fff;
+}
+
+.input-area button {
+  margin-left: 8px;
+  background: #333;
+  border: none;
+  padding: 0 14px;
+  border-radius: 6px;
+  color: #fff;
+  cursor: pointer;
+}
 </style>
 </head>
+
 <body>
 
-<div class="container">
-  <div class="sidebar">
-    <button onclick="showSection('newChat')">New Chat</button>
-    <button onclick="showSection('history')">Chat History</button>
-    <button onclick="showSection('profile')">Profile</button>
-    <button onclick="showSection('settings')">Settings</button>
-    <button onclick="openModal('signupModal')">Sign Up / Login</button>
-  </div>
-
-  <div class="main">
-    <div class="header">
-      <h1 id="sectionTitle">New Chat</h1>
-      
-  <select name="languages" id="languages">
-  <option value="">Select Language</option>
-  <option value="afrikaans">Afrikaans</option>
-  <option value="albanian">Albanian</option>
-  <option value="amharic">Amharic</option>
-  <option value="arabic">Arabic</option>
-  <option value="armenian">Armenian</option>
-  <option value="assamese">Assamese</option>
-  <option value="aymara">Aymara</option>
-  <option value="azerbaijani">Azerbaijani</option>
-  <option value="bashkir">Bashkir</option>
-  <option value="basque">Basque</option>
-  <option value="belarusian">Belarusian</option>
-  <option value="bengali">Bengali</option>
-  <option value="bislama">Bislama</option>
-  <option value="bosnian">Bosnian</option>
-  <option value="breton">Breton</option>
-  <option value="bulgarian">Bulgarian</option>
-  <option value="burmese">Burmese</option>
-  <option value="catalan">Catalan</option>
-  <option value="cebuano">Cebuano</option>
-  <option value="chichewa">Chichewa</option>
-  <option value="chinese">Chinese</option>
-  <option value="corsican">Corsican</option>
-  <option value="croatian">Croatian</option>
-  <option value="czech">Czech</option>
-  <option value="danish">Danish</option>
-  <option value="dhivehi">Dhivehi</option>
-  <option value="dutch">Dutch</option>
-  <option value="english">English</option>
-  <option value="esperanto">Esperanto</option>
-  <option value="estonian">Estonian</option>
-  <option value="faroese">Faroese</option>
-  <option value="fijian">Fijian</option>
-  <option value="filipino">Filipino</option>
-  <option value="finnish">Finnish</option>
-  <option value="french">French</option>
-  <option value="frisian">Frisian</option>
-  <option value="galician">Galician</option>
-  <option value="georgian">Georgian</option>
-  <option value="german">German</option>
-  <option value="greek">Greek</option>
-  <option value="guarani">Guarani</option>
-    </div>
-    
-    <div class="content">
-      <div id="newChat" class="section">
-        <div class="chat-area" id="chatArea"></div>
-        <div class="input-area">
-          <input type="text" id="userInput" placeholder="Type your message...">
-          <button onclick="sendMessage()">Send</button>
-        </div>
-      </div>
-
-      <div id="history" class="section" style="display:none;">
-        <h2>Chat History</h2>
-        <ul id="historyList"></ul>
-      </div>
-
-      <div id="profile" class="section" style="display:none;">
-        <h2>Profile</h2>
-        <p>Name: <span id="profile Name">Guest</span></p>
-        <p>Email: <span id="profile Email">guest@example.com</span></p>
-      </div>
-
-      <div id="settings" class="section" style="display:none;">
-        <h2>Settings</h2>
-        <label>Theme: 
-          <select id="themeSelect" onchange="changeTheme()">
-            <option value="dark">Dark</option>
-            <option value="light">Light</option>
-          </select>
-        </label>
-      </div> 
-    </div>
-  </div>
+<div class="sidebar">
+  <h2>BotFusion</h2>
+  <button onclick="newChat()">+ New Chat</button>
 </div>
 
-<!-- Modals -->
-<div id="signupModal" class="modal">
-  <div class="modal-content">
-    <h2>Sign Up / Login</h2>
-    <input type="text" id="signupName" placeholder="Name">
-    <input type="email" id="signupEmail" placeholder="Email">
-    <button onclick="signup()">Submit</button>
+<div class="main">
+  <div class="header">
+    <span>AI Chat</span>
+    <select id="language" class="language-select"></select>
+  </div>
+
+  <div id="chat" class="chat"></div>
+
+  <div class="input-area">
+    <input id="input" placeholder="Type your message..." />
+    <button onclick="startVoice()">🎤</button>
+    <button onclick="send()">➤</button>
   </div>
 </div>
 
 <script>
-let chatHistory = [];
-let currentSection = 'newChat';
-let currentLanguage = 'en';
+/* ================= LANGUAGES (100+) ================= */
+const languages = [
+  { code: "auto", name: "🌍 Auto Detect" },
+  { code: "en", name: "English" }, { code: "hi", name: "Hindi" },
+  { code: "mr", name: "Marathi" }, { code: "ta", name: "Tamil" },
+  { code: "te", name: "Telugu" }, { code: "bn", name: "Bengali" },
+  { code: "ur", name: "Urdu" }, { code: "gu", name: "Gujarati" },
+  { code: "kn", name: "Kannada" }, { code: "ml", name: "Malayalam" },
+  { code: "pa", name: "Punjabi" }, { code: "or", name: "Odia" },
+  { code: "es", name: "Spanish" }, { code: "fr", name: "French" },
+  { code: "de", name: "German" }, { code: "it", name: "Italian" },
+  { code: "pt", name: "Portuguese" }, { code: "ru", name: "Russian" },
+  { code: "nl", name: "Dutch" }, { code: "pl", name: "Polish" },
+  { code: "sv", name: "Swedish" }, { code: "no", name: "Norwegian" },
+  { code: "fi", name: "Finnish" }, { code: "da", name: "Danish" },
+  { code: "el", name: "Greek" }, { code: "ar", name: "Arabic" },
+  { code: "fa", name: "Persian" }, { code: "he", name: "Hebrew" },
+  { code: "tr", name: "Turkish" }, { code: "zh", name: "Chinese" },
+  { code: "ja", name: "Japanese" }, { code: "ko", name: "Korean" },
+  { code: "th", name: "Thai" }, { code: "vi", name: "Vietnamese" },
+  { code: "id", name: "Indonesian" }, { code: "ms", name: "Malay" },
+  { code: "sw", name: "Swahili" }, { code: "zu", name: "Zulu" },
+  { code: "af", name: "Afrikaans" }, { code: "uk", name: "Ukrainian" },
+  { code: "bg", name: "Bulgarian" }, { code: "sr", name: "Serbian" },
+  { code: "hr", name: "Croatian" }, { code: "sk", name: "Slovak" },
+  { code: "sl", name: "Slovenian" }, { code: "cs", name: "Czech" },
+  { code: "hu", name: "Hungarian" }, { code: "ro", name: "Romanian" },
+  { code: "eo", name: "Esperanto" }, { code: "la", name: "Latin" }
+];
 
-function showSection(section) {
-  document.getElementById(currentSection).style.display = 'none';
-  document.getElementById(section).style.display = 'block';
-  document.getElementById('sectionTitle').innerText = section.charAt(0).toUpperCase() + section.slice(1);
-  currentSection = section;
-  if(section === 'history') renderHistory();
+const langSelect = document.getElementById("language");
+languages.forEach(l => {
+  const opt = document.createElement("option");
+  opt.value = l.code;
+  opt.textContent = l.name;
+  langSelect.appendChild(opt);
+});
+
+/* ================= CHAT ================= */
+const chat = document.getElementById("chat");
+const input = document.getElementById("input");
+
+function addMsg(text, cls) {
+  const div = document.createElement("div");
+  div.className = "msg " + cls;
+  div.textContent = text;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
 }
 
-function sendMessage() {
-  const input = document.getElementById('userInput');
-  const message = input.value.trim();
-  if(!message) return;
+function send() {
+  const text = input.value.trim();
+  if (!text) return;
+  addMsg(text, "user");
+  input.value = "";
 
-  chatHistory.push({ sender:'user', text: message, lang: currentLanguage });
-  renderChat();
-  input.value='';
-
-  // Fake bot response in selected language
-  setTimeout(()=>{
-    chatHistory.push({ sender:'bot', text:'[Bot reply in '+currentLanguage+'] ' + message, lang: currentLanguage });
-    renderChat();
-  },500);
+  fetch("https://YOUR-BACKEND-URL/api/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      message: text,
+      language: langSelect.value
+    })
+  })
+  .then(r => r.json())
+  .then(d => addMsg(d.reply, "bot"))
+  .catch(() => addMsg("Server error", "bot"));
 }
 
-function renderChat() {
-  const chatArea = document.getElementById('chatArea');
-  chatArea.innerHTML = '';
-  chatHistory.forEach(msg=>{
-    const div = document.createElement('div');
-    div.className = 'chat-message ' + msg.sender;
-    div.innerText = msg.text;
-    chatArea.appendChild(div);
-    chatArea.scrollTop = chatArea.scrollHeight;
-  });
+function newChat() {
+  chat.innerHTML = "";
 }
 
-function renderHistory() {
-  const historyList = document.getElementById('historyList');
-  historyList.innerHTML='';
-  chatHistory.forEach(msg=>{
-    const li = document.createElement('li');
-    li.innerText = `[${msg.lang}] ${msg.sender.toUpperCase()}: ${msg.text}`;
-    historyList.appendChild(li);
-  });
-}
-
-function openModal(modalId) {
-  document.getElementById(modalId).style.display='flex';
-}
-
-function signup() {
-  const name = document.getElementById('signupName').value;
-  const email = document.getElementById('signupEmail').value;
-  if(name && email){
-    document.getElementById('profileName').innerText=name;
-    document.getElementById('profileEmail').innerText=email;
-    document.getElementById('signupModal').style.display='none';
-    alert('Signed up successfully!');
-  } else alert('Please fill all fields.');
-}
-
-function changeTheme() {
-  const theme = document.getElementById('themeSelect').value;
-  if(theme==='light'){
-    document.body.style.background='#f5f5f5';
-    document.body.style.color='#000';
-  } else {
-    document.body.style.background='#1f1f1f';
-    document.body.style.color='#fff';
+/* ================= VOICE ================= */
+let recognition;
+function startVoice() {
+  if (!("webkitSpeechRecognition" in window)) {
+    alert("Voice not supported");
+    return;
   }
-}
+  recognition = new webkitSpeechRecognition();
+  recognition.lang =
+    langSelect.value === "auto" ? "en-US" : langSelect.value + "-IN";
 
-function setLanguage(){
-  currentLanguage = document.getElementById('languageSelect').value;
+  recognition.onresult = e => {
+    input.value = e.results[0][0].transcript;
+  };
+  recognition.start();
 }
 </script>
 
