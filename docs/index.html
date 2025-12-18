@@ -1,6 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BotFusion</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f8f8f8;
+        }
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        h2 {
+            font-size: 22px;
+            margin-top: 20px;
+        }
+        select, input, button {
+            padding: 10px;
+            margin: 5px 0;
+            font-size: 16px;
+        }
+        button {
+            cursor: pointer;
+        }
+        .chat-section {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
   <select name="languages" id="languages">
   <option value="">Select Language</option>
   <option value="afrikaans">Afrikaans</option>
@@ -125,59 +157,22 @@
   <option value="yiddish">Yiddish</option>
   <option value="yoruba">Yoruba</option>
   <option value="zulu">Zulu</option>
-  </select>
-  <meta charset="UTF-8" />
-  <title>BotFusion AI</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <!-- CSS CONNECTION (IMPORTANT) -->
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
+    </select>
 
-<div class="app">
+    <h1>BotFusion</h1>
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <h2 class="logo">BotFusion</h2>
+    <button>New Chat</button>
 
-    <button class="new-chat">➕ New chat</button>
-
-    <div class="history">
-      <p class="section-title">Today</p>
-      <div class="chat-item">First chat</div>
+    <div class="chat-section">
+        <p>Today</p>
+        <p>First Chat</p>
+        <button>Settings</button>
+        <button>Account</button>
     </div>
 
-    <div class="bottom-menu">
-      <button class="menu-btn">⚙ Settings</button>
-      <button class="menu-btn">👤 Account</button>
-    </div>
-  </aside>
+    <h2>How can I help you today?</h2>
+    <input type="text" placeholder="Message BotFusion...">
+    <button>Send</button>
 
-  <!-- MAIN CHAT AREA -->
-  <main class="chat-area">
-    <div class="chat-header">
-      <h3>How can I help you today?</h3>
-    </div>
-
-    <div id="chat-box" class="chat-box">
-      <!-- Messages appear here -->
-    </div>
-
-    <!-- INPUT BAR -->
-    <div class="input-bar">
-      <input
-        type="text"
-        id="user-input"
-        placeholder="Message BotFusion..."
-      />
-      <button onclick="sendMessage()">➤</button>
-    </div>
-  </main>
-
-</div>
-
-<!-- JS CONNECTION -->
-<script src="script.js"></script>
 </body>
 </html>
