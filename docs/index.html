@@ -1,110 +1,285 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>BotFusion AI</title>
 
-<!-- Google Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
-/* RESET */
-* { margin:0; padding:0; box-sizing:border-box; font-family:'Inter', sans-serif; }
-body { display:flex; height:100vh; background:#121212; color:#f1f1f1; overflow:hidden; }
+:root {
+  --bg-main: #0f1115;
+  --bg-sidebar: #15171c;
+  --bg-card: #1c1f26;
+  --bg-input: #1a1d24;
+  --accent: #19c37d;
+  --text-main: #e5e7eb;
+  --text-muted: #9ca3af;
+  --border: #2a2d35;
+}
 
-/* SIDEBAR */
-.sidebar { width:280px; background:#1f1f1f; display:flex; flex-direction:column; border-right:1px solid #2a2a2a; }
-.sidebar .logo { padding:20px; font-size:22px; font-weight:700; text-align:center; background:linear-gradient(90deg,#7C4DFF,#BB86FC); -webkit-background-clip:text; color:transparent; }
-.sidebar .menu { flex:1; overflow-y:auto; margin-top:10px; }
-.menu-item { padding:14px 20px; display:flex; align-items:center; gap:12px; cursor:pointer; border-radius:8px; transition:0.2s; }
-.menu-item:hover { background:#2a2a2a; }
-.menu-item i { font-size:18px; }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Inter", sans-serif;
+}
 
-/* BOTTOM MENU */
-.bottom-menu { border-top:1px solid #2a2a2a; padding:10px; display:flex; flex-direction:column; gap:8px; }
-.bottom-menu button { padding:10px; border:none; border-radius:8px; cursor:pointer; background:#2b2b2b; color:white; transition:0.2s; }
-.bottom-menu button:hover { background:#3a3a3a; }
+body {
+  background: var(--bg-main);
+  color: var(--text-main);
+  height: 100vh;
+  display: flex;
+}
 
-/* MAIN AREA */
-.main { flex:1; display:flex; flex-direction:column; background:#181818; }
-.top-bar { height:60px; display:flex; align-items:center; justify-content:space-between; padding:0 20px; border-bottom:1px solid #2a2a2a; }
-.top-bar select { background:#2b2b2b; border:none; border-radius:6px; padding:6px 12px; color:white; cursor:pointer; }
+/* ===== SIDEBAR ===== */
+.sidebar {
+  width: 260px;
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-header {
+  padding: 18px;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.new-chat {
+  margin: 10px 16px;
+  padding: 12px;
+  border-radius: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  text-align: center;
+}
+
+.new-chat:hover {
+  border-color: var(--accent);
+}
+
+.history {
+  flex: 1;
+  padding: 10px 16px;
+  overflow-y: auto;
+}
+
+.history h4 {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 10px 0;
+}
+
+.chat-item {
+  padding: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.chat-item:hover {
+  background: var(--bg-card);
+}
+
+.sidebar-footer {
+  padding: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.sidebar-footer div {
+  padding: 8px 0;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+/* ===== MAIN ===== */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* HEADER */
+.header {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.lang-select {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-main);
+  padding: 6px 10px;
+  border-radius: 6px;
+}
 
 /* CHAT AREA */
-.chat-container { flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:12px; }
-.message { max-width:70%; padding:14px 18px; border-radius:12px; line-height:1.4; position:relative; word-wrap:break-word; }
-.user { align-self:flex-end; background:#3b3b3b; }
-.bot { align-self:flex-start; background:#262626; border:1px solid #2a2a2a; }
-.message span.time { position:absolute; bottom:-16px; right:10px; font-size:10px; color:#999; }
+.chat-area {
+  flex: 1;
+  padding: 40px 20px;
+  overflow-y: auto;
+}
 
-/* IMAGE AREA */
-.image-area { display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:12px; padding:12px; }
-.generated-image { width:100%; height:120px; object-fit:cover; border-radius:8px; transition:0.2s; }
-.generated-image:hover { transform:scale(1.05); }
+.welcome {
+  text-align: center;
+  margin-top: 40px;
+}
 
-/* INPUT AREA */
-.input-area { display:flex; gap:10px; padding:12px 20px; border-top:1px solid #2a2a2a; }
-.input-area input { flex:1; padding:12px 16px; border-radius:10px; border:none; background:#2b2b2b; color:white; }
-.input-area button { padding:0 16px; border:none; border-radius:10px; background:#7C4DFF; color:white; cursor:pointer; transition:0.2s; }
-.input-area button:hover { background:#BB86FC; }
+.welcome h1 {
+  font-size: 28px;
+  margin-bottom: 10px;
+}
+
+.prompt-card {
+  margin: 12px auto;
+  max-width: 600px;
+  background: var(--bg-card);
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  cursor: pointer;
+}
+
+.prompt-card:hover {
+  border-color: var(--accent);
+}
+
+/* MESSAGE INPUT */
+.input-area {
+  padding: 16px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 10px;
+}
+
+.input-area input {
+  flex: 1;
+  padding: 14px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text-main);
+}
+
+.input-area button {
+  background: var(--accent);
+  border: none;
+  padding: 0 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* ICON BUTTONS */
+.icon-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 0 12px;
+  border-radius: 10px;
+  cursor: pointer;
+}
 </style>
-
-<!-- Firebase SDK -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "botfusion-ai.firebaseapp.com",
-  projectId: "botfusion-ai",
-  storageBucket: "botfusion-ai.appspot.com",
-  messagingSenderId: "XXXX",
-  appId: "XXXX"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const provider = new GoogleAuthProvider();
-const db = getFirestore(app);
-
-window.auth = auth;
-window.provider = provider;
-window.db = db;
-window.doc = doc;
-window.setDoc = setDoc;
-window.getDoc = getDoc;
-window.updateDoc = updateDoc;
-window.arrayUnion = arrayUnion;
-window.signInWithPopup = signInWithPopup;
-window.signOutFirebase = signOut;
-window.onAuthStateChanged = onAuthStateChanged;
-</script>
-
 </head>
+
 <body>
 
+<!-- SIDEBAR -->
 <div class="sidebar">
-  <div class="logo">🤖 BotFusion AI</div>
-  <div class="menu">
-    <div class="menu-item" onclick="newChat()"><i class="fa-solid fa-plus"></i> New Chat</div>
-    <div class="menu-item" onclick="toggleHistory()"><i class="fa-solid fa-clock-rotate-left"></i> History</div>
-    <div class="menu-item" onclick="toggleSettings()"><i class="fa-solid fa-gear"></i> Settings</div>
-    <div class="menu-item" onclick="toggleProfile()"><i class="fa-solid fa-user"></i> Account</div>
+  <div class="sidebar-header">BotFusion</div>
+
+  <div class="new-chat" onclick="newChat()">➕ New Chat</div>
+
+  <div class="history">
+    <h4>TODAY</h4>
+    <div class="chat-item">AI Business Ideas</div>
+
+    <h4>PREVIOUS 7 DAYS</h4>
+    <div class="chat-item">Image generation</div>
+    <div class="chat-item">Resume help</div>
   </div>
-  <div class="bottom-menu">
-    <button onclick="googleLogin()">🔐 Sign in with Google</button>
-    <button onclick="logout()">🚪 Logout</button>
+
+  <div class="sidebar-footer">
+    <div>⚙️ Settings</div>
+    <div>👤 Account</div>
   </div>
 </div>
 
+<!-- MAIN -->
 <div class="main">
-  <div class="top-bar">
-    <div>Chat</div>
-   <select name="language" id="language">
-  <option>Auto Detect</option>
+
+  <div class="header">
+    <div>How can I help you today?</div>
+    <select class="lang-select">
+      <option>Auto Detect</option>
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>BotFusion AI</title>
+<style>
+/* ===== RESET ===== */
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,sans-serif}
+body{display:flex;height:100vh;background:#0f172a;color:#e5e7eb}
+/* ===== SIDEBAR ===== */
+.sidebar{width:260px;background:#020617;display:flex;flex-direction:column;border-right:1px solid #1f2937}
+.brand{display:flex;align-items:center;gap:10px;padding:16px;border-bottom:1px solid #1f2937}
+.brand svg{width:36px;height:36px}
+.brand-name{font-size:18px;font-weight:600}
+.new-chat{margin:12px;padding:12px;background:#111827;border-radius:8px;text-align:center;cursor:pointer}
+.history{flex:1;padding:12px;font-size:13px;color:#9ca3af}
+.sidebar-footer{border-top:1px solid #1f2937;padding:12px}
+.sidebar-footer div{padding:10px;cursor:pointer;border-radius:6px}
+.sidebar-footer div:hover{background:#111827}
+/* ===== MAIN ===== */
+.main{flex:1;display:flex;flex-direction:column}
+.topbar{height:56px;display:flex;justify-content:space-between;align-items:center;padding:0 16px;border-bottom:1px solid #1f2937}
+.language-select{background:#020617;color:#e5e7eb;border:1px solid #1f2937;padding:6px;border-radius:6px}
+/* ===== CHAT ===== */
+.chat{flex:1;padding:20px;overflow-y:auto;display:flex;flex-direction:column;gap:8px}
+.message{max-width:70%;padding:12px;border-radius:10px}
+.user{background:#2563eb;align-self:flex-end}
+.bot{background:#111827}
+/* ===== INPUT ===== */
+.input-bar{display:flex;gap:10px;padding:16px;border-top:1px solid #1f2937}
+.input-bar input{flex:1;padding:12px;background:#020617;border:1px solid #1f2937;border-radius:8px;color:#fff}
+.input-bar button{padding:12px 16px;background:#2563eb;border:none;border-radius:8px;cursor:pointer}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="brand">
+    <svg viewBox="0 0 64 64" fill="none">
+      <path d="M32 4C20 4 10 14 10 26v12c0 6 4 10 10 10h2v8l8-8h6c12 0 22-10 22-22S44 4 32 4z" stroke="#38bdf8" stroke-width="3"/>
+      <circle cx="24" cy="28" r="3" fill="#38bdf8"/>
+      <circle cx="40" cy="28" r="3" fill="#38bdf8"/>
+    </svg>
+    <span class="brand-name">BotFusion AI</span>
+  </div>
+  <div class="new-chat" onclick="newChat()">+ New Chat</div>
+  <div class="history" id="history">No chats yet</div>
+  <div class="sidebar-footer">
+    <div onclick="openSettings()">⚙ Settings</div>
+    <div onclick="login()">👤 Account</div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <span>AI Chat</span>
+    <select name="language" id="language">
   <option value="af">Afrikaans</option>
   <option value="sq">Albanian</option>
   <option value="am">Amharic</option>
@@ -207,84 +382,60 @@ window.onAuthStateChanged = onAuthStateChanged;
   <option value="yi">Yiddish</option>
   <option value="yo">Yoruba</option>
   <option value="zu">Zulu</option>
-   </select>
+    </select>
   </div>
 
-  <div class="chat-container" id="chat"></div>
-  <div class="image-area" id="images"></div>
+  <div class="chat" id="chat"></div>
 
-  <div class="input-area">
-    <input id="input" placeholder="Type a message..."/>
-    <button onclick="sendMessage()">Send</button>
-    <button onclick="generateImage()"> Generate Image</button>
+  <div class="input-bar">
+    <input type="text" id="input" placeholder="Message BotFusion..." />
+    <button onclick="sendMessage()">➤</button>
   </div>
 </div>
 
-<!-- Font Awesome for Icons -->
-<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-
-<script type="module">
-// CHAT, IMAGE, FIREBASE FUNCTIONS
+<script>
 const chat = document.getElementById("chat");
 const input = document.getElementById("input");
-const imageDiv = document.getElementById("images");
-let currentUser=null;
-let chats=[], currentChat=null;
+const lang = document.getElementById("lang");
 
-// ------------------- LOGIN -------------------
-window.googleLogin=async function(){
-  try{
-    const result=await signInWithPopup(auth, provider);
-    currentUser=result.user;
-    alert("Welcome "+currentUser.displayName);
-    const userRef=doc(db,"users",currentUser.uid);
-    const snap=await getDoc(userRef);
-    if(!snap.exists()){
-      await setDoc(userRef,{name:currentUser.displayName,email:currentUser.email,photo:currentUser.photoURL,createdAt:new Date()});
-    }
-  }catch(err){console.error(err);alert("Login failed");}
-};
-
-window.logout=async function(){await signOutFirebase(auth);currentUser=null;chats=[];chat.innerHTML="";imageDiv.innerHTML="";alert("Logged out");};
-
-onAuthStateChanged(auth,user=>{if(user)currentUser=user;});
-
-// ------------------- CHAT -------------------
-function addMessage(text,sender){
-  const div=document.createElement("div");
-  div.className="message "+sender;
-  div.innerHTML=text+` <span class="time">${new Date().toLocaleTimeString()}</span>`;
+function addMessage(text, type){
+  const div = document.createElement("div");
+  div.className = "message " + type;
+  div.innerText = text;
   chat.appendChild(div);
-  chat.scrollTop=chat.scrollHeight;
-}
-function newChat(){currentChat={id:Date.now(),messages:[]};chats.push(currentChat);chat.innerHTML="";}
-async function sendMessage(){
-  if(!currentUser){alert("Please login");return;}
-  const text=input.value.trim();
-  if(!text)return;
-  addMessage(text,"user");
-  currentChat.messages.push({text,sender:"user"});
-  input.value="";
-  try{
-    const res=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:text,userId:currentUser.uid,language:document.getElementById("lang").value})});
-    const data=await res.json();
-    addMessage(data.reply,"bot");
-    currentChat.messages.push({text:data.reply,sender:"bot"});
-  }catch(err){console.error(err);addMessage("⚠️ Server error","bot");}
+  chat.scrollTop = chat.scrollHeight;
 }
 
-// ------------------- IMAGE -------------------
-async function generateImage(){
-  if(!currentUser){alert("Please login");return;}
-  const prompt=window.prompt("Enter image description:");
-  if(!prompt)return;
-  try{
-    const res=await fetch("/api/image",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt,userId:currentUser.uid})});
-    const data=await res.json();
-    if(data.url){const img=document.createElement("img");img.src=data.url;img.className="generated-image";imageDiv.appendChild(img);}
-  }catch(err){console.error(err);alert("Error generating image");}
+function saveHistory(text){
+  let history = JSON.parse(localStorage.getItem("botfusion"))||[];
+  history.push(text);
+  localStorage.setItem("botfusion",JSON.stringify(history));
+  document.getElementById("history").innerText = history.slice(-5).join("\n");
 }
-newChat();
+
+function newChat(){
+  chat.innerHTML="";
+}
+
+function sendMessage(){
+  if(!input.value) return;
+  addMessage(input.value,"user");
+  saveHistory("You: "+input.value);
+  const message=input.value;
+  const language=lang.value;
+  input.value="";
+  fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message,language})})
+  .then(r=>r.json())
+  .then(d=>{
+    addMessage(d.reply,"bot");
+    saveHistory("Bot: "+d.reply);
+  }).catch(()=>{addMessage("⚠️ Error connecting to server.","bot")});
+}
+
+function openSettings(){alert("Settings placeholder");}
+function login(){alert("Login placeholder");}
+window.onload=()=>{let h=JSON.parse(localStorage.getItem("botfusion"))||[];if(h.length) document.getElementById("history").innerText=h.slice(-5).join("\n");}
 </script>
+
 </body>
-</html>
+</html> 
