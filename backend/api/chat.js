@@ -1,25 +1,30 @@
-import OpenAI from "openai";
-import { db } from "../lib/db.js";
+const express = require("express");
+const router = express.Router();
+const axios = require("axios");
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
-export default async function handler(req, res) {
+router.post("/", async (req, res) => {
   const { message, userId, language } = req.body;
+  if (!message) return res.status(400).json({ reply: "No message provided" });
 
-  const response = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
-    messages: [
-      { role: "system", content: `Reply in ${language}` },
-      { role: "user", content: message }
-    ]
-  });
+  try {
+    const response = await axios.post(
+      "https://api.openai.com/v1/chat/completions",
+      {
+        model: "gpt-4",
+        messages: [
+          { role: "system", content: "You are a helpful AI assistant." },
+          { role: "user", content: message }
+        ]
+      },
+      { headers: { "Authorization": `Bearer ${process.env.OPENAI_API_KEY}` } }
+    );
 
-  const reply = response.choices[0].message.content;
+    const reply = response.data.choices[0].message.content;
+    res.json({ reply });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ reply: "Error contacting OpenAI API" });
+  }
+});
 
-  db.run(`INSERT INTO chats(user_id, role, message) VALUES (?, 'user', ?)`,
-    [userId, message]);
-  db.run(`INSERT INTO chats(user_id, role, message) VALUES (?, 'assistant', ?)`,
-    [userId, reply]);
-
-  res.json({ reply });
-}
+module.exports = router;
