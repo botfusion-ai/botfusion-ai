@@ -1,384 +1,409 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0f1115">
-<link rel="apple-touch-icon" href="icons/icon-192.png">
-  <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>BotFusion AI</title>
 
-<!-- =========================
-  GLOBAL STYLES
-========================= -->
+<!-- Icons -->
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
 <style>
-:root {
-  --bg: #0f1115;
-  --panel: #16181d;
-  --panel-2: #1c1f26;
-  --border: #2a2d35;
-  --text: #e6e6e6;
-  --muted: #9aa0a6;
-  --accent: #8b8cff;
+:root{
+  --bg:#1e1f22;
+  --panel:#2a2b2f;
+  --panel-2:#202123;
+  --text:#e6e6e6;
+  --muted:#9aa0a6;
+  --accent:#19c37d;
+  --border:#303134;
 }
 
-* {
-  box-sizing: border-box;
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto;
 }
 
-body {
-  margin: 0;
-  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  height: 100vh;
-  display: flex;
-  overflow: hidden;
+/* Layout */
+.app{
+  display:flex;
+  height:100vh;
+  overflow:hidden;
 }
 
-/* =========================
-  SIDEBAR
-========================= */
-.sidebar {
-  width: 280px;
-  background: var(--panel);
-  border-right: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
+/* Sidebar */
+.sidebar{
+  width:280px;
+  background:var(--panel-2);
+  border-right:1px solid var(--border);
+  display:flex;
+  flex-direction:column;
+}
+.sidebar-header{
+  padding:14px;
+}
+.new-chat{
+  width:100%;
+  padding:12px;
+  border-radius:10px;
+  background:var(--panel);
+  border:1px solid var(--border);
+  color:var(--text);
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.history{
+  flex:1;
+  padding:10px;
+  overflow-y:auto;
+}
+.history h4{
+  font-size:12px;
+  color:var(--muted);
+  margin:12px 8px;
+}
+.history-item{
+  padding:10px;
+  border-radius:8px;
+  cursor:pointer;
+}
+.history-item:hover{background:#2f3035}
+
+/* Sidebar Footer */
+.sidebar-footer{
+  padding:10px;
+  border-top:1px solid var(--border);
+}
+.footer-btn{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px;
+  border-radius:8px;
+  cursor:pointer;
+}
+.footer-btn:hover{background:#2f3035}
+
+/* Main */
+.main{
+  flex:1;
+  display:flex;
+  flex-direction:column;
 }
 
-.sidebar-header {
-  padding: 16px;
-  font-size: 20px;
-  font-weight: 700;
+/* Top bar */
+.topbar{
+  height:56px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 16px;
+  border-bottom:1px solid var(--border);
+}
+.brand{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.brand img{
+  width:26px;
+  height:26px;
+}
+.actions{
+  display:flex;
+  gap:10px;
+}
+.icon-btn{
+  background:none;
+  border:none;
+  color:var(--text);
+  cursor:pointer;
 }
 
-.new-chat {
-  margin: 0 16px 12px;
-  padding: 10px;
-  background: var(--panel-2);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  text-align: center;
-  cursor: pointer;
+/* Chat Area */
+.chat{
+  flex:1;
+  padding:20px;
+  overflow-y:auto;
+}
+.center{
+  text-align:center;
+  margin-top:60px;
+}
+.prompt{
+  background:var(--panel);
+  border-radius:12px;
+  padding:14px;
+  margin:12px auto;
+  max-width:500px;
+  text-align:left;
 }
 
-.new-chat:hover {
-  background: #222633;
+/* Input */
+.input-area{
+  padding:12px;
+  border-top:1px solid var(--border);
+}
+.input-box{
+  background:var(--panel);
+  border-radius:14px;
+  padding:10px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.input-box input{
+  flex:1;
+  background:none;
+  border:none;
+  color:var(--text);
+  outline:none;
+}
+.send{
+  background:var(--accent);
+  border:none;
+  border-radius:50%;
+  width:36px;
+  height:36px;
+  cursor:pointer;
 }
 
-.history {
-  flex: 1;
-  overflow-y: auto;
-  padding: 0 10px;
+/* Modal */
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
+  display:none;
+  align-items:center;
+  justify-content:center;
 }
-
-.history h4 {
-  font-size: 12px;
-  color: var(--muted);
-  margin: 14px 10px 6px;
+.modal-content{
+  background:var(--panel);
+  width:90%;
+  max-width:400px;
+  border-radius:14px;
+  padding:20px;
 }
-
-.chat-item {
-  padding: 10px;
-  margin: 6px 6px;
-  border-radius: 8px;
-  cursor: pointer;
-  background: transparent;
-}
-
-.chat-item:hover {
-  background: var(--panel-2);
-}
-
-.sidebar-footer {
-  border-top: 1px solid var(--border);
-  padding: 12px;
-}
-
-.account-btn {
-  width: 100%;
-  padding: 10px;
-  border-radius: 8px;
-  background: var(--panel-2);
-  border: 1px solid var(--border);
-  cursor: pointer;
-}
-
-/* =========================
-  MAIN CHAT AREA
-========================= */
-.main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.topbar {
-  height: 56px;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 16px;
-}
-
-.topbar .title {
-  font-weight: 600;
-}
-
-.topbar .icons span {
-  margin-left: 14px;
-  cursor: pointer;
-}
-
-.messages {
-  flex: 1;
-  overflow-y: auto;
-  padding: 24px 16px;
-}
-
-.message {
-  max-width: 85%;
-  margin-bottom: 14px;
-  padding: 12px 14px;
-  border-radius: 12px;
-  line-height: 1.5;
-}
-
-.message.user {
-  background: #2a2f3a;
-  margin-left: auto;
-}
-
-.message.bot {
-  background: var(--panel-2);
-  border: 1px solid var(--border);
-}
-
-/* =========================
-  INPUT BAR
-========================= */
-.input-area {
-  border-top: 1px solid var(--border);
-  padding: 12px;
-  background: var(--panel);
-}
-
-.input-box {
-  display: flex;
-  align-items: center;
-  background: var(--panel-2);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 10px;
-}
-
-.input-box input {
-  flex: 1;
-  background: transparent;
-  border: none;
-  outline: none;
-  color: var(--text);
-  font-size: 15px;
-}
-
-.input-box button {
-  background: none;
-  border: none;
-  color: var(--accent);
-  font-size: 18px;
-  cursor: pointer;
-  margin-left: 10px;
-}
-
-/* =========================
-  MODALS (Settings / Account)
-========================= */
-.modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.6);
-  display: none;
-  align-items: center;
-  justify-content: center;
-}
-
-.modal-content {
-  background: var(--panel);
-  width: 90%;
-  max-width: 420px;
-  border-radius: 14px;
-  padding: 20px;
-  border: 1px solid var(--border);
-}
-
-.modal h3 {
-  margin-top: 0;
-}
-
-.modal button {
-  width: 100%;
-  padding: 10px;
-  margin-top: 10px;
-  border-radius: 8px;
-  background: var(--panel-2);
-  border: 1px solid var(--border);
-  color: var(--text);
-  cursor: pointer;
-}
-
-/* =========================
-  MOBILE
-========================= */
-@media (max-width: 900px) {
-  .sidebar {
-    display: none;
-  }
+.modal h3{margin-top:0}
+.modal button{
+  width:100%;
+  margin-top:10px;
+  padding:10px;
+  background:var(--accent);
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
 }
 </style>
 </head>
 
 <body>
 
-<!-- =========================
-  SIDEBAR
-========================= -->
-<div class="sidebar">
-  <div class="sidebar-header">BotFusion</div>
+<div class="app">
 
-  <div class="new-chat" onclick="newChat()">＋ New Chat</div>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <button class="new-chat" onclick="newChat()">
+        <span class="material-icons">edit</span> New chat
+      </button>
+    </div>
 
-  <div class="history">
-    <h4>Today</h4>
-    <div class="chat-item">BotFusion AI</div>
+    <div class="history">
+      <h4>TODAY</h4>
+      <div class="history-item">Explain quantum computing</div>
+      <h4>PREVIOUS 7 DAYS</h4>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="footer-btn" onclick="openSettings()">
+        <span class="material-icons">settings</span> Settings
+      </div>
+      <div class="footer-btn" onclick="openProfile()">
+        <span class="material-icons">account_circle</span> Account
+      </div>
+    </div>
   </div>
 
-  <div class="sidebar-footer">
-    <button class="account-btn" onclick="openAccount()">Account</button>
+  <!-- Main -->
+  <div class="main">
+    <div class="topbar">
+      <div class="brand">
+        <img src="logo.svg" alt="logo">
+        <strong>BotFusion</strong>
+      </div>
+      <div class="actions">
+        <select id="languageSelect">
+          <option value="auto">🌐 Auto</option>
+          <option value="af">Afrikaans</option>
+<option value="sq">Albanian</option>
+<option value="am">Amharic</option>
+<option value="ar">Arabic</option>
+<option value="hy">Armenian</option>
+<option value="az">Azerbaijani</option>
+<option value="eu">Basque</option>
+<option value="be">Belarusian</option>
+<option value="bn">Bengali</option>
+<option value="bs">Bosnian</option>
+<option value="bg">Bulgarian</option>
+<option value="my">Burmese</option>
+<option value="ca">Catalan</option>
+<option value="ceb">Cebuano</option>
+<option value="zh">Chinese</option>
+<option value="co">Corsican</option>
+<option value="hr">Croatian</option>
+<option value="cs">Czech</option>
+<option value="da">Danish</option>
+<option value="nl">Dutch</option>
+<option value="en">English</option>
+<option value="eo">Esperanto</option>
+<option value="et">Estonian</option>
+<option value="fi">Finnish</option>
+<option value="fr">French</option>
+<option value="fy">Frisian</option>
+<option value="gl">Galician</option>
+<option value="ka">Georgian</option>
+<option value="de">German</option>
+<option value="el">Greek</option>
+<option value="gu">Gujarati</option>
+<option value="ht">Haitian Creole</option>
+<option value="ha">Hausa</option>
+<option value="haw">Hawaiian</option>
+<option value="he">Hebrew</option>
+<option value="hi">Hindi</option>
+<option value="hmn">Hmong</option>
+<option value="hu">Hungarian</option>
+<option value="is">Icelandic</option>
+<option value="ig">Igbo</option>
+<option value="id">Indonesian</option>
+<option value="ga">Irish</option>
+<option value="it">Italian</option>
+<option value="ja">Japanese</option>
+<option value="jw">Javanese</option>
+<option value="kn">Kannada</option>
+<option value="kk">Kazakh</option>
+<option value="km">Khmer</option>
+<option value="rw">Kinyarwanda</option>
+<option value="ko">Korean</option>
+<option value="ku">Kurdish</option>
+<option value="ky">Kyrgyz</option>
+<option value="lo">Lao</option>
+<option value="la">Latin</option>
+<option value="lv">Latvian</option>
+<option value="lt">Lithuanian</option>
+<option value="lb">Luxembourgish</option>
+<option value="mk">Macedonian</option>
+<option value="mg">Malagasy</option>
+<option value="ms">Malay</option>
+<option value="ml">Malayalam</option>
+<option value="mt">Maltese</option>
+<option value="mi">Maori</option>
+<option value="mr">Marathi</option>
+<option value="mn">Mongolian</option>
+<option value="ne">Nepali</option>
+<option value="no">Norwegian</option>
+<option value="or">Odia</option>
+<option value="ps">Pashto</option>
+<option value="fa">Persian</option>
+<option value="pl">Polish</option>
+<option value="pt">Portuguese</option>
+<option value="pa">Punjabi</option>
+<option value="ro">Romanian</option>
+<option value="ru">Russian</option>
+<option value="sm">Samoan</option>
+<option value="gd">Scots Gaelic</option>
+<option value="sr">Serbian</option>
+<option value="st">Sesotho</option>
+<option value="sn">Shona</option>
+<option value="sd">Sindhi</option>
+<option value="si">Sinhala</option>
+<option value="sk">Slovak</option>
+<option value="sl">Slovenian</option>
+<option value="so">Somali</option>
+<option value="es">Spanish</option>
+<option value="su">Sundanese</option>
+<option value="sw">Swahili</option>
+<option value="sv">Swedish</option>
+<option value="ta">Tamil</option>
+<option value="te">Telugu</option>
+<option value="th">Thai</option>
+<option value="tr">Turkish</option>
+<option value="uk">Ukrainian</option>
+<option value="ur">Urdu</option>
+<option value="uz">Uzbek</option>
+<option value="vi">Vietnamese</option>
+<option value="cy">Welsh</option>
+<option value="xh">Xhosa</option>
+<option value="yi">Yiddish</option>
+<option value="yo">Yoruba</option>
+<option value="zu">Zulu</option>
+        </select>
+        <button class="icon-btn" onclick="startVoice()">
+          <span class="material-icons">mic</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="chat">
+      <div class="center">
+        <img src="logo.svg" width="60"><br><br>
+        <h2>How can I help you today?</h2>
+        <div class="prompt">Explain quantum computing in simple terms</div>
+        <div class="prompt">Write a creative story about a robot</div>
+        <div class="prompt">Help me debug my code</div>
+      </div>
+    </div>
+
+    <div class="input-area">
+      <div class="input-box">
+        <span class="material-icons">attach_file</span>
+        <input type="text" placeholder="Message BotFusion...">
+        <button class="send">
+          <span class="material-icons">arrow_upward</span>
+        </button>
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- =========================
-  MAIN
-========================= -->
-<div class="main">
-
-  <div class="topbar">
-    <div class="title">BotFusion AI</div>
-    <div class="icons">
-      <span onclick="openSettings()">⚙️</span>
-      <span>🌐</span>
-      <span>🎤</span>
-    </div>
+<!-- Profile Modal -->
+<div class="modal" id="profileModal">
+  <div class="modal-content">
+    <h3>Account</h3>
+    <p>User: Guest</p>
+    <button onclick="closeModal('profileModal')">Close</button>
   </div>
-
-  <div class="messages" id="messages">
-    <div class="message bot">
-      Hello 👋 I’m BotFusion AI.<br>
-      I can chat, generate images, search the web, and speak multiple languages.
-    </div>
-  </div>
-
-  <div class="input-area">
-    <div class="input-box">
-      <input id="userInput" placeholder="Message BotFusion…" />
-      <button onclick="sendMessage()">➤</button>
-    </div>
-  </div>
-
 </div>
 
-<!-- =========================
-  SETTINGS MODAL
-========================= -->
+<!-- Settings Modal -->
 <div class="modal" id="settingsModal">
   <div class="modal-content">
     <h3>Settings</h3>
-    <button>Language (Auto)</button>
-    <button>Voice Output</button>
-    <button>Theme: Dark</button>
-    <button onclick="closeSettings()">Close</button>
+    <p>Theme: Dark</p>
+    <button onclick="closeModal('settingsModal')">Close</button>
   </div>
 </div>
 
-<!-- =========================
-  ACCOUNT MODAL
-========================= -->
-<div class="modal" id="accountModal">
-  <div class="modal-content">
-    <h3>Account</h3>
-    <button>Login</button>
-    <button>Sign Up</button>
-    <button>Google Login</button>
-    <button onclick="closeAccount()">Close</button>
-  </div>
-</div>
-
-<!-- =========================
-  SCRIPT
-========================= -->
 <script>
-const messages = document.getElementById("messages");
-const input = document.getElementById("userInput");
-
-function addMessage(text, sender) {
-  const div = document.createElement("div");
-  div.className = "message " + sender;
-  div.innerHTML = text;
-  messages.appendChild(div);
-  messages.scrollTop = messages.scrollHeight;
+function openProfile(){
+  document.getElementById("profileModal").style.display="flex";
 }
-
-async function sendMessage() {
-  const text = input.value.trim();
-  if (!text) return;
-
-  addMessage(text, "user");
-  input.value = "";
-
-  addMessage("Thinking…", "bot");
-  const botMsg = messages.lastChild;
-
-  try {
-    const res = await fetch("/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: text })
-    });
-    const data = await res.json();
-    botMsg.innerHTML = data.reply;
-  } catch {
-    botMsg.innerHTML = "⚠️ Backend not connected.";
-  }
+function openSettings(){
+  document.getElementById("settingsModal").style.display="flex";
 }
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("service-worker.js");
-  });
+function closeModal(id){
+  document.getElementById(id).style.display="none";
 }
-function newChat() {
-  messages.innerHTML = "";
-  addMessage("New chat started ✨", "bot");
+function newChat(){
+  alert("New chat started");
 }
-
-function openSettings() {
-  document.getElementById("settingsModal").style.display = "flex";
+function startVoice(){
+  alert("Voice input started (browser supported)");
 }
-function closeSettings() {
-  document.getElementById("settingsModal").style.display = "none";
-}
-
-function openAccount() {
-  document.getElementById("accountModal").style.display = "flex";
-}
-function closeAccount() {
-  document.getElementById("accountModal").style.display = "none";
-}
-
-input.addEventListener("keydown", e => {
-  if (e.key === "Enter") sendMessage();
-});
 </script>
 
 </body>
