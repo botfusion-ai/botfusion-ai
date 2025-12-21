@@ -1,25 +1,43 @@
-const express = require("express");
-const cors = require("cors");
-const path = require("path");
+import OpenAI from "openai";
 
-const chatRoute = require("./api/chat");
-const imageRoute = require("./api/image");
-
-const app = express();
-app.use(cors());
-app.use(express.json());
-
-// Serve frontend from docs/
-app.use(express.static(path.join(__dirname, "../docs")));
-
-// API routes
-app.use("/api/chat", chatRoute);
-app.use("/api/image", imageRoute);
-
-// SPA fallback
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../docs/index.html"));
+const client = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+export default async function handler(req, res) {
+  // Allow only POST
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  try {
+    const { message } = req.body;
+
+    if (!message) {
+      return res.status(400).json({ error: "Message is required" });
+    }
+
+    const response = await client.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are BotFusion AI, a professional, intelligent, helpful assistant.",
+        },
+        {
+          role: "user",
+          content: message,
+        },
+      ],
+      temperature: 0.7,
+    });
+
+    res.status(200).json({
+      reply: response.choices[0].message.content,
+    });
+  } catch (error) {
+    console.error("BotFusion Error:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+}
