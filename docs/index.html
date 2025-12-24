@@ -185,7 +185,28 @@ body{
 <div class="footer">
   BotFusion can make mistakes. Consider checking important information.
 </div>
+<script>
+function openPanel(panelId) {
+  document.querySelectorAll(".panel").forEach(p => {
+    p.classList.remove("show");
+  });
 
+  const panel = document.getElementById(panelId);
+  panel.classList.add("show");
+}
+
+document.getElementById("btnProfile").addEventListener("click", () => {
+  openPanel("profilePanel");
+});
+
+document.getElementById("btnSettings").addEventListener("click", () => {
+  openPanel("settingsPanel");
+});
+
+document.getElementById("btnHistory").addEventListener("click", () => {
+  openPanel("historyPanel");
+});
+</script>
 <script>
 function toggleDrawer(){
   document.getElementById("drawer").classList.toggle("open");
