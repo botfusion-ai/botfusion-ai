@@ -1,217 +1,262 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>BotFusion</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BotFusion</title>
 
-<link rel="manifest" href="manifest.json">
+  <!-- Remix Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
 
-<style>
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, Arial, sans-serif;
+      background: #0d0d0d;
+      color: #fff;
+    }
 
-*{box-sizing:border-box;margin:0;padding:0;font-family:Inter,system-ui,-apple-system;}
+    /* TOP HEADER */
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 16px;
+      background: #1dbf73;
+      font-weight: 600;
+      font-size: 18px;
+    }
 
-body{
-  background:#111;
-  color:white;
-}
+    .header button {
+      background: none;
+      border: none;
+      font-size: 22px;
+      color: #fff;
+    }
 
-/* HEADER */
-.header{
-  height:56px;
-  background:#0ead8c;
-  display:flex;
-  align-items:center;
-  padding:0 14px;
-  gap:10px;
-}
-.panel {
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 92%;
-  height: 100%;
-  background: #111;
-  color: #fff;
-  padding: 16px;
-  transform: translateX(100%);
-  transition: 0.25s ease;
-  z-index: 50;
-  overflow-y: auto;
-}
+    /* SIDE MENU */
+    .drawer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 75%;
+      height: 100%;
+      background: #121212;
+      padding: 18px;
+      transform: translateX(-100%);
+      transition: .25s;
+      z-index: 100;
+    }
 
-.panel.show {
-  transform: translateX(0);
-}
+    .drawer.show {
+      transform: translateX(0);
+    }
 
-.hidden {
-  display: none;
-}
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.6);
+      display: none;
+      z-index: 90;
+    }
 
-.icon-btn {
-  background: none;
-  border: none;
-  font-size: 22px;
-}
-.menu-btn{
-  font-size:26px;
-  cursor:pointer;
-}
+    .overlay.show {
+      display: block;
+    }
 
-.logo{
-  font-weight:700;
-  font-size:18px;
-}
+    .menu-item {
+      padding: 14px 0;
+      border-bottom: 1px solid #2b2b2b;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
 
-/* DRAWER */
-.drawer{
-  position:fixed;
-  top:0;left:-260px;
-  width:260px;
-  height:100%;
-  background:#0f0f0f;
-  border-right:1px solid #2a2a2a;
-  transition:.25s;
-  padding:14px;
-}
+    /* MAIN CONTENT */
+    .main {
+      padding: 16px;
+      text-align: center;
+    }
 
-.drawer.open{left:0;}
+    .suggestion {
+      background: #1b1b1b;
+      padding: 14px;
+      border-radius: 10px;
+      margin: 10px 0;
+    }
 
-.drawer-section{
-  margin-top:20px;
-}
+    /* FOOTER CHAT INPUT */
+    .chat-box {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      padding: 10px;
+      background: #0d0d0d;
+      display: flex;
+      gap: 10px;
+    }
 
-.drawer-item{
-  padding:12px 10px;
-  border-radius:10px;
-  background:#181818;
-  margin-bottom:8px;
-  cursor:pointer;
-}
+    .chat-box input {
+      flex: 1;
+      padding: 12px;
+      border-radius: 20px;
+      border: none;
+      outline: none;
+      background: #1c1c1c;
+      color: white;
+    }
 
-/* MAIN */
-.main{
-  padding:18px;
-  margin-top:20px;
-  text-align:center;
-}
+    .chat-box button {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: none;
+      background: #5c8dff;
+      color: white;
+      font-size: 18px;
+    }
 
-.suggestions{
-  margin-top:16px;
-}
+    /* SLIDE PANELS (Profile / Settings / History) */
+    .panel {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 92%;
+      height: 100%;
+      background: #111;
+      padding: 16px;
+      transform: translateX(100%);
+      transition: .25s;
+      z-index: 120;
+      overflow-y: auto;
+    }
 
-.card{
-  background:#1a1a1a;
-  padding:14px;
-  border-radius:12px;
-  margin:10px 0;
-  text-align:left;
-  font-size:15px;
-}
+    .panel.show {
+      transform: translateX(0);
+    }
 
-/* CHAT BAR */
-.chatbar{
-  position:fixed;
-  bottom:10px;
-  left:10px;
-  right:10px;
-  display:flex;
-  gap:10px;
-  padding:8px 12px;
-  border-radius:30px;
-  background:#1a1a1a;
-  align-items:center;
-}
-
-.chatbar input{
-  flex:1;
-  background:transparent;
-  border:none;
-  color:white;
-  outline:none;
-}
-
-.send{
-  background:#4e8cf7;
-  border:none;
-  padding:10px 14px;
-  border-radius:20px;
-}
-
-.footer{
-  text-align:center;
-  font-size:12px;
-  opacity:.6;
-  padding:70px 20px 20px;
-}
-
-</style>
+    .close-panel {
+      font-size: 22px;
+      background: none;
+      border: none;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+  </style>
 </head>
 
 <body>
 
-<div class="header">
-  <div class="menu-btn" onclick="toggleDrawer()">☰</div>
-  <div class="logo">BotFusion</div>
-</div>
-
-<div class="drawer" id="drawer">
-
-  <div class="drawer-section">
-    <div class="drawer-item">New chat</div>
-    <div class="drawer-item">History</div>
-    <div class="drawer-item">Settings</div>
-    <div class="drawer-item">Account</div>
+  <!-- HEADER -->
+  <div class="header">
+    <button id="btnMenu"><i class="ri-menu-line"></i></button>
+    BotFusion
   </div>
 
-</div>
+  <!-- OVERLAY -->
+  <div id="overlay" class="overlay"></div>
 
-<div class="main">
-  <h2>How can I help you today?</h2>
+  <!-- DRAWER (Hamburger Menu) -->
+  <div id="drawer" class="drawer">
 
-  <div class="suggestions">
-    <div class="card">Explain quantum computing in simple terms</div>
-    <div class="card">Write a creative story about a robot</div>
-    <div class="card">Help me debug my code</div>
-    <div class="card">What’s the best way to learn a new language?</div>
+    <div class="menu-item" id="btnProfile">
+      <i class="ri-user-line"></i> Profile
+    </div>
+
+    <div class="menu-item" id="btnSettings">
+      <i class="ri-settings-3-line"></i> Settings
+    </div>
+
+    <div class="menu-item" id="btnHistory">
+      <i class="ri-time-line"></i> Chat History
+    </div>
+
   </div>
-</div>
 
-<div class="chatbar">
-  <input placeholder="Message BotFusion...">
-  <button class="send">↑</button>
-</div>
+  <!-- MAIN -->
+  <div class="main">
+    <h2>How can I help you today?</h2>
 
-<div class="footer">
-  BotFusion can make mistakes. Consider checking important information.
-</div>
-<script>
-function openPanel(panelId) {
-  document.querySelectorAll(".panel").forEach(p => {
-    p.classList.remove("show");
-  });
+    <div class="suggestion">Explain quantum computing in simple terms</div>
+    <div class="suggestion">Write a creative story about a robot</div>
+    <div class="suggestion">Help me debug my code</div>
+    <div class="suggestion">What’s the best way to learn a new language?</div>
 
-  const panel = document.getElementById(panelId);
-  panel.classList.add("show");
-}
+    <p style="margin-top: 20px;color:#999;">
+      BotFusion can make mistakes. Consider checking important information.
+    </p>
+  </div>
 
-document.getElementById("btnProfile").addEventListener("click", () => {
-  openPanel("profilePanel");
-});
+  <!-- BOTTOM CHAT -->
+  <div class="chat-box">
+    <input placeholder="Message BotFusion..." />
+    <button><i class="ri-arrow-up-line"></i></button>
+  </div>
 
-document.getElementById("btnSettings").addEventListener("click", () => {
-  openPanel("settingsPanel");
-});
+  <!-- PANELS -->
+  <div id="profilePanel" class="panel">
+    <button class="close-panel" onclick="closePanels()"><i class="ri-close-line"></i></button>
+    <h2>Profile</h2>
+    <p>Google login coming soon.</p>
+  </div>
 
-document.getElementById("btnHistory").addEventListener("click", () => {
-  openPanel("historyPanel");
-});
-</script>
-<script>
-function toggleDrawer(){
-  document.getElementById("drawer").classList.toggle("open");
-}
-</script>
+  <div id="settingsPanel" class="panel">
+    <button class="close-panel" onclick="closePanels()"><i class="ri-close-line"></i></button>
+    <h2>Settings</h2>
+    <p>Dark mode, language & more coming soon.</p>
+  </div>
+
+  <div id="historyPanel" class="panel">
+    <button class="close-panel" onclick="closePanels()"><i class="ri-close-line"></i></button>
+    <h2>Chat history</h2>
+    <p>Saved chats will appear here.</p>
+  </div>
+
+
+  <script>
+    const drawer = document.getElementById("drawer");
+    const overlay = document.getElementById("overlay");
+
+    // OPEN MENU
+    document.getElementById("btnMenu").addEventListener("click", () => {
+      drawer.classList.add("show");
+      overlay.classList.add("show");
+    });
+
+    // CLOSE WHEN CLICK OUTSIDE
+    overlay.addEventListener("click", () => {
+      drawer.classList.remove("show");
+      overlay.classList.remove("show");
+    });
+
+    /* PANELS */
+    function closePanels() {
+      document.querySelectorAll(".panel").forEach(p => p.classList.remove("show"));
+    }
+
+    document.getElementById("btnProfile").addEventListener("click", () => {
+      closePanels();
+      drawer.classList.remove("show");
+      overlay.classList.remove("show");
+      document.getElementById("profilePanel").classList.add("show");
+    });
+
+    document.getElementById("btnSettings").addEventListener("click", () => {
+      closePanels();
+      drawer.classList.remove("show");
+      overlay.classList.remove("show");
+      document.getElementById("settingsPanel").classList.add("show");
+    });
+
+    document.getElementById("btnHistory").addEventListener("click", () => {
+      closePanels();
+      drawer.classList.remove("show");
+      overlay.classList.remove("show");
+      document.getElementById("historyPanel").classList.add("show");
+    });
+  </script>
 
 </body>
 </html>
