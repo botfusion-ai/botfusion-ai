@@ -8,10 +8,7 @@ It is inspired by professional AI tools but built step-by-step for learning, exp
 
 ## 🚀 Live Demo
 
-(Add your live link here once deployed)
-
-```
-https://your-domain-or-vercel-url
+hhtps://botfusion-ai.github.io
 ```
 
 ---
@@ -218,9 +215,7 @@ Open an issue or PR any time.
 
 ## 🛡️ License
 
-This project is for learning & personal use.  
-Commercial use at your own risk.
-
+#APACHE 2.0 LICENSE
 ---
 
 ### ⭐ If you like BotFusion AI — give the repo a star!
