@@ -6,229 +6,206 @@
 <title>BotFusion — v1</title>
 
 <style>
+*{box-sizing:border-box;font-family:system-ui,-apple-system,Segoe UI,Roboto}
 body{
   margin:0;
-  font-family:system-ui, Arial;
-  background:#0f1220;
-  color:#e9ecf5;
-}
-
-header{
-  background:#151a2f;
-  padding:10px 16px;
+  background:#0c0f14;
+  color:#e7ecf5;
   display:flex;
-  align-items:center;
-  justify-content:space-between;
-  border-bottom:1px solid #1f2546;
+  height:100vh;
 }
 
-header h1{font-size:16px;margin:0}
+/* Sidebar */
+.sidebar{
+  width:260px;
+  background:#0f141c;
+  border-right:1px solid #1d2330;
+  padding:18px;
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+}
+
+.sidebar h2{
+  margin:0;
+  font-size:20px;
+}
+
+.card{
+  background:#101725;
+  border:1px solid #1f2a3d;
+  padding:14px;
+  border-radius:10px;
+}
+
+/* Header / Top bar */
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:14px 18px;
+  border-bottom:1px solid #1d2330;
+}
 
 button{
-  cursor:pointer;
-  border:none;
-  border-radius:6px;
-  padding:8px 12px;
-}
-
-#googleBtn{
-  background:#fff;
-  color:#000;
-}
-
-#logoutBtn{
-  background:#303a6b;
+  background:#1e2a44;
   color:#fff;
-  display:none;
+  border:none;
+  padding:10px 14px;
+  border-radius:8px;
+  cursor:pointer;
 }
+button:hover{background:#26365a}
 
-.container{
-  display:flex;
-  height:calc(100vh - 56px);
-}
-
-.sidebar{
-  width:250px;
-  background:#11152a;
-  border-right:1px solid #1f2546;
-  padding:10px;
-}
-
-.sidebar h3{margin-top:10px;font-size:14px;color:#9ea7d9}
-
-.chat-area{
+/* Main area */
+.main{
   flex:1;
   display:flex;
   flex-direction:column;
 }
 
-.messages{
+.chat-area{
   flex:1;
-  padding:16px;
   overflow-y:auto;
+  padding:18px;
 }
 
-.message{
-  margin-bottom:10px;
-  padding:10px;
-  border-radius:10px;
-  max-width:80%;
-}
-
-.me{background:#2f3570;margin-left:auto}
-.bot{background:#1d2347}
-
-.typing{
-  display:none;
-  margin:0 0 14px 0;
-  color:#9ea7d9;
-  font-size:13px;
-}
-
-.input-row{
-  padding:10px;
-  border-top:1px solid #1f2546;
+.message-box{
+  border-top:1px solid #1d2330;
+  padding:14px;
   display:flex;
   gap:10px;
 }
 
-.input-row input{
+input{
   flex:1;
-  padding:10px;
+  padding:12px;
   border-radius:8px;
-  border:1px solid #2c3361;
-  background:#0f1220;
+  border:1px solid #2b3650;
+  background:#0f141c;
   color:#fff;
 }
 
-.input-row input:focus{outline:none;border-color:#5865f2}
-
-.send-btn{
-  background:#5865f2;
-  color:#fff;
+footer{
+  text-align:center;
+  font-size:12px;
+  color:#8994aa;
+  padding:10px;
 }
 </style>
 </head>
 
 <body>
 
-<header>
-  <h1>BotFusion — v1</h1>
+<!-- Sidebar -->
+<div class="sidebar">
+  <h2>BotFusion — v1</h2>
 
-  <div>
-    <button id="googleBtn">Sign in with Google</button>
-    <button id="logoutBtn">Logout</button>
-  </div>
-</header>
-
-<div class="container">
-  <div class="sidebar">
-    <h3>About</h3>
-    <p style="font-size:13px;color:#c9cee9">
-      BotFusion v1 — personal AI assistant.<br><br>
-      License: MIT<br>
-      Version: 1.0.0<br>
-      Built with Firebase Auth + Web.
-    </p>
+  <div class="card">
+    <strong>About</strong><br><br>
+    BotFusion — personal AI assistant.<br><br>
+    Version: 1.0.0<br>
+    Built with Firebase Auth + Web.
   </div>
 
-  <div class="chat-area">
-    <div class="messages" id="messages"></div>
-
-    <div class="typing" id="typingIndicator">
-      Bot is typing…
-    </div>
-
-    <div class="input-row">
-      <input id="userInput" placeholder="Type a message..." />
-      <button class="send-btn" id="sendBtn">Send</button>
-    </div>
+  <div class="card" id="profileCard">
+    <strong>Profile</strong><br><br>
+    <span id="userName">Not logged in</span><br>
+    <span id="userEmail" style="font-size:12px;color:#9fadce;"></span>
   </div>
+
+  <button id="logoutBtn" style="display:none;">Log out</button>
+</div>
+
+<!-- Main -->
+<div class="main">
+  <div class="header">
+    <span></span>
+    <button id="loginBtn">Sign in with Google</button>
+  </div>
+
+  <div class="chat-area" id="chat">
+    <p style="color:#9fadce;">Welcome to BotFusion! Sign in to start.</p>
+  </div>
+
+  <div class="message-box">
+    <input id="msg" placeholder="Type a message..." disabled />
+    <button disabled id="sendBtn">Send</button>
+  </div>
+
+  <footer>BotFusion © 2025</footer>
 </div>
 
 <!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-
-<script>
-// TODO: REPLACE WITH YOUR FIREBASE CONFIG
-const firebaseConfig = {
-  apiKey: "AIzaSyDA62eN5MEjX9Z-gw6w9UuR8L-Ke_6J7eE",
+<script type="module">
+  // 🔥 REPLACE WITH YOUR FIREBASE CONFIG
+  // Copy from Firebase ➜ Project Settings ➜ Web App
+  const firebaseConfig = {
+    apiKey: "AIzaSyDA62eN5MEjX9Z-gw6w9UuR8L-Ke_6J7eE",
   authDomain: "botfusion-ai-bd6d0.firebaseapp.com",
   projectId: "botfusion-ai-bd6d0",
   storageBucket: "botfusion-ai-bd6d0.firebasestorage.app",
   messagingSenderId: "730477136598",
   appId: "1:730477136598:web:c6b4e0d495744d12079777"
-};
+  };
 
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { 
+    getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged 
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-// GOOGLE PROVIDER
-const provider = new firebase.auth.GoogleAuthProvider();
-provider.setCustomParameters({
-  client_id: "730477136598-2oqsl0hv4srn6rll9e41dfvdruhej9th.apps.googleusercontent.com"
-});
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const provider = new GoogleAuthProvider();
 
-// UI ELEMENTS
-const googleBtn = document.getElementById("googleBtn");
-const logoutBtn = document.getElementById("logoutBtn");
-const messages = document.getElementById("messages");
-const typingIndicator = document.getElementById("typingIndicator");
-const input = document.getElementById("userInput");
-const sendBtn = document.getElementById("sendBtn");
+  const loginBtn = document.getElementById("loginBtn");
+  const logoutBtn = document.getElementById("logoutBtn");
+  const userName = document.getElementById("userName");
+  const userEmail = document.getElementById("userEmail");
+  const msg = document.getElementById("msg");
+  const sendBtn = document.getElementById("sendBtn");
+  const chat = document.getElementById("chat");
 
-// AUTH EVENTS
-googleBtn.onclick = async () => {
-  try {
-    await auth.signInWithPopup(provider);
-  } catch (e) { alert(e.message); }
-};
+  loginBtn.onclick = async () => {
+    await signInWithPopup(auth, provider).catch(console.error);
+  };
 
-logoutBtn.onclick = () => auth.signOut();
+  logoutBtn.onclick = async () => {
+    await signOut(auth);
+  };
 
-auth.onAuthStateChanged(user => {
-  if (user) {
-    googleBtn.style.display = "none";
-    logoutBtn.style.display = "inline-block";
-    addMessage("bot","Welcome, " + (user.displayName || "User") + " 👋");
-  } else {
-    googleBtn.style.display = "inline-block";
-    logoutBtn.style.display = "none";
-    addMessage("bot","You are logged out.");
-  }
-});
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      userName.textContent = user.displayName;
+      userEmail.textContent = user.email;
 
-// CHAT
-sendBtn.onclick = sendMessage;
-input.addEventListener("keydown", e => { if(e.key==="Enter") sendMessage(); });
+      loginBtn.style.display = "none";
+      logoutBtn.style.display = "block";
 
-function sendMessage(){
-  const text = input.value.trim();
-  if(!text) return;
-  addMessage("me", text);
-  input.value = "";
-  showTyping(true);
+      msg.disabled = false;
+      sendBtn.disabled = false;
+    } else {
+      userName.textContent = "Not logged in";
+      userEmail.textContent = "";
 
-  // fake bot reply
-  setTimeout(()=>{
-    showTyping(false);
-    addMessage("bot","This is a demo reply for: " + text);
-  }, 1200);
-}
+      loginBtn.style.display = "block";
+      logoutBtn.style.display = "none";
 
-function addMessage(type, text){
-  const div = document.createElement("div");
-  div.className = "message " + type;
-  div.innerText = text;
-  messages.appendChild(div);
-  messages.scrollTop = messages.scrollHeight;
-}
+      msg.disabled = true;
+      sendBtn.disabled = true;
+    }
+  });
 
-function showTyping(state){
-  typingIndicator.style.display = state ? "block" : "none";
-}
+  sendBtn.onclick = () => {
+    const text = msg.value.trim();
+    if (!text) return;
+
+    const p = document.createElement("p");
+    p.textContent = "You: " + text;
+    chat.appendChild(p);
+
+    msg.value = "";
+  };
 </script>
-
 </body>
 </html>
