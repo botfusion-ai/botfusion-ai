@@ -1,11 +1,10 @@
 {
   "name": "BotFusion AI",
   "short_name": "BotFusion",
-  "description": "Your intelligent AI assistant — chat, generate images, code, summarize, and more.",
-  "start_url": "/index.html",
+  "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#121212",
-  "theme_color": "#00a77b",
+  "background_color": "#000000",
+  "theme_color": "#0f0f0f",
   "icons": [
     {
       "src": "icons/logo-192.png",
