@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"></script>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>BotFusion</title>
@@ -259,15 +261,53 @@ select{
 </div>
 
 <!-- ABOUT PANEL -->
-<div class="panel" id="aboutPanel">
-  <header>About BotFusion</header>
+<div class="panel" id="profilePanel">
+  <header>Profile</header>
   <div class="content">
-    <p>Version: 1.0</p>
-    <p>Built with HTML + CSS + JS.</p>
-    <p>All rights reserved.</p>
+    <p>You are not logged in</p>
+    <button onclick="googleLogin()">Login with Google</button>
   </div>
 </div>
+<script>
+  // Initialize Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyDA62eN5MEjX9Z-gw6w9UuR8L-Ke_6J7eE",
+  authDomain: "botfusion-ai-bd6d0.firebaseapp.com",
+  projectId: "botfusion-ai-bd6d0",
+  storageBucket: "botfusion-ai-bd6d0.firebasestorage.app",
+  messagingSenderId: "730477136598",
+  appId: "1:730477136598:web:c6b4e0d495744d12079777",
+  measurementId: "G-53FTWNQB8X"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const provider = new firebase.auth.GoogleAuthProvider();
 
+  function googleLogin() {
+    auth.signInWithPopup(provider)
+      .then((res) => {
+        const user = res.user;
+        document.querySelector("#profilePanel .content").innerHTML = `
+          <p><b>Logged in</b></p>
+          <p>Name: ${user.displayName}</p>
+          <p>Email: ${user.email}</p>
+          <img src="${user.photoURL}" width="70" style="border-radius:50%;margin-top:10px;">
+          <br><br>
+          <button onclick="logout()">Logout</button>
+        `;
+      })
+      .catch(err => alert(err.message));
+  }
+
+  function logout() {
+    auth.signOut().then(() => {
+      document.querySelector("#profilePanel .content").innerHTML = `
+        <p>You are not logged in</p>
+        <button onclick="googleLogin()">Login with Google</button>
+      `;
+    });
+  }
+</script>
 <script>
 // BASIC CHAT
 function send(){
