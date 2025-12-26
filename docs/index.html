@@ -10,110 +10,106 @@
 <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-auth-compat.js"></script>
 
 <style>
-/* BODY & GENERAL */
+/* ================= BODY ================= */
 body {
-  background-color: #1e1e2f;
-  color: #e0e0e0;
-  font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #2a2a2a; /* Dark grey */
+  color: #e0e0e0;
   transition: all 0.3s ease;
 }
 
-/* HEADER */
+/* ================ HEADER ================= */
 header {
-  background-color: #2a2a3d;
-  color: #ffffff;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  background-color: #1f1f1f;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 20px;
-  position: fixed;
-  top: 0;
-  width: 100%;
+  padding: 0 20px;
   z-index: 1000;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.5);
 }
 
 #menuBtn {
-  font-size: 24px;
+  font-size: 28px;
   cursor: pointer;
   background: none;
   border: none;
-  color: #ffffff;
+  color: #fff;
 }
 
-header button {
-  background-color: #505070;
-  color: #ffffff;
+header .right-buttons button {
+  background: #2c2c2c;
+  color: #fff;
   border: none;
   padding: 8px 12px;
+  border-radius: 6px;
   margin-left: 10px;
-  border-radius: 5px;
   cursor: pointer;
 }
 
-header button:hover {
-  background-color: #606090;
-}
+header .right-buttons button:hover { background: #444; }
 
-/* SIDEBAR */
+/* =============== SIDEBAR ================ */
 #sidebar {
-  background-color: #2a2a3d;
-  color: #e0e0e0;
-  width: 250px;
-  height: 100vh;
   position: fixed;
   top: 0;
   left: -260px;
-  transition: left 0.3s ease;
+  width: 260px;
+  height: 100%;
+  background-color: #1b1b1b;
   padding-top: 60px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
+  transition: left 0.3s ease;
   z-index: 999;
 }
 
 #sidebar.active { left: 0; }
 
 #sidebar button {
-  background-color: #3a3a50;
+  background-color: #2a2a3d;
   color: #e0e0e0;
   border: none;
-  padding: 10px 15px;
+  padding: 12px 20px;
   text-align: left;
-  width: 90%;
   cursor: pointer;
-  border-radius: 5px;
+  border-radius: 8px;
   margin: 0 auto;
+  width: 90%;
 }
 
-#sidebar button:hover {
-  background-color: #505070;
-}
+#sidebar button:hover { background-color: #3b3b50; }
 
-/* CHAT AREA */
+/* ============== CHAT AREA ================= */
 #chatArea {
   margin-top: 60px;
   margin-left: 0;
   padding: 20px;
-  min-height: calc(100vh - 70px);
-  background-color: #1e1e2f;
+  min-height: calc(100vh - 60px - 70px); /* header + input */
   transition: margin-left 0.3s ease;
 }
 
-#chatArea.sidebar-open { margin-left: 250px; }
+#chatArea.sidebar-open { margin-left: 260px; }
 
-/* CHAT MESSAGES */
+/* ============== MESSAGES ================= */
 .message {
   background-color: #2a2a3d;
   color: #e0e0e0;
-  padding: 10px 15px;
+  padding: 12px 16px;
   margin: 10px 0;
-  border-radius: 8px;
+  border-radius: 10px;
   max-width: 80%;
 }
 
-.message.bot { background-color: #3a3a50; }
+.message.bot { background-color: #3b3b50; }
 
 #typing {
   font-style: italic;
@@ -121,7 +117,7 @@ header button:hover {
   margin: 5px 0;
 }
 
-/* PANEL */
+/* ============== PANEL ================= */
 #panel {
   display: none;
   background-color: #2a2a3d;
@@ -130,49 +126,57 @@ header button:hover {
   margin-top: 10px;
 }
 
-/* CHAT INPUT BAR */
+/* ============== CHAT INPUT ================= */
 #chatInputContainer {
   position: fixed;
   bottom: 0;
   width: 100%;
   display: flex;
-  background-color: #2a2a3d;
-  padding: 10px;
+  background-color: #1f1f1f;
+  padding: 10px 20px;
   gap: 10px;
 }
 
 #chatInput {
   flex: 1;
-  padding: 10px;
-  border-radius: 5px;
+  padding: 12px;
+  border-radius: 8px;
   border: none;
-  background-color: #3a3a50;
+  background-color: #2a2a3d;
   color: #e0e0e0;
 }
 
 #sendBtn {
-  background-color: #505070;
-  color: #ffffff;
+  background-color: #3b3b50;
+  color: #fff;
   border: none;
-  padding: 10px 15px;
-  border-radius: 5px;
+  padding: 12px 18px;
+  border-radius: 8px;
   cursor: pointer;
 }
 
-#sendBtn:hover { background-color: #606090; }
+#sendBtn:hover { background-color: #505070; }
+
+/* =============== RESPONSIVE =============== */
+@media (max-width: 600px){
+  #sidebar { width: 200px; }
+  #chatArea.sidebar-open { margin-left: 200px; }
+}
 </style>
 </head>
 <body>
 
+<!-- ======= HEADER ======= -->
 <header>
   <button id="menuBtn">&#9776;</button>
   <span>BotFusion AI</span>
-  <div>
+  <div class="right-buttons">
     <button id="themeBtn">Theme</button>
     <button id="loginBtn">Login</button>
   </div>
 </header>
 
+<!-- ======= SIDEBAR ======= -->
 <div id="sidebar">
   <button id="newChatBtn">New Chat</button>
   <button id="accountBtn">Account</button>
@@ -180,32 +184,33 @@ header button:hover {
   <button id="logoutBtn">Logout</button>
 </div>
 
+<!-- ======= CHAT AREA ======= -->
 <div id="chatArea">
   <div id="messages"></div>
   <div id="typing"></div>
   <div id="panel"><div id="panelContent"></div></div>
 </div>
 
+<!-- ======= INPUT BAR ======= -->
 <div id="chatInputContainer">
   <input type="text" id="chatInput" placeholder="Type a message...">
   <button id="sendBtn">Send</button>
 </div>
 
 <script>
-// Firebase config
+// ========== Firebase setup ==========
 const firebaseConfig = {
-  apiKey: "AIzaSyDA62eN5MEjX9Z-gw6w9UuR8L-Ke_6J7eE",
-  authDomain: "botfusion-ai-bd6d0.firebaseapp.com",
-  projectId: "botfusion-ai-bd6d0",
-  storageBucket: "botfusion-ai-bd6d0.firebasestorage.app",
-  messagingSenderId: "730477136598",
-  appId: "1:730477136598:web:c6b4e0d495744d12079777",
-  measurementId: "G-53FTWNQB8X"
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT_ID.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
 };
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 
-// Sidebar toggle
+// ========== SIDEBAR TOGGLE ==========
 const menuBtn = document.getElementById('menuBtn');
 const sidebar = document.getElementById('sidebar');
 const chatArea = document.getElementById('chatArea');
@@ -214,17 +219,17 @@ menuBtn.addEventListener('click', () => {
   chatArea.classList.toggle('sidebar-open');
 });
 
-// Theme switch
+// ========== THEME SWITCH ==========
 const themeBtn = document.getElementById('themeBtn');
 let darkMode = true;
 themeBtn.addEventListener('click', () => {
   darkMode = !darkMode;
-  document.body.style.backgroundColor = darkMode ? '#1e1e2f' : '#ffffff';
-  document.body.style.color = darkMode ? '#e0e0e0' : '#111111';
-  chatArea.style.backgroundColor = darkMode ? '#1e1e2f' : '#f0f0f0';
+  document.body.style.backgroundColor = darkMode ? '#121212' : '#f5f5f5';
+  document.body.style.color = darkMode ? '#e0e0e0' : '#111';
+  chatArea.style.backgroundColor = darkMode ? '#121212' : '#ffffff';
 });
 
-// Chat send
+// ========== CHAT MESSAGES ==========
 const sendBtn = document.getElementById('sendBtn');
 const chatInput = document.getElementById('chatInput');
 const messagesDiv = document.getElementById('messages');
@@ -253,7 +258,7 @@ function sendMsg() {
   }
 }
 
-// Sidebar panel
+// ========== PANEL ==========
 const panel = document.getElementById('panel');
 const panelContent = document.getElementById('panelContent');
 
@@ -274,10 +279,10 @@ document.getElementById('settingsBtn').addEventListener('click', () => {
     </select>
   `;
   document.getElementById('panelThemeBtn').addEventListener('click', () => themeBtn.click());
-  document.getElementById('languageSelect').addEventListener('change', e => alert(`Language changed to: ${e.target.value}`));
+  document.getElementById('languageSelect').addEventListener('change', e => alert(`Language: ${e.target.value}`));
 });
 
-// Google login/logout/account
+// ========== GOOGLE LOGIN / ACCOUNT ==========
 const loginBtn = document.getElementById('loginBtn');
 const logoutBtn = document.getElementById('logoutBtn');
 const accountBtn = document.getElementById('accountBtn');
@@ -291,7 +296,7 @@ loginBtn.addEventListener('click', async () => {
   } catch(err){ alert('Login failed: '+err.message); }
 });
 
-logoutBtn.addEventListener('click', async () => { await auth.signOut(); alert('Logged out!'); });
+logoutBtn.addEventListener('click', async () => { await auth.signOut(); alert('Logged out'); });
 
 accountBtn.addEventListener('click', () => {
   const user = auth.currentUser;
