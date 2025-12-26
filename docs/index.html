@@ -1,129 +1,212 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>BotFusion</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BotFusion AI</title>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <style>
-:root{
-  --bg:#0f1116;
-  --panel:#161a22;
-  --border:#222834;
-  --text:#e7e7ec;
-  --button:#2b59ff;
+:root {
+  --dark-bg: #1e1e2f;
+  --dark-secondary: #2a2a3d;
+  --dark-text: #e0e0e0;
+  --light-bg: #ffffff;
+  --light-text: #111111;
 }
 
-.light{
-  --bg:#f7f7fb;
-  --panel:#ffffff;
-  --border:#dcdde3;
-  --text:#0c0d12;
-  --button:#2b59ff;
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: var(--dark-bg);
+  color: var(--dark-text);
+  transition: all 0.3s;
 }
 
-*{box-sizing:border-box;font-family:system-ui,Arial}
-body{margin:0;background:var(--bg);color:var(--text)}
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 15px;
+  background: var(--dark-secondary);
+}
 
-.header{
-  height:60px;display:flex;align-items:center;justify-content:space-between;
-  padding:0 14px;border-bottom:1px solid var(--border);background:var(--panel);
+.hamburger {
+  font-size: 24px;
+  cursor: pointer;
 }
-.hamburger{width:34px;height:24px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer}
-.hamburger span{height:4px;border-radius:3px;background:var(--text)}
 
-.sidebar{
-  position:fixed;top:0;left:-260px;width:260px;height:100%;
-  background:var(--panel);border-right:1px solid var(--border);
-  transition:.25s;padding:12px;z-index:5;
+header h1 {
+  margin: 0;
+  font-size: 20px;
 }
-.sidebar.open{left:0}
-.menu-btn{padding:14px;border-radius:10px;margin:8px 0;background:#0f1116;border:1px solid var(--border);cursor:pointer}
-.page{display:none;height:calc(100vh - 120px);overflow-y:auto;padding:14px}
-.page.active{display:block}
-.chat{height:calc(100vh - 120px);overflow-y:auto;padding:14px}
 
-.footer{
-  height:60px;display:flex;gap:8px;padding:8px;
-  border-top:1px solid var(--border);background:var(--panel);
+header button {
+  margin-left: 10px;
+  padding: 5px 10px;
+  cursor: pointer;
 }
-.footer input{
-  flex:1;padding:12px;border-radius:10px;border:1px solid var(--border);
-  background:transparent;color:var(--text)
+
+#sidebar {
+  position: fixed;
+  top: 0;
+  left: -250px;
+  width: 250px;
+  height: 100%;
+  background: var(--dark-secondary);
+  transition: 0.3s;
+  padding-top: 50px;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.5);
+  z-index: 10;
 }
-.footer button{padding:10px 18px;border-radius:10px;background:var(--button);border:none;color:#fff}
-.card{background:var(--panel);border:1px solid var(--border);padding:14px;border-radius:10px;margin-bottom:10px}
+
+#sidebar.active { left: 0; }
+
+#sidebar button {
+  width: 90%;
+  margin: 10px auto;
+  display: block;
+  padding: 10px;
+  background: #333;
+  border: none;
+  color: var(--dark-text);
+  cursor: pointer;
+  border-radius: 5px;
+  text-align: left;
+}
+
+#sidebar button:hover { background: #444; }
+
+#chatArea {
+  margin-left: 0;
+  padding: 10px;
+  transition: margin-left 0.3s;
+}
+
+#chatArea.active { margin-left: 250px; }
+
+#messages {
+  height: calc(100vh - 180px);
+  overflow-y: auto;
+  padding: 10px;
+  background: var(--dark-bg);
+}
+
+.message {
+  margin: 5px 0;
+  padding: 8px 12px;
+  border-radius: 10px;
+  max-width: 80%;
+}
+
+.userMsg { background: #3a3a4d; margin-left: auto; }
+.botMsg { background: #44445a; margin-right: auto; }
+
+#typing {
+  font-style: italic;
+  margin: 5px;
+  display: none;
+}
+
+#chatInput {
+  display: flex;
+  padding: 10px;
+  background: var(--dark-secondary);
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#chatInput input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 5px;
+  border: none;
+  margin-right: 5px;
+  background: #333;
+  color: var(--dark-text);
+}
+
+#chatInput button {
+  padding: 10px 15px;
+  border-radius: 5px;
+  border: none;
+  background: #4a90e2;
+  color: #fff;
+  cursor: pointer;
+}
+
+#settingsPanel {
+  display: none;
+  margin-top: 10px;
+  padding: 10px;
+  background: var(--dark-secondary);
+}
+
+#settingsPanel label {
+  display: block;
+  margin: 10px 0 5px;
+}
+
+select, input[type="checkbox"] {
+  padding: 5px;
+}
+
+#sidebar img { width: 30px; margin-right: 5px; vertical-align: middle; }
 </style>
 </head>
 
 <body>
-
-<!-- SIDEBAR -->
-<div class="sidebar" id="sidebar">
-  <h3>Menu</h3>
-  <div class="menu-btn" onclick="openPage('chat')">New Chat</div>
-  <div class="menu-btn" onclick="openPage('account')">Account</div>
-  <div class="menu-btn" onclick="openPage('settings')">Settings</div>
-  <div class="menu-btn" onclick="logout()">Logout</div>
-</div>
-
-<!-- HEADER -->
-<div class="header">
-  <div class="hamburger" onclick="toggleSidebar()">
-    <span></span><span></span><span></span>
-  </div>
-
-  <h3>BotFusion</h3>
-
+<header>
+  <span class="hamburger" onclick="toggleSidebar()">☰</span>
+  <h1>BotFusion AI</h1>
   <div>
     <button onclick="toggleTheme()">Theme</button>
-    <button onclick="login()">Login</button>
+    <button id="loginBtn" onclick="googleLogin()">Login</button>
   </div>
+</header>
+
+<div id="sidebar">
+  <button onclick="newChat()">New Chat</button>
+  <button onclick="showAccount()">Account</button>
+  <button onclick="showSettings()">Settings</button>
+  <button onclick="summarizeChat()">Summarize</button>
+  <button onclick="analyzeChat()">Analyze</button>
+  <button onclick="makeList()">Make List</button>
+  <button onclick="generateImage()">Generate Image</button>
+  <button onclick="logout()">Logout</button>
 </div>
 
-<!-- CHAT -->
-<div class="page active" id="chat">
-  <div class="chat" id="chatBox"></div>
+<div id="chatArea">
+  <div id="messages"></div>
+  <div id="typing">Bot is typing...</div>
 </div>
 
-<!-- ACCOUNT -->
-<div class="page" id="account">
-  <div class="card">
-    <h3>Account</h3>
-    <p id="accountInfo">Not logged in</p>
-    <button onclick="login()">Login with Google</button>
-  </div>
-</div>
-
-<!-- SETTINGS -->
-<div class="page" id="settings">
-  <div class="card">
-    <h3>Theme</h3>
-    <button onclick="toggleTheme()">Switch Theme</button>
-  </div>
-
-  <div class="card">
-    <h3>Language</h3>
-    <select id="langSelect" onchange="changeLang()">
-      <option value="en">English</option>
-      <option value="hi">Hindi</option>
-      <option value="mr">Marathi</option>
-    </select>
-  </div>
-</div>
-
-<!-- FOOTER -->
-<div class="footer">
-  <input id="msgInput" placeholder="Type your message..." />
+<div id="chatInput">
+  <input type="text" id="message" placeholder="Type a message..." />
   <button onclick="sendMessage()">Send</button>
 </div>
 
-<!-- 🔥 FIREBASE -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+<div id="settingsPanel">
+  <label for="languageSelect">Language:</label>
+  <select id="languageSelect">
+    <option value="en">English</option>
+    <option value="hi">Hindi</option>
+  </select>
+  <label>
+    Dark Theme:
+    <input type="checkbox" id="themeToggle" onchange="toggleTheme()" checked>
+  </label>
+</div>
 
-// ⛔ REPLACE WITH YOUR VALUES from Firebase Console
+<script>
+// Firebase Config
 const firebaseConfig = {
   apiKey: "AIzaSyDA62eN5MEjX9Z-gw6w9UuR8L-Ke_6J7eE",
   authDomain: "botfusion-ai-bd6d0.firebaseapp.com",
@@ -133,69 +216,143 @@ const firebaseConfig = {
   appId: "1:730477136598:web:c6b4e0d495744d12079777",
   measurementId: "G-53FTWNQB8X"
 };
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const provider = new GoogleAuthProvider();
+const messagesDiv = document.getElementById('messages');
+const typingDiv = document.getElementById('typing');
 
-// UI HELPERS (not Firebase)
-window.toggleSidebar = function(){
-  document.getElementById("sidebar").classList.toggle("open");
+// Sidebar toggle
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('active');
+  document.getElementById('chatArea').classList.toggle('active');
 }
 
-window.openPage = function(id){
-  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
-  toggleSidebar();
+// Theme toggle
+function toggleTheme(){
+  const isDark = document.getElementById('themeToggle').checked;
+  if(isDark){
+    document.body.style.background = "#1e1e2f";
+    document.body.style.color = "#e0e0e0";
+  } else {
+    document.body.style.background = "#ffffff";
+    document.body.style.color = "#111";
+  }
 }
 
-window.toggleTheme = function(){
-  document.body.classList.toggle("light");
+// Add message
+function addMessage(text,sender){
+  const div=document.createElement('div');
+  div.classList.add('message',sender==='user'?'userMsg':'botMsg');
+  div.textContent=text;
+  messagesDiv.appendChild(div);
+  messagesDiv.scrollTop=messagesDiv.scrollHeight;
 }
 
-window.changeLang = function(){
-  alert("Language changed: " + document.getElementById("langSelect").value);
+// Language dictionary
+const translations = {
+  'en': { reply: 'Bot reply to:' },
+  'hi': { reply: 'बॉट का जवाब:' }
+};
+
+function getCurrentLanguage(){
+  return document.getElementById('languageSelect').value;
 }
 
-window.sendMessage = function(){
-  const chat = document.getElementById("chatBox");
-  const input = document.getElementById("msgInput");
-  if(!input.value.trim()) return;
+// Send message
+async function sendMessage(){
+  const input=document.getElementById('message');
+  if(!input.value) return;
+  const msg=input.value;
+  addMessage(msg,'user');
+  input.value='';
+  typingDiv.style.display='block';
 
-  chat.innerHTML += `<div class="card">${input.value}</div>`;
-  input.value = "";
+  const user=auth.currentUser;
+  const uid=user?user.uid:'guest';
+  await db.collection('chats').add({
+    uid,
+    sender:'user',
+    message: msg,
+    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+  });
 
-  chat.innerHTML += `<div id="typing" class="card">Typing…</div>`;
-  setTimeout(()=>{
-    document.getElementById("typing")?.remove();
-    chat.innerHTML += `<div class="card">Bot reply here</div>`;
+  setTimeout(async ()=>{
+    const lang = getCurrentLanguage();
+    const botPrefix = translations[lang].reply;
+    const botReply = `${botPrefix} "${msg}"`;
+    addMessage(botReply,'bot');
+    typingDiv.style.display='none';
+
+    await db.collection('chats').add({
+      uid,
+      sender:'bot',
+      message: botReply,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
   },1200);
 }
 
-// LOGIN
-window.login = function(){
-  await signInWithRedirect(auth, provider);.catch(err=>alert(err.message));
-  import { getRedirectResult } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+// Helper to get last user message
+function getLastUserMessage(){
+  const allMsgs = messagesDiv.querySelectorAll('.userMsg');
+  if(allMsgs.length===0) return null;
+  return allMsgs[allMsgs.length-1].textContent;
+}
 
-getRedirectResult(auth).then(result => {
-  if (result && result.user) {
-    document.getElementById("userName").innerText =
-      result.user.displayName + " (" + result.user.email + ")";
+// Generic API call
+async function callAPI(endpoint, message, action){
+  try{
+    const response = await fetch(endpoint, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({message, action})
+    });
+    const data = await response.json();
+    return data.reply || data.url || 'No response';
+  }catch(err){
+    console.error(err);
+    return '⚠️ Error connecting to server';
   }
-}).catch(console.error);
 }
 
-window.logout = function(){
-  signOut(auth);
+// Action buttons
+async function summarizeChat(){ const msg=getLastUserMessage(); if(!msg)return; addMessage(await callAPI('/api/chat',msg,'summarize'),'bot'); }
+async function analyzeChat(){ const msg=getLastUserMessage(); if(!msg)return; addMessage(await callAPI('/api/chat',msg,'analyze'),'bot'); }
+async function makeList(){ const msg=getLastUserMessage(); if(!msg)return; addMessage(await callAPI('/api/chat',msg,'list'),'bot'); }
+async function generateImage(){ const msg=getLastUserMessage(); if(!msg)return; const res=await callAPI('/api/image',msg); const img=document.createElement('img'); img.src=res.url; img.style.maxWidth='100%'; messagesDiv.appendChild(img); messagesDiv.scrollTop=messagesDiv.scrollHeight; }
+
+// Menu actions
+function newChat(){ messagesDiv.innerHTML=''; }
+function showSettings(){ document.getElementById('settingsPanel').style.display='block'; }
+function showAccount(){ const user=auth.currentUser; if(user){ alert(`Logged in as: ${user.displayName} (${user.email})`); } else { alert('Not logged in'); } }
+async function logout(){ await auth.signOut(); alert('Logged out'); }
+
+// Google login
+async function googleLogin(){
+  const provider=new firebase.auth.GoogleAuthProvider();
+  try{
+    const result=await auth.signInWithPopup(provider);
+    const user=result.user;
+    document.getElementById('loginBtn').textContent='Logged in';
+    alert(`Logged in as: ${user.displayName} (${user.email})`);
+  }catch(e){ alert(e.message); }
 }
 
-// WATCH LOGIN STATE
-onAuthStateChanged(auth, user=>{
-  const info = document.getElementById("accountInfo");
+// Load chat history
+auth.onAuthStateChanged(user=>{
   if(user){
-    info.innerText = `Logged in as: ${user.displayName}`;
-  } else {
-    info.innerText = "Not logged in";
+    document.getElementById('loginBtn').textContent='Logged in';
+    db.collection('chats')
+      .where('uid','==',user.uid)
+      .orderBy('timestamp')
+      .get()
+      .then(snapshot=>{
+        snapshot.forEach(doc=>{
+          addMessage(doc.data().message,doc.data().sender);
+        });
+      });
   }
 });
 </script>
