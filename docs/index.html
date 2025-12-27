@@ -128,7 +128,11 @@ header{
 
   <button onclick="showHome()"><i class="fa fa-home"></i>  Home</button>
   <button onclick="openChat()"><i class="fa fa-message"></i>  New Chat</button>
-  <button onclick="openProfilePage()"><i class="fa fa-user"></i>  Profile</button>
+<button id="loginBtn">Login with Google</button>
+<button id="logoutBtn" style="display:none;">Logout</button>
+
+<!-- Example profile name display -->
+<p id="profileName">Guest</p>
   <button onclick="openAccountPage()"><i class="fa fa-id-card"></i>  Account</button>
   <button onclick="openSettingsPage()"><i class="fa fa-gear"></i>  Settings</button>
   <button onclick="closeSidebar()"><i class="fa fa-times"></i>  Close</button>
@@ -176,6 +180,9 @@ header{
     Project: BotFusion
   </div>
 </div>
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js"></script>
 
 <!-- SETTINGS -->
 <div class="page" id="settingsPage">
@@ -275,7 +282,69 @@ function saveLanguage(){
   localStorage.setItem("lang",val);
   alert("Language saved (we'll apply translations later)");
 }
+<script>
+// 1️⃣ Your Firebase config (PASTE YOURS HERE)
+const firebaseConfig = {
+  apiKey: "AIzaSyDA62eN5MEjX9Z-gw6w9UuR8L-Ke_6J7eE",
+  authDomain: "botfusion-ai-bd6d0.firebaseapp.com",
+  projectId: "botfusion-ai-bd6d0",
+  storageBucket: "botfusion-ai-bd6d0.firebasestorage.app",
+  messagingSenderId: "730477136598",
+  appId: "1:730477136598:web:c6b4e0d495744d12079777",
+  measurementId: "G-53FTWNQB8X"
+};
 
+// 2️⃣ Init
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const provider = new firebase.auth.GoogleAuthProvider();
+
+// UI elements (change IDs if different in your HTML)
+const loginBtn = document.getElementById("loginBtn");
+const profileName = document.getElementById("profileName");
+const logoutBtn = document.getElementById("logoutBtn");
+
+// 3️⃣ Login
+function googleLogin() {
+  auth.signInWithPopup(provider)
+    .then(result => {
+      const user = result.user;
+      alert(`Welcome ${user.displayName}!`);
+      updateUI(user);
+    })
+    .catch(err => {
+      alert("Login failed: " + err.message);
+    });
+}
+
+// 4️⃣ Logout
+function googleLogout() {
+  auth.signOut().then(() => {
+    updateUI(null);
+  });
+}
+
+// 5️⃣ Update UI
+function updateUI(user) {
+  if (!user) {
+    if (profileName) profileName.textContent = "Guest";
+    if (loginBtn) loginBtn.style.display = "inline-block";
+    if (logoutBtn) logoutBtn.style.display = "none";
+    return;
+  }
+
+  if (profileName) profileName.textContent = user.displayName || "User";
+  if (loginBtn) loginBtn.style.display = "none";
+  if (logoutBtn) logoutBtn.style.display = "inline-block";
+}
+
+// 6️⃣ Listen for auth state
+auth.onAuthStateChanged(updateUI);
+
+// 7️⃣ Hook buttons
+if (loginBtn) loginBtn.addEventListener("click", googleLogin);
+if (logoutBtn) logoutBtn.addEventListener("click", googleLogout);
+</script>
 /* default screen */
 showHome();
 </script>
