@@ -128,11 +128,7 @@ header{
 
   <button onclick="showHome()"><i class="fa fa-home"></i>  Home</button>
   <button onclick="openChat()"><i class="fa fa-message"></i>  New Chat</button>
-<button id="loginBtn">Login with Google</button>
-<button id="logoutBtn" style="display:none;">Logout</button>
-
-<!-- Example profile name display -->
-<p id="profileName">Guest</p>
+  <button onclick="openProfilePage()"><i class="fa fa-user"></i>  Profile</button>
   <button onclick="openAccountPage()"><i class="fa fa-id-card"></i>  Account</button>
   <button onclick="openSettingsPage()"><i class="fa fa-gear"></i>  Settings</button>
   <button onclick="closeSidebar()"><i class="fa fa-times"></i>  Close</button>
@@ -183,7 +179,11 @@ header{
 <!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js"></script>
+<button id="loginBtn">Login with Google</button>
+<button id="logoutBtn" style="display:none;">Logout</button>
 
+<!-- Example profile name display -->
+<p id="profileName">Guest</p>
 <!-- SETTINGS -->
 <div class="page" id="settingsPage">
   <h2>Settings</h2>
