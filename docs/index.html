@@ -205,104 +205,59 @@ select{
   </div>
 
 </div>
+ <script type="module">
+  // Firebase SDKs
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+  import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } 
+    from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
-<!-- FIREBASE + GOOGLE LOGIN -->
-<script type="module">
-  const appContent = document.querySelector(".main");
-
-onAuthStateChanged(auth, (user) => {
-  const info = document.getElementById("user-info");
-  const name = document.getElementById("user-name");
-
-  if (user) {
-    info.style.display = "block";
-    name.innerText = user.displayName;
-    appContent.style.display = "block";
-  } else {
-    info.style.display = "none";
-    appContent.style.display = "none";
-    alert("Please sign in first");
-  }
-});
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
-  from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
-
-/* 🔴 REPLACE WITH YOUR FIREBASE CONFIG */
-const firebaseConfig = {
-  apiKey: "AIzaSyDA62eN5MEjX9Z-gw6w9UuR8L-Ke_6J7eE",
+  // ⚠️ Use the SAME values you put in .env
+  const firebaseConfig = {
+    apiKey: "AIzaSyDA62eN5MEjX9Z-gw6w9UuR8L-Ke_6J7eE",
   authDomain: "botfusion-ai-bd6d0.firebaseapp.com",
   projectId: "botfusion-ai-bd6d0",
   storageBucket: "botfusion-ai-bd6d0.firebasestorage.app",
   messagingSenderId: "730477136598",
   appId: "1:730477136598:web:c6b4e0d495744d12079777",
-  measurementId: "G-53FTWNQB8X",
-};
+  measurementId: "G-53FTWNQB8X"
+  };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const provider = new GoogleAuthProvider();
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const provider = new GoogleAuthProvider();
 
-window.signInGoogle = async () => {
-  try {
-    await signInWithPopup(auth, provider);
-  } catch (err) {
-    alert(err.message);
-  }
-};
+  // Login button
+  window.googleLogin = async () => {
+    try {
+      await signInWithPopup(auth, provider);
+    } catch (err) {
+      console.error(err);
+      alert("Login failed");
+    }
+  };
 
-window.signOutUser = async () => {
-  await signOut(auth);
-};
+  // Logout button
+  window.googleLogout = async () => {
+    await signOut(auth);
+  };
 
-onAuthStateChanged(auth, (user) => {
-  const info = document.getElementById("user-info");
-  const name = document.getElementById("user-name");
-
-  if(user){
-    info.style.display = "block";
-    name.innerText = user.displayName;
-  } else {
-    info.style.display = "none";
-  }
-});
-</script>
-
-<script>
-const sidebar = document.getElementById("sidebar");
-const overlay = document.getElementById("overlay");
-const home = document.getElementById("home");
-const settings = document.getElementById("settings");
-
-function toggleSidebar(){
-  sidebar.classList.toggle("open");
-  overlay.classList.toggle("show");
-}
-
-function showHome(){
-  settings.classList.remove("active");
-  home.style.display = "block";
-  sidebar.classList.remove("open");
-  overlay.classList.remove("show");
-}
-
-function openSettings(){
-  home.style.display = "none";
-  settings.classList.add("active");
-  sidebar.classList.remove("open");
-  overlay.classList.remove("show");
-}
-
-function toggleTheme(){
-  if(document.body.style.background === "white"){
-    document.body.style.background = "#2a2a2a";
-    document.body.style.color = "#fff";
-  } else {
-    document.body.style.background = "white";
-    document.body.style.color = "#000";
-  }
-}
-</script>
+  // Show profile when logged in
+  onAuthStateChanged(auth, (user) => {
+    const profile = document.getElementById("profile-info");
+    if (user) {
+      profile.innerHTML = `
+        <img src="${user.photoURL}" style="width:40px;border-radius:50%" />
+        <p>${user.displayName}</p>
+        <p>${user.email}</p>
+        <button onclick="googleLogout()">Logout</button>
+      `;
+    } else {
+      profile.innerHTML = `
+        <button onclick="googleLogin()">Sign in with Google</button>
+      `;
+    }
+  });
+ </script>
 
 </body>
 </html>
