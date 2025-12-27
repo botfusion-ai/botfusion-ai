@@ -1,177 +1,137 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>BotFusion</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BotFusion AI</title>
+  
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-firestore-compat.js"></script>
 
-<style>
-body{
-  margin:0;
-  font-family: system-ui, Arial;
-  background:#1f1f1f;
-  color:white;
-}
-
-header{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:14px 16px;
-  background:#2a2a2a;
-}
-
-header h2{
-  margin:0;
-}
-
-.menu-icon{
-  font-size:28px;
-  cursor:pointer;
-}
-
-#drawer{
-  position:fixed;
-  top:0;
-  left:-260px;
-  width:240px;
-  height:100%;
-  background:#111;
-  padding:20px;
-  transition:.3s;
-}
-
-.drawer-item{
-  padding:12px 0;
-  border-bottom:1px solid #333;
-  cursor:pointer;
-}
-
-main{
-  padding:16px;
-}
-
-.btn{
-  width:100%;
-  border-radius:6px;
-  border:1px solid #333;
-  padding:14px;
-  text-align:center;
-  cursor:pointer;
-  background:#fff;
-  color:#000;
-  margin-bottom:18px;
-  font-weight:600;
-}
-
-.card{
-  background:#222;
-  padding:14px;
-  border-radius:10px;
-  margin-bottom:14px;
-  cursor:pointer;
-}
-</style>
+  <!-- Styles -->
+  <style>
+    body { margin:0; font-family: sans-serif; background:#2a2a2a; color:#fff; }
+    header { display:flex; justify-content:space-between; align-items:center; padding:10px 20px; background:#1f1f1f; }
+    header h1 { margin:0; font-size:1.4rem; }
+    #hamburger { cursor:pointer; font-size:1.4rem; }
+    #sidebar { position:fixed; top:0; left:-250px; width:250px; height:100%; background:#1f1f1f; padding:20px; transition:0.3s; overflow-y:auto; z-index:1000; }
+    #sidebar.active { left:0; }
+    #sidebar button { display:block; width:100%; margin:10px 0; padding:10px; font-size:1rem; background:#2a2a2a; color:#fff; border:none; cursor:pointer; text-align:left; }
+    #sidebar #profile-info { margin:15px 0; text-align:center; }
+    main { padding:20px; margin-top:10px; }
+    .home-btn { background:#2a2a2a; border:none; padding:15px; margin:10px 0; width:100%; font-size:1rem; cursor:pointer; text-align:left; }
+    #chatArea { margin-top:20px; }
+    #userInput { width:calc(100% - 60px); padding:10px; background:#1f1f1f; color:#fff; border:none; }
+    #sendBtn { padding:10px; background:#007bff; color:#fff; border:none; cursor:pointer; }
+    .chat-msg { margin:5px 0; padding:10px; background:#3a3a3a; border-radius:5px; }
+    .chat-msg.user { background:#0056b3; color:#fff; }
+  </style>
 </head>
-
 <body>
 
-<header>
-  <span class="menu-icon" onclick="toggleDrawer()">≡</span>
-  <h2>BotFusion</h2>
-</header>
+  <!-- Sidebar -->
+  <div id="sidebar">
+    <div id="profile-info"></div>
+    <button id="googleLoginBtn">Continue with Google</button>
+    <button onclick="showHome()">✨ Ask anything</button>
+    <button onclick="showIdeas()">💡 Get ideas</button>
+    <button onclick="showLearn()">📚 Learn something</button>
+    <button onclick="showProjects()">🛠 Help with projects</button>
+    <button onclick="closeSidebar()">❌ Close</button>
+  </div>
 
-<div id="drawer">
-  <div class="drawer-item" onclick="openHome()">🏠 Home</div>
-  <div class="drawer-item" onclick="openProfile()">👤 Profile</div>
-  <div class="drawer-item" onclick="openSettings()">⚙️ Settings</div>
-  <div class="drawer-item" onclick="openHistory()">🕘 History</div>
-  <div class="drawer-item" onclick="logout()">🚪 Logout</div>
-</div>
+  <!-- Header -->
+  <header>
+    <span id="hamburger">☰</span>
+    <h1>BotFusion</h1>
+  </header>
 
-<main>
+  <!-- Main content -->
+  <main>
+    <div id="homeContent">
+      <button class="home-btn" onclick="startChat()">✨ Start chatting</button>
+      <button class="home-btn" onclick="viewProfile()">👤 View profile</button>
+      <button class="home-btn" onclick="manageAccount()">🪪 Manage account</button>
+      <button class="home-btn" onclick="openSettings()">⚙ Settings</button>
+    </div>
 
-<h3>Get started</h3>
+    <div id="chatArea"></div>
+    <div style="display:flex; margin-top:10px;">
+      <input id="userInput" placeholder="Type a message..." />
+      <button id="sendBtn" onclick="sendMessage()">Send</button>
+    </div>
+  </main>
 
-<div class="btn" onclick="googleLogin()">Continue with Google</div>
-
-<div class="card" onclick="askAnything()">✨ Ask anything</div>
-<div class="card" onclick="getIdeas()">💡 Get ideas</div>
-<div class="card" onclick="learnSomething()">📚 Learn something</div>
-<div class="card" onclick="projectHelp()">🛠 Help with projects</div>
-
-<div id="profile-info" style="margin-top:20px;"></div>
-
-</main>
-
-<!-- Firebase SDK -->
-<script type="module">
-
-// ------------------ FIREBASE IMPORTS --------------------
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } 
-  from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-
-// ----------- 🔥 PASTE YOUR CONFIG HERE -------------
-const firebaseConfig = {
-apiKey: "AIzaSyDA62eN5MEjX9Z-gw6w9UuR8L-Ke_6J7eE",
+  <!-- Scripts -->
+  <script>
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyDA62eN5MEjX9Z-gw6w9UuR8L-Ke_6J7eE",
   authDomain: "botfusion-ai-bd6d0.firebaseapp.com",
   projectId: "botfusion-ai-bd6d0",
   storageBucket: "botfusion-ai-bd6d0.firebasestorage.app",
   messagingSenderId: "730477136598",
   appId: "1:730477136598:web:c6b4e0d495744d12079777",
   measurementId: "G-53FTWNQB8X"
-};
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
 
-// Initialize
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const provider = new GoogleAuthProvider();
+    // Sidebar toggle
+    const sidebar = document.getElementById("sidebar");
+    document.getElementById("hamburger").addEventListener("click", () => {
+      sidebar.classList.toggle("active");
+    });
+    function closeSidebar() { sidebar.classList.remove("active"); }
 
-// ---------------- UI FUNCTIONS ----------------
-window.toggleDrawer = () => {
-  const drawer = document.getElementById("drawer");
-  drawer.style.left = drawer.style.left === "0px" ? "-260px" : "0px";
-};
+    // Google login
+    const googleBtn = document.getElementById("googleLoginBtn");
+    googleBtn.addEventListener("click", () => {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider)
+        .then((result) => {
+          const user = result.user;
+          document.getElementById("profile-info").innerHTML =
+            `<p>Welcome, ${user.displayName}</p><img src="${user.photoURL}" width="50" style="border-radius:50%;">`;
+        })
+        .catch(console.error);
+    });
 
-window.googleLogin = async () => {
-  try {
-    await signInWithPopup(auth, provider);
-  } catch (e) {
-    alert("Login failed");
-    console.error(e);
-  }
-};
+    // Home buttons
+    function startChat(){ alert("Start chatting clicked"); }
+    function viewProfile(){ alert("View profile clicked"); }
+    function manageAccount(){ alert("Manage account clicked"); }
+    function openSettings(){ alert("Settings clicked"); }
+    function showHome(){ alert("Ask anything clicked"); }
+    function showIdeas(){ alert("Get ideas clicked"); }
+    function showLearn(){ alert("Learn something clicked"); }
+    function showProjects(){ alert("Help with projects clicked"); }
 
-window.logout = async () => {
-  await signOut(auth);
-};
-
-onAuthStateChanged(auth, (user) => {
-  const profile = document.getElementById("profile-info");
-  if (user) {
-    profile.innerHTML = `
-      <p>Logged in as:</p>
-      <strong>${user.displayName}</strong><br/>
-      <small>${user.email}</small>
-    `;
-  } else {
-    profile.innerHTML = "";
-  }
-});
-
-// Clickable icon handlers
-window.openHome = () => alert("Home clicked");
-window.openProfile = () => alert("Profile page coming soon");
-window.openSettings = () => alert("Settings coming soon");
-window.openHistory = () => alert("History coming soon");
-
-window.askAnything = () => alert("Ask anything");
-window.getIdeas = () => alert("Ideas page");
-window.learnSomething = () => alert("Learn section");
-window.projectHelp = () => alert("Project help");
-
-</script>
+    // Chat backend
+    const CHAT_API = "YOUR_FIREBASE_FUNCTION_URL";
+    function sendMessage(){
+      const input = document.getElementById("userInput");
+      const chat = document.getElementById("chatArea");
+      if(!input.value.trim()) return;
+      const userMsg = input.value;
+      chat.innerHTML += `<div class="chat-msg user"><b>You:</b> ${userMsg}</div>`;
+      input.value = "";
+      fetch(CHAT_API, {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({message:userMsg})
+      })
+      .then(res => res.json())
+      .then(data => {
+        chat.innerHTML += `<div class="chat-msg"><b>BotFusion:</b> ${data.reply}</div>`;
+      })
+      .catch(err => {
+        chat.innerHTML += `<div class="chat-msg" style="color:red;">Error: ${err}</div>`;
+      });
+    }
+  </script>
 
 </body>
 </html>
