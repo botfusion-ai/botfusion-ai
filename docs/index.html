@@ -6,14 +6,15 @@
 <title>Botfusion</title>
 
 <style>
+/* ---------- GLOBAL ---------- */
 body{
   margin:0;
   font-family: Arial, sans-serif;
-  background:#2a2a2a;
+  background:#2a2a2a;        /* Default dark grey */
   color:white;
 }
 
-/* header */
+/* ---------- HEADER ---------- */
 .header{
   display:flex;
   align-items:center;
@@ -26,6 +27,7 @@ body{
   margin-right:12px;
 }
 
+/* ---------- SIDEBAR ---------- */
 .sidebar{
   position:fixed;
   top:0;
@@ -35,11 +37,11 @@ body{
   background:#111;
   transition:0.3s;
   padding:16px;
+  overflow-y:auto;
 }
 .sidebar.open{
   left:0;
 }
-
 .sidebar button{
   width:100%;
   padding:10px;
@@ -47,13 +49,17 @@ body{
   background:#2a2a2a;
   color:white;
   border:none;
+  border-radius:6px;
   cursor:pointer;
 }
+.sidebar button:hover{
+  background:#3a3a3a;
+}
 
+/* ---------- HOME CARDS ---------- */
 .home-cards{
   padding:20px;
 }
-
 .card{
   background:#1f1f1f;
   padding:18px;
@@ -61,16 +67,17 @@ body{
   margin-bottom:10px;
 }
 
+/* ---------- PROFILE ---------- */
 #profile-section{
   display:none;
   padding:20px;
 }
-
 #profile-info img{
-  width:70px;
-  height:70px;
+  width:75px;
+  height:75px;
   border-radius:50%;
   margin-bottom:10px;
+  object-fit:cover;
 }
 </style>
 </head>
@@ -110,30 +117,36 @@ body{
   <div id="profile-info"></div>
 </div>
 
-
 <!-- FIREBASE -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
+/* ---------- YOUR FIREBASE CONFIG ---------- */
 const firebaseConfig = {
-  // 🔥 PUT YOUR CONFIG HERE
+  apiKey: "AIzaSyDA62eN5MEjX9Z-gw6w9UuR8L-Ke_6J7eE",
+  authDomain: "botfusion-ai-bd6d0.firebaseapp.com",
+  projectId: "botfusion-ai-bd6d0",
+  storageBucket: "botfusion-ai-bd6d0.firebasestorage.app",
+  messagingSenderId: "730477136598",
+  appId: "1:730477136598:web:c6b4e0d495744d12079777",
+  measurementId: "G-53FTWNQB8X"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
-/******** UI controls ********/
+/* ---------- ELEMENTS ---------- */
 const sidebar = document.getElementById("sidebar");
 const home = document.getElementById("home");
 const profileSection = document.getElementById("profile-section");
 const profileInfo = document.getElementById("profile-info");
-
 const loginBtn = document.getElementById("loginBtn");
 const logoutBtn = document.getElementById("logoutBtn");
 
+/* ---------- UI CONTROLS ---------- */
 window.toggleSidebar = () => sidebar.classList.toggle("open");
 
 window.showHome = () => {
@@ -147,10 +160,12 @@ window.showProfile = () => {
 };
 
 window.startChat = () => alert("Chat screen coming soon!");
+
 window.manageAccount = () => alert("Account manager coming soon!");
+
 window.openSettings = () => alert("Settings coming soon!");
 
-/******** Google Login ********/
+/* ---------- GOOGLE LOGIN ---------- */
 window.googleLogin = async () => {
   try {
     await signInWithPopup(auth, provider);
@@ -163,7 +178,7 @@ window.logout = async () => {
   await signOut(auth);
 };
 
-/******** Listen for login ********/
+/* ---------- LISTEN FOR LOGIN ---------- */
 onAuthStateChanged(auth, (user) => {
   if (user) {
     loginBtn.style.display = "none";
