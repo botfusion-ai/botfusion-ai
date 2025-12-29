@@ -1,172 +1,180 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>BotFusion</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Botfusion</title>
 
 <style>
+/* ---------------- GLOBAL ---------------- */
 body{
   margin:0;
   font-family: Arial, sans-serif;
-  background:#111;
-  color:white;
+  background:#2a2a2a;
+  color:#fff;
+  transition: background .2s, color .2s;
+}
+
+/* THEMES */
+body.theme-dark{ background:#2a2a2a; color:#fff; }
+body.theme-amoled{ background:#000; color:#fff; }
+body.theme-light{ background:#f5f5f5; color:#000; }
+body.theme-blue{ background:#0e1a2b; color:#e9f0ff; }
+body.theme-purple{ background:#1a0f26; color:#f0e9ff; }
+
+.screen, .sidebar, .header, .card, .chat-box{
+  transition: background .2s, color .2s, border .2s;
 }
 
 /* HEADER */
 .header{
-  background:#1f1f1f;
-  padding:12px 14px;
   display:flex;
   align-items:center;
-  justify-content:space-between;
-  position:sticky;
-  top:0;
+  gap:10px;
+  padding:12px 16px;
+  background:#1f1f1f;
 }
-
-.icon{font-size:24px;cursor:pointer;}
-.title{font-size:22px;font-weight:bold}
+.hamburger{ font-size:24px; cursor:pointer; }
 
 /* SIDEBAR */
 .sidebar{
   position:fixed;
   top:0;
-  left:-260px;
-  width:260px;
-  height:100%;
-  background:#141414;
-  padding:15px;
-  transition:0.3s;
-  z-index:20;
+  left:-270px;
+  width:270px;
+  height:100vh;
+  background:#111;
+  padding:18px;
+  transition:.25s;
+  overflow-y:auto;
 }
-.sidebar.open{left:0;}
-
-.close{
-  font-size:26px;
-  text-align:right;
-  cursor:pointer;
-  margin-bottom:18px;
-}
+.sidebar.open{ left:0; }
 
 .sidebar button{
   width:100%;
-  background:#1f1f1f;
-  color:white;
-  border:none;
   padding:10px;
-  border-radius:10px;
-  margin-top:8px;
+  margin:6px 0;
+  border:none;
+  border-radius:8px;
+  background:#2a2a2a;
+  color:#fff;
   cursor:pointer;
 }
-.sidebar button:hover{background:#2a2a2a}
+.sidebar button:hover{ background:#3b3b3b; }
 
-/* OVERLAY */
-.overlay{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.6);
-  display:none;
-  z-index:15;
+.close-btn{
+  background:#ff4949;
 }
-.overlay.show{display:block}
 
 /* MAIN SCREENS */
-.screen{padding:18px;}
-.hidden{display:none}
+.screen{ display:none; padding:18px; }
+.active{ display:block; }
 
 .card{
-  background:#1a1a1a;
-  padding:14px;
+  background:#1f1f1f;
+  padding:16px;
   border-radius:10px;
-  margin-top:10px;
+  margin-bottom:10px;
+}
+
+.chat-box{
+  background:#1c1c1c;
+  padding:12px;
+  border-radius:10px;
 }
 
 /* PROFILE */
-.profile-box{
-  background:#1a1a1a;
-  padding:14px;
-  border-radius:10px;
-}
-
-.profile-box img{
+#profile-info img{
   width:80px;
   height:80px;
   border-radius:50%;
   object-fit:cover;
+  margin-bottom:8px;
+}
+
+/* INPUTS */
+select, input{
+  width:100%;
+  padding:10px;
+  margin:8px 0;
+  border-radius:6px;
+  border:1px solid #444;
+  background:#2a2a2a;
+  color:#fff;
 }
 </style>
 </head>
 
-<body>
+<body class="theme-dark">
 
-<!-- OVERLAY -->
-<div id="overlay" class="overlay" onclick="toggleSidebar()"></div>
+<!-- HEADER -->
+<div class="header">
+  <div class="hamburger" onclick="toggleSidebar()">☰</div>
+  <h2>Botfusion</h2>
+</div>
 
 <!-- SIDEBAR -->
 <div id="sidebar" class="sidebar">
-  <div class="close" onclick="toggleSidebar()">×</div>
-
   <button onclick="showScreen('home')">🏠 Home</button>
-  <button onclick="showScreen('chat')">💬 Start chatting</button>
-  <button onclick="showScreen('profile')">👤 View profile</button>
-  <button onclick="showScreen('account')">📄 Manage account</button>
-  <button onclick="showScreen('settings')">⚙️ Settings</button>
+  <button onclick="showScreen('chat')">💬 Start Chatting</button>
+  <button onclick="showScreen('profile')">👤 View Profile</button>
+  <button onclick="showScreen('account')">⚙ Manage Account</button>
+  <button onclick="showScreen('settings')">🛠 Settings</button>
 
   <hr>
 
   <button id="loginBtn" onclick="googleLogin()">🔑 Login with Google</button>
   <button id="logoutBtn" onclick="logout()" style="display:none;">🚪 Logout</button>
-</div>
 
-<!-- HEADER -->
-<div class="header">
-  <span class="icon" onclick="toggleSidebar()">☰</span>
-  <div class="title">BotFusion</div>
-  <span>🏠</span>
+  <hr>
+  <button class="close-btn" onclick="toggleSidebar()">Close</button>
 </div>
 
 <!-- HOME -->
-<div id="home" class="screen">
-  <h2>Welcome 👋</h2>
-  <p>What would you like to do?</p>
-
-  <div class="card" onclick="showScreen('chat')">💬 Start chatting</div>
-  <div class="card" onclick="showScreen('profile')">👤 View profile</div>
-  <div class="card" onclick="showScreen('account')">📄 Manage account</div>
-  <div class="card" onclick="showScreen('settings')">⚙️ Settings</div>
-
-  <p style="opacity:.6;margin-top:18px">
-    BotFusion — frontend + Google login (backend next)
-  </p>
+<div id="home" class="screen active">
+  <div class="card">✨ Start chatting smarter</div>
+  <div class="card">🤖 AI help whenever you need</div>
+  <div class="card">⚡ Fast, smooth experience</div>
 </div>
 
 <!-- CHAT -->
-<div id="chat" class="screen hidden">
-  <h3>💬 Chat</h3>
-  <p>Chatbot backend will be added next.</p>
+<div id="chat" class="screen">
+  <h3>Chat</h3>
+  <div class="chat-box">Typing indicator + backend coming soon…</div>
 </div>
 
 <!-- PROFILE -->
-<div id="profile" class="screen hidden">
+<div id="profile" class="screen">
   <h3>Your Profile</h3>
-  <div id="profileBox" class="profile-box">
-    <p>Login to see profile.</p>
-  </div>
+  <div id="profile-info"></div>
 </div>
 
 <!-- ACCOUNT -->
-<div id="account" class="screen hidden">
+<div id="account" class="screen">
   <h3>Manage Account</h3>
-  <p>Edit account features will be here.</p>
+  <p>Edit account & security will be added here.</p>
 </div>
 
 <!-- SETTINGS -->
-<div id="settings" class="screen hidden">
+<div id="settings" class="screen">
   <h3>Settings</h3>
 
-  <p>🌗 Theme / Dark mode (default)</p>
-  <p>🌍 Language switch (coming)</p>
-  <p>ℹ️ About BotFusion</p>
+  <label>Theme</label>
+  <select id="themeSelect">
+    <option value="dark">Dark</option>
+    <option value="amoled">AMOLED Black</option>
+    <option value="light">Light</option>
+    <option value="blue">Blue</option>
+    <option value="purple">Purple</option>
+  </select>
+
+  <label>Language</label>
+  <select id="languageSelect">
+    <option>English</option>
+    <option>Hindi</option>
+    <option>Marathi</option>
+    <option>Spanish</option>
+  </select>
 </div>
 
 <!-- FIREBASE -->
@@ -175,7 +183,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/fireba
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-/* 🔥 PASTE YOUR FIREBASE CONFIG HERE */
+/* ---- PASTE YOUR CONFIG ---- */
 const firebaseConfig = {
   apiKey: "AIzaSyDA62eN5MEjX9Z-gw6w9UuR8L-Ke_6J7eE",
   authDomain: "botfusion-ai-bd6d0.firebaseapp.com",
@@ -191,50 +199,60 @@ const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
 /* ELEMENTS */
-const sidebar=document.getElementById("sidebar");
-const overlay=document.getElementById("overlay");
-const loginBtn=document.getElementById("loginBtn");
-const logoutBtn=document.getElementById("logoutBtn");
-const profileBox=document.getElementById("profileBox");
+const sidebar = document.getElementById("sidebar");
+const profileInfo = document.getElementById("profile-info");
+const loginBtn = document.getElementById("loginBtn");
+const logoutBtn = document.getElementById("logoutBtn");
 
 /* SIDEBAR */
-window.toggleSidebar=()=>{
-  sidebar.classList.toggle("open");
-  overlay.classList.toggle("show");
-};
+window.toggleSidebar = () => sidebar.classList.toggle("open");
 
 /* SCREENS */
-window.showScreen=(id)=>{
-  document.querySelectorAll(".screen").forEach(s=>s.classList.add("hidden"));
-  document.getElementById(id).classList.remove("hidden");
-  toggleSidebar();
-};
+function showScreen(id){
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  sidebar.classList.remove("open");
+}
+window.showScreen = showScreen;
 
-/* LOGIN */
-window.googleLogin=async()=>{
-  try{ await signInWithPopup(auth,provider); }
+/* GOOGLE LOGIN */
+window.googleLogin = async () => {
+  try{ await signInWithPopup(auth, provider); }
   catch(e){ alert(e.message); }
 };
+window.logout = () => signOut(auth);
 
-window.logout=()=>signOut(auth);
-
-/* LISTEN USER */
-onAuthStateChanged(auth,user=>{
+/* AUTH LISTENER */
+onAuthStateChanged(auth, user=>{
   if(user){
     loginBtn.style.display="none";
     logoutBtn.style.display="block";
-
-    profileBox.innerHTML=`
-      <img src="${user.photoURL||''}">
-      <p><b>${user.displayName||''}</b></p>
-      <p>${user.email||''}</p>
+    profileInfo.innerHTML = `
+      <img src="${user.photoURL || ''}">
+      <p><b>${user.displayName || ''}</b></p>
+      <p>${user.email || ''}</p>
     `;
   }else{
     loginBtn.style.display="block";
     logoutBtn.style.display="none";
-    profileBox.innerHTML=`<p>Login to see profile.</p>`;
+    profileInfo.innerHTML="";
   }
 });
+
+/* THEME SWITCH */
+const themeSelect = document.getElementById("themeSelect");
+const savedTheme = localStorage.getItem("theme") || "dark";
+applyTheme(savedTheme);
+themeSelect.value = savedTheme;
+
+themeSelect.onchange = e => {
+  applyTheme(e.target.value);
+  localStorage.setItem("theme", e.target.value);
+};
+
+function applyTheme(name){
+  document.body.className = "theme-" + name;
+}
 </script>
 
 </body>
