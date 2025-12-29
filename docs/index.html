@@ -1,313 +1,213 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>BotFusion</title>
 
 <style>
-
-/* GLOBAL */
 body{
   margin:0;
-  background:#202020;
-  color:white;
   font-family:Arial, sans-serif;
+  background:#111;
+  color:#fff;
 }
 
-h2,h3{
-  margin:0 0 10px;
-}
-
-/* HEADER */
+/* Header */
 .header{
   display:flex;
   align-items:center;
   justify-content:space-between;
-  padding:12px 16px;
-  background:#111;
+  padding:10px 14px;
+  background:#1f1f1f;
 }
+.icon-btn{font-size:22px;cursor:pointer;}
+.logo{font-size:22px;font-weight:700}
 
-.hamburger{
-  font-size:24px;
-  cursor:pointer;
-}
-
-.home-icon{
-  font-size:22px;
-  cursor:pointer;
-}
-
-.center-title{
-  font-size:24px;
-  font-weight:bold;
-}
-
-/* SIDEBAR */
+/* Sidebar */
 .sidebar{
   position:fixed;
   top:0;
-  left:-270px;
-  width:270px;
-  height:100vh;
-  background:#121212;
+  left:-260px;
+  width:260px;
+  height:100%;
+  background:#141414;
   transition:0.3s;
-  padding:15px;
-  overflow-y:auto;
-  z-index:5;
+  padding:14px;
+  box-shadow:2px 0 12px rgba(0,0,0,.6);
+  z-index:20;
 }
-.sidebar.open{ left:0; }
+.sidebar.open{left:0}
+.close-btn{
+  text-align:right;
+  font-size:26px;
+  cursor:pointer;
+  margin-bottom:14px;
+}
+.sidebar a{
+  display:block;
+  padding:10px 8px;
+  margin-top:6px;
+  border-radius:6px;
+  color:#fff;
+  text-decoration:none;
+  background:#1f1f1f;
+}
+.sidebar a:hover{background:#2b2b2b}
 
-.sidebar button{
-  width:100%;
-  padding:10px;
-  margin:5px 0;
-  border:none;
-  border-radius:8px;
-  background:#2c2c2c;
-  color:white;
+/* Screens */
+.screen{display:none;padding:18px;}
+.screen.active{display:block;}
+
+.card{
+  background:#1a1a1a;
+  padding:14px;
+  border-radius:10px;
+  margin-top:10px;
   cursor:pointer;
 }
-.sidebar button:hover{ background:#3b3b3b; }
 
-/* MAIN AREA */
-.container{
-  padding:18px;
+/* Login popup */
+.overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.7);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:30;
 }
-
-/* HOME CARDS */
-.card{
-  background:#2b2b2b;
+.popup{
+  background:#1b1b1b;
+  padding:18px;
   border-radius:10px;
-  padding:18px;
-  margin:10px 0;
+  width:90%;
+  max-width:360px;
 }
-
-.section{ display:none; }
-
-/* CHAT BOX */
-.chat-box{
-  height:60vh;
-  background:#1a1a1a;
-  border-radius:8px;
-  margin-bottom:10px;
+.input{
+  width:100%;
   padding:10px;
-  overflow-y:auto;
-}
-
-.input-row{
-  display:flex;
-  gap:8px;
-}
-
-.input-row input{
-  flex:1;
-  padding:10px;
+  margin-top:8px;
   border-radius:6px;
   border:none;
 }
-
-.input-row button{
-  padding:10px 16px;
+.btn{
+  width:100%;
+  margin-top:10px;
+  padding:10px;
   border:none;
   border-radius:6px;
+  background:#3b82f6;
+  color:#fff;
+  font-weight:600;
+  cursor:pointer;
 }
-
-/* SETTINGS */
-.settings-row{
-  margin:10px 0;
+.google{
+  background:#db4437;
 }
-
+.small{opacity:.7;margin-top:8px;font-size:13px}
 </style>
 </head>
 
 <body>
 
-<!-- HEADER -->
-<div class="header">
-  <div class="hamburger" onclick="toggleSidebar()">☰</div>
-  <div class="center-title">BotFusion</div>
-  <div class="home-icon" onclick="showSection('home')">🏠</div>
-</div>
-
 <!-- SIDEBAR -->
 <div id="sidebar" class="sidebar">
-  <button onclick="showSection('home')">🏠 Home</button>
-  <button onclick="showSection('chat')">💬 Start chatting</button>
-  <button onclick="showSection('profile')">👤 View profile</button>
-  <button onclick="showSection('account')">📄 Manage account</button>
-  <button onclick="showSection('settings')">⚙️ Settings</button>
+  <div class="close-btn" onclick="toggleSidebar()">×</div>
 
-  <hr>
+  <a onclick="openScreen('home')">🏠 Home</a>
+  <a onclick="openScreen('chat')">💬 Start chatting</a>
+  <a onclick="openScreen('profile')">👤 Profile</a>
+  <a onclick="openScreen('manage')">📄 Manage account</a>
+  <a onclick="openScreen('settings')">⚙️ Settings</a>
+  <a onclick="openLogin()">🔐 Login</a>
+</div>
 
-  <button id="loginBtn" onclick="googleLogin()">🔑 Login with Google</button>
-  <button id="logoutBtn" onclick="logout()" style="display:none;">🚪 Logout</button>
+<!-- HEADER -->
+<div class="header">
+  <span class="icon-btn" onclick="toggleSidebar()">☰</span>
+  <div class="logo">BotFusion</div>
+  <span>🏠</span>
 </div>
 
 <!-- HOME -->
-<div id="home" class="container section" style="display:block;">
+<div id="home" class="screen active">
   <h2>Welcome 👋</h2>
   <p>What would you like to do?</p>
 
-  <div class="card" onclick="showSection('chat')">💬 Start chatting</div>
-  <div class="card" onclick="showSection('profile')">👤 View profile</div>
-  <div class="card" onclick="showSection('account')">📄 Manage account</div>
-  <div class="card" onclick="showSection('settings')">⚙️ Settings</div>
+  <div class="card" onclick="openScreen('chat')">💬 Start chatting</div>
+  <div class="card" onclick="openScreen('profile')">👤 View profile</div>
+  <div class="card" onclick="openScreen('manage')">📄 Manage account</div>
+  <div class="card" onclick="openScreen('settings')">⚙️ Settings</div>
 
-  <p style="text-align:center;margin-top:25px;">
-    BotFusion — frontend only (backend next)
-  </p>
+  <p class="small">BotFusion — frontend only (backend next)</p>
 </div>
 
 <!-- CHAT -->
-<div id="chat" class="container section">
-  <h3>Chat</h3>
-  <div class="chat-box" id="chatBox"></div>
-
-  <div class="input-row">
-    <input id="chatInput" placeholder="Type a message...">
-    <button onclick="sendMessage()">Send</button>
-  </div>
+<div id="chat" class="screen">
+  <h2>💬 Chat</h2>
+  <p>This will connect to backend later.</p>
 </div>
 
 <!-- PROFILE -->
-<div id="profile" class="container section">
-  <h3>Your Profile</h3>
-  <div id="profileInfo">Not logged in yet.</div>
+<div id="profile" class="screen">
+  <h2>👤 Your Profile</h2>
+  <p>Name: (will come from backend)</p>
 </div>
 
-<!-- ACCOUNT -->
-<div id="account" class="container section">
-  <h3>Manage Account</h3>
-
-  <label>Name</label>
-  <input id="nameInput" style="width:100%;padding:8px;margin:6px 0;">
-
-  <label>Photo URL</label>
-  <input id="photoInput" style="width:100%;padding:8px;margin:6px 0;">
-
-  <button onclick="saveAccount()">Save</button>
+<!-- MANAGE -->
+<div id="manage" class="screen">
+  <h2>📄 Manage Account</h2>
+  <p>Change password, delete account (later).</p>
 </div>
 
 <!-- SETTINGS -->
-<div id="settings" class="container section">
-  <h3>Settings</h3>
+<div id="settings" class="screen">
+  <h2>⚙️ Settings</h2>
+  <p>Theme, notifications — coming later.</p>
+</div>
 
-  <div class="settings-row">
-    <b>Theme</b><br>
-    <button onclick="setTheme('dark')">Dark</button>
-    <button onclick="setTheme('light')">Light</button>
-  </div>
+<!-- LOGIN POPUP -->
+<div id="loginBox" class="overlay">
+  <div class="popup">
+    <h3>Login</h3>
 
-  <div class="settings-row">
-    <b>Language</b><br>
-    <select id="langSelect">
-      <option>English</option>
-      <option>Hindi</option>
-      <option>Marathi</option>
-      <option>Spanish</option>
-    </select>
-  </div>
+    <input class="input" placeholder="Email" />
+    <input class="input" placeholder="Password" type="password" />
 
-  <div class="settings-row">
-    <b>About BotFusion</b>
-    <p>
-      Developer: You 🙂<br>
-      Features: Chat, profile, login, settings<br>
-      Backend: coming soon
-    </p>
+    <button class="btn" onclick="fakeLogin()">Login</button>
+    <button class="btn google" onclick="fakeGoogle()">Continue with Google</button>
+
+    <div class="small" onclick="closeLogin()" style="text-align:center;cursor:pointer">
+      Close
+    </div>
   </div>
 </div>
 
-<!-- FIREBASE -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"></script>
-
 <script>
-
-// 🔥 PASTE YOUR FIREBASE CONFIG HERE
-const firebaseConfig = {
-  apiKey: "AIzaSyDA62eN5MEjX9Z-gw6w9UuR8L-Ke_6J7eE",
-  authDomain: "botfusion-ai-bd6d0.firebaseapp.com",
-  projectId: "botfusion-ai-bd6d0",
-  };
-
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-
-/* SIDEBAR */
 function toggleSidebar(){
   document.getElementById("sidebar").classList.toggle("open");
 }
 
-/* SECTIONS */
-function showSection(id){
-  document.querySelectorAll('.section').forEach(s => s.style.display = "none");
-  document.getElementById(id).style.display = "block";
+function openScreen(id){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  toggleSidebar();
 }
 
-/* CHAT */
-function sendMessage(){
-  let box = document.getElementById("chatBox");
-  let input = document.getElementById("chatInput");
+/* Login popup */
+function openLogin(){document.getElementById("loginBox").style.display="flex";}
+function closeLogin(){document.getElementById("loginBox").style.display="none";}
 
-  if(input.value.trim() === "") return;
-  box.innerHTML += `<p>👤 You: ${input.value}</p>`;
-  input.value = "";
+/* Fake (frontend only) */
+function fakeLogin(){
+  alert("Login will work after backend.");
+  closeLogin();
 }
-
-/* GOOGLE LOGIN */
-function googleLogin(){
-  const provider = new firebase.auth.GoogleAuthProvider();
-  auth.signInWithPopup(provider)
-  .catch(e=>alert(e.message));
+function fakeGoogle(){
+  alert("Google login will be added in backend step.");
+  closeLogin();
 }
-
-function logout(){
-  auth.signOut();
-}
-
-/* ON LOGIN STATE */
-auth.onAuthStateChanged(user=>{
-  const loginBtn = document.getElementById("loginBtn");
-  const logoutBtn = document.getElementById("logoutBtn");
-  const profileInfo = document.getElementById("profileInfo");
-
-  if(user){
-    loginBtn.style.display="none";
-    logoutBtn.style.display="block";
-
-    profileInfo.innerHTML = `
-      <img src="${user.photoURL || ''}" width="70" style="border-radius:50%"><br>
-      <b>${user.displayName}</b><br>
-      ${user.email}
-    `;
-
-    document.getElementById("nameInput").value = user.displayName || "";
-    document.getElementById("photoInput").value = user.photoURL || "";
-  }else{
-    loginBtn.style.display="block";
-    logoutBtn.style.display="none";
-    profileInfo.innerHTML = "Not logged in yet";
-  }
-});
-
-/* ACCOUNT SAVE (LOCAL ONLY NOW) */
-function saveAccount(){
-  alert("Saved locally — backend coming soon!");
-}
-
-/* THEME */
-function setTheme(mode){
-  if(mode==="light"){
-    document.body.style.background="#f2f2f2";
-    document.body.style.color="#000";
-  }else{
-    document.body.style.background="#202020";
-    document.body.style.color="#fff";
-  }
-}
-
 </script>
 
 </body>
