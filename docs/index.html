@@ -32,18 +32,20 @@ body {
 .sidebar {
   position: fixed;
   top: 0;
-  left: -100%; /* fully hidden */
-  width: 300px;
+  left: -300px; /* fully hidden: equal to sidebar width */
+  width: 300px; /* fixed width */
   height: 100vh;
   background: #111;
-  transition: 0.3s;
+  transition: left 0.3s ease;
   padding: 16px;
   overflow-y: auto;
   z-index: 1000;
 }
+
 .sidebar.open {
-  left: 0;
+  left: 0; /* slide in */
 }
+
 .sidebar button, .sidebar select {
   width: 100%;
   padding: 10px;
@@ -54,14 +56,15 @@ body {
   border-radius: 6px;
   cursor: pointer;
 }
+
 .sidebar button:hover, .sidebar select:hover {
   background: #3a3a3a;
 }
+
 .sidebar .close-btn {
   background: #900;
   margin-bottom: 16px;
 }
-
 /* ---------- HOME CARDS ---------- */
 .home-cards {
   padding: 20px;
@@ -261,7 +264,7 @@ body.theme-red { background:#3a0d0d; color:#fff; }
 </div>
 
 <!-- Typing indicator -->
-<div id="typingIndicator">Bot is typing...</div>
+<div id="typingIndicator">Botfusion is typing...</div>
 
 <!-- FIREBASE + SCRIPT -->
 <script type="module">
