@@ -4,311 +4,140 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Botfusion AI</title>
+
+<!-- PWA -->
+<meta name="theme-color" content="#121212">
+<link rel="icon" href="data:image/png;base64,iVBORw0KGgo=">
+
 <style>
-/* ---------- GLOBAL ---------- */
 :root {
-  --bg-color: #2a2a2a;
-  --header-color: #1f1f1f;
-  --card-color: #1f1f1f;
-  --sidebar-color: #111;
-  --button-color: #2a2a2a;
-  --button-hover: #3a3a3a;
-  --text-color: white;
+  --bg:#121212;
+  --card:#1f1f1f;
+  --text:#fff;
+  --accent:#ff4444;
 }
-body {
-  margin:0;
-  font-family: Arial, sans-serif;
-  background: var(--bg-color);
-  color: var(--text-color);
-  transition: all 0.3s;
-  overflow-x: hidden;
+.light {
+  --bg:#f2f2f2;
+  --card:#ffffff;
+  --text:#000;
 }
+* { box-sizing:border-box; font-family:system-ui; }
+body { margin:0; background:var(--bg); color:var(--text); }
 
-/* ---------- HEADER ---------- */
-.header{
+/* Header */
+header {
+  padding:14px;
+  background:var(--card);
   display:flex;
+  justify-content:space-between;
   align-items:center;
-  padding:12px 16px;
-  background: var(--header-color);
-}
-.hamburger{
-  font-size:24px;
-  cursor:pointer;
-  margin-right:12px;
 }
 
-/* ---------- SIDEBAR ---------- */
-.sidebar{
-  position:fixed;
-  top:0;
-  left:-100%; /* fully hidden */
-  width:300px;
-  height:100vh;
-  background: var(--sidebar-color);
-  transition:0.3s;
-  padding:16px;
+/* Chat */
+#chat {
+  height: calc(100vh - 120px);
   overflow-y:auto;
-  z-index:1000;
-}
-.sidebar.open{
-  left:0;
-}
-.sidebar button, .sidebar select{
-  width:100%;
   padding:10px;
-  margin:6px 0;
-  background: var(--button-color);
-  color:white;
+}
+.msg {
+  padding:10px;
+  margin:8px 0;
+  border-radius:12px;
+  max-width:80%;
+}
+.user { background:var(--accent); margin-left:auto; }
+.bot { background:var(--card); }
+
+/* Input */
+footer {
+  display:flex;
+  padding:10px;
+  background:var(--card);
+}
+input[type=text] {
+  flex:1;
+  padding:10px;
   border:none;
-  border-radius:6px;
-  cursor:pointer;
-}
-.sidebar button:hover, .sidebar select:hover{
-  background: var(--button-hover);
-}
-.sidebar .close-btn{
-  background: #900;
-  margin-bottom:16px;
-}
-
-/* ---------- HOME CARDS ---------- */
-.home-cards{
-  padding:20px;
-}
-.card{
-  background: var(--card-color);
-  padding:18px;
   border-radius:10px;
-  margin-bottom:10px;
 }
-
-/* ---------- CHAT ---------- */
-.chat-screen{
-  display:none;
-  padding:16px;
-}
-.message{
-  margin:6px 0;
+button {
+  margin-left:6px;
   padding:10px;
-  border-radius:8px;
-}
-.message.user{
-  background:#444;
-  text-align:right;
-}
-.message.bot{
-  background:#555;
-  text-align:left;
-}
-#typing-indicator{
-  font-style:italic;
-  margin-top:10px;
-}
-
-/* ---------- PROFILE ---------- */
-#profile-section{
-  display:none;
-  padding:20px;
-}
-#profile-info img{
-  width:75px;
-  height:75px;
-  border-radius:50%;
-  margin-bottom:10px;
-  object-fit:cover;
-}
-#profile-info p{
-  margin:4px 0;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
 }
 </style>
 </head>
+
 <body>
 
-<!-- HEADER -->
-<div class="header">
-  <div class="hamburger" onclick="toggleSidebar()">☰</div>
-  <h2>Botfusion AI</h2>
+<header>
+  <b>Botfusion AI</b>
+  <button onclick="toggleTheme()">🌗</button>
+</header>
+
+<div id="chat">
+  <div class="msg bot">Hello 👋 I am Botfusion</div>
 </div>
 
-<!-- SIDEBAR -->
-<div id="sidebar" class="sidebar">
-  <button class="close-btn" onclick="toggleSidebar()">❌ Close</button>
-  <button onclick="showHome()">🏠 Home</button>
-  <button onclick="startChat()">💬 Start Chatting</button>
-  <button onclick="showProfile()">👤 View Profile</button>
-  <button onclick="manageAccount()">⚙ Manage Account</button>
-  <button onclick="openSettings()">🛠 Settings</button>
-  
-  <hr>
+<footer>
+  <input id="msg" placeholder="Type message...">
+  <input type="file" id="file" hidden>
+  <button onclick="document.getElementById('file').click()">📎</button>
+  <button onclick="send()">➤</button>
+</footer>
 
-  <label>Theme:</label>
-  <select id="theme-select" onchange="switchTheme(this.value)">
-    <option value="#2a2a2a" selected>Dark Grey</option>
-    <option value="#1f1f1f">Dark</option>
-    <option value="#ffffff">Light</option>
-    <option value="#003366">Blue</option>
-    <option value="#663399">Purple</option>
-  </select>
+<script>
+/* Chat */
+function send() {
+  const input = document.getElementById('msg');
+  if(!input.value) return;
 
-  <label>Language:</label>
-  <select id="language-select">
-    <!-- 100+ languages -->
-    <option value="en" selected>English</option>
-    <option value="hi">Hindi</option>
-    <option value="mr">Marathi</option>
-    <option value="fr">French</option>
-    <option value="de">German</option>
-    <option value="es">Spanish</option>
-    <option value="zh">Chinese</option>
-    <option value="ja">Japanese</option>
-    <option value="ar">Arabic</option>
-    <option value="ru">Russian</option>
-    <!-- add remaining languages here -->
-  </select>
-
-  <hr>
-
-  <button id="loginBtn" onclick="googleLogin()">🔑 Login with Google</button>
-  <button id="logoutBtn" onclick="logout()" style="display:none;">🚪 Logout</button>
-</div>
-
-<!-- HOME -->
-<div id="home" class="home-cards">
-  <div class="card">✨ Start chatting smarter</div>
-  <div class="card">🤖 AI help whenever you need</div>
-  <div class="card">⚡ Fast, modern experience</div>
-</div>
-
-<!-- CHAT -->
-<div id="chat" class="chat-screen">
-  <div id="messages"></div>
-  <div id="typing-indicator"></div>
-  <input type="text" id="user-input" placeholder="Type a message..." onkeydown="if(event.key==='Enter'){sendMessage()}">
-  <button onclick="sendMessage()">Send</button>
-</div>
-
-<!-- PROFILE -->
-<div id="profile-section">
-  <h3>Your Profile</h3>
-  <div id="profile-info"></div>
-</div>
-
-<!-- FIREBASE -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
-from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-/* ---------- FIREBASE CONFIG ---------- */
-const firebaseConfig = {
-  apiKey: "AIzaSyDA62eN5MEjX9Z-gw6w9UuR8L-Ke_6J7eE",
-  authDomain: "botfusion-ai-bd6d0.firebaseapp.com",
-  projectId: "botfusion-ai-bd6d0",
-  storageBucket: "botfusion-ai-bd6d0.firebasestorage.app",
-  messagingSenderId: "730477136598",
-  appId: "1:730477136598:web:c6b4e0d495744d12079777",
-  measurementId: "G-53FTWNQB8X"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const provider = new GoogleAuthProvider();
-
-/* ---------- ELEMENTS ---------- */
-const sidebar = document.getElementById("sidebar");
-const home = document.getElementById("home");
-const chatScreen = document.getElementById("chat");
-const profileSection = document.getElementById("profile-section");
-const profileInfo = document.getElementById("profile-info");
-const loginBtn = document.getElementById("loginBtn");
-const logoutBtn = document.getElementById("logoutBtn");
-
-/* ---------- UI CONTROLS ---------- */
-window.toggleSidebar = () => sidebar.classList.toggle("open");
-window.showHome = () => {
-  home.style.display="block";
-  chatScreen.style.display="none";
-  profileSection.style.display="none";
-};
-window.showProfile = () => {
-  home.style.display="none";
-  chatScreen.style.display="none";
-  profileSection.style.display="block";
-};
-window.startChat = () => {
-  home.style.display="none";
-  profileSection.style.display="none";
-  chatScreen.style.display="block";
-  addMessage("bot","Hello! How can I help you?");
-};
-window.manageAccount = () => alert("Account manager coming soon!");
-window.openSettings = () => alert("Settings coming soon!");
-
-/* ---------- GOOGLE LOGIN ---------- */
-window.googleLogin = async () => {
-  try { await signInWithPopup(auth, provider); }
-  catch(err){ alert(err.message); }
-};
-window.logout = async () => { await signOut(auth); };
-
-/* ---------- LOGIN STATE ---------- */
-onAuthStateChanged(auth, (user)=>{
-  if(user){
-    loginBtn.style.display="none";
-    logoutBtn.style.display="block";
-    profileInfo.innerHTML = `
-      <img src="${user.photoURL || ""}">
-      <p><b>${user.displayName}</b></p>
-      <p>${user.email}</p>
-    `;
-  } else {
-    loginBtn.style.display="block";
-    logoutBtn.style.display="none";
-    profileInfo.innerHTML="";
-  }
-});
-
-/* ---------- THEME SWITCH ---------- */
-window.switchTheme = (color)=>{
-  document.documentElement.style.setProperty('--bg-color',color);
-  document.documentElement.style.setProperty('--sidebar-color',color==='#ffffff'?'#ddd':'#111');
-  document.documentElement.style.setProperty('--header-color',color==='#ffffff'?'#ccc':'#1f1f1f');
-  document.documentElement.style.setProperty('--card-color',color==='#ffffff'?'#eee':'#1f1f1f');
-  document.documentElement.style.setProperty('--button-color',color==='#ffffff'?'#ddd':'#2a2a2a');
-};
-
-/* ---------- CHAT FUNCTIONS ---------- */
-const messagesDiv = document.getElementById("messages");
-const typingIndicator = document.getElementById("typing-indicator");
-
-function addMessage(sender,text){
-  const msgDiv = document.createElement("div");
-  msgDiv.className="message "+sender;
-  msgDiv.textContent=text;
-  messagesDiv.appendChild(msgDiv);
-  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  const chat = document.getElementById('chat');
+  chat.innerHTML += `<div class="msg user">${input.value}</div>`;
+  chat.innerHTML += `<div class="msg bot">Received ✅</div>`;
+  input.value="";
+  chat.scrollTop = chat.scrollHeight;
 }
 
-function sendMessage(){
-  const input = document.getElementById("user-input");
-  const text = input.value.trim();
-  if(!text) return;
-  addMessage("user",text);
-  input.value="";
-  typingIndicator.textContent="Bot is typing...";
-  // Call backend API
-  fetch("/api/chat",{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({message:text})
-  }).then(r=>r.json()).then(data=>{
-    typingIndicator.textContent="";
-    addMessage("bot",data.reply);
-  }).catch(err=>{
-    typingIndicator.textContent="";
-    addMessage("bot","Error connecting to server");
-  });
+/* Theme */
+function toggleTheme(){
+  document.body.classList.toggle('light');
+}
+
+/* PWA: Manifest */
+const manifest = {
+  name:"Botfusion AI",
+  short_name:"Botfusion",
+  start_url:".",
+  display:"standalone",
+  background_color:"#121212",
+  theme_color:"#121212",
+  icons:[{
+    src:"data:image/png;base64,iVBORw0KGgo=",
+    sizes:"192x192",
+    type:"image/png"
+  }]
+};
+const blob = new Blob([JSON.stringify(manifest)],{type:'application/json'});
+const manifestURL = URL.createObjectURL(blob);
+const link = document.createElement('link');
+link.rel='manifest';
+link.href=manifestURL;
+document.head.appendChild(link);
+
+/* PWA: Service Worker */
+if('serviceWorker' in navigator){
+  const swCode = `
+    self.addEventListener('install',e=>self.skipWaiting());
+    self.addEventListener('fetch',e=>{});
+  `;
+  const swBlob = new Blob([swCode],{type:'text/javascript'});
+  const swURL = URL.createObjectURL(swBlob);
+  navigator.serviceWorker.register(swURL);
 }
 </script>
+
 </body>
 </html>
