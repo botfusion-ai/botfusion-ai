@@ -1,71 +1,110 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Botfusion AI</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>BotFusion AI</title>
 
 <!-- PWA -->
-<meta name="theme-color" content="#121212">
-<link rel="icon" href="data:image/png;base64,iVBORw0KGgo=">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#16a085">
 
 <style>
-:root {
-  --bg:#121212;
-  --card:#1f1f1f;
-  --text:#fff;
-  --accent:#ff4444;
+:root{
+  --bg:#1e1e1e;
+  --card:#2a2a2a;
+  --text:#ffffff;
+  --accent:#16a085;
 }
-.light {
-  --bg:#f2f2f2;
-  --card:#ffffff;
-  --text:#000;
+body{
+  margin:0;
+  font-family:system-ui, sans-serif;
+  background:var(--bg);
+  color:var(--text);
 }
-* { box-sizing:border-box; font-family:system-ui; }
-body { margin:0; background:var(--bg); color:var(--text); }
-
-/* Header */
-header {
-  padding:14px;
-  background:var(--card);
+header{
   display:flex;
-  justify-content:space-between;
   align-items:center;
+  padding:12px;
+  background:#111;
 }
-
-/* Chat */
-#chat {
-  height: calc(100vh - 120px);
-  overflow-y:auto;
-  padding:10px;
+header h1{
+  margin:0 auto;
+  font-size:18px;
 }
-.msg {
-  padding:10px;
-  margin:8px 0;
-  border-radius:12px;
-  max-width:80%;
-}
-.user { background:var(--accent); margin-left:auto; }
-.bot { background:var(--card); }
-
-/* Input */
-footer {
-  display:flex;
-  padding:10px;
-  background:var(--card);
-}
-input[type=text] {
-  flex:1;
-  padding:10px;
-  border:none;
-  border-radius:10px;
-}
-button {
-  margin-left:6px;
-  padding:10px;
-  border:none;
-  border-radius:10px;
+.menu-btn{
+  font-size:22px;
   cursor:pointer;
+}
+.sidebar{
+  position:fixed;
+  top:0; left:-260px;
+  width:260px; height:100%;
+  background:#121212;
+  padding:15px;
+  transition:0.3s;
+  z-index:10;
+}
+.sidebar.active{ left:0; }
+.sidebar button{
+  width:100%;
+  padding:12px;
+  margin:6px 0;
+  background:var(--card);
+  color:#fff;
+  border:none;
+  border-radius:8px;
+  text-align:left;
+}
+main{
+  padding:15px;
+}
+.card{
+  background:var(--card);
+  padding:14px;
+  border-radius:12px;
+  margin-bottom:10px;
+  cursor:pointer;
+}
+.chat-box{
+  position:fixed;
+  bottom:0;
+  left:0; right:0;
+  background:#111;
+  padding:10px;
+  display:flex;
+}
+.chat-box input{
+  flex:1;
+  padding:12px;
+  border-radius:25px;
+  border:none;
+  outline:none;
+}
+.chat-box button{
+  margin-left:10px;
+  border:none;
+  border-radius:50%;
+  width:44px;
+  background:var(--accent);
+  color:#fff;
+  font-size:18px;
+}
+.chat-area{
+  padding-bottom:80px;
+}
+.msg{
+  margin:8px 0;
+}
+.user{ text-align:right; }
+.bot{ color:#9cdcfe; }
+select{
+  width:100%;
+  padding:10px;
+  border-radius:8px;
+  background:var(--card);
+  color:white;
+  border:none;
 }
 </style>
 </head>
@@ -73,69 +112,107 @@ button {
 <body>
 
 <header>
-  <b>Botfusion AI</b>
-  <button onclick="toggleTheme()">🌗</button>
+  <span class="menu-btn" onclick="toggleMenu()">☰</span>
+  <h1>BotFusion</h1>
 </header>
 
-<div id="chat">
-  <div class="msg bot">Hello 👋 I am Botfusion</div>
+<div class="sidebar" id="sidebar">
+  <button onclick="showHome()">🏠 Home</button>
+  <button onclick="showProfile()">👤 Profile</button>
+  <button onclick="showSettings()">⚙️ Settings</button>
 </div>
 
-<footer>
-  <input id="msg" placeholder="Type message...">
-  <input type="file" id="file" hidden>
-  <button onclick="document.getElementById('file').click()">📎</button>
+<main id="content">
+  <h2 style="text-align:center;">How can I help you today?</h2>
+
+  <div class="card" onclick="quick('Explain quantum computing in simple terms')">✨ Explain quantum computing</div>
+  <div class="card" onclick="quick('Write a creative story about a robot')">🤖 Creative story</div>
+  <div class="card" onclick="quick('Help me debug my code')">🧠 Debug my code</div>
+  <div class="card" onclick="quick('How to learn a new language')">🌍 Learn a language</div>
+
+  <div class="chat-area" id="chat"></div>
+</main>
+
+<div class="chat-box">
+  <input id="input" placeholder="Message BotFusion..." />
   <button onclick="send()">➤</button>
-</footer>
+</div>
 
 <script>
-/* Chat */
-function send() {
-  const input = document.getElementById('msg');
-  if(!input.value) return;
+/* MENU */
+function toggleMenu(){
+  document.getElementById("sidebar").classList.toggle("active");
+}
 
-  const chat = document.getElementById('chat');
-  chat.innerHTML += `<div class="msg user">${input.value}</div>`;
-  chat.innerHTML += `<div class="msg bot">Received ✅</div>`;
+/* CHAT */
+let chat = document.getElementById("chat");
+
+function addMsg(text, cls){
+  let d=document.createElement("div");
+  d.className="msg "+cls;
+  d.innerText=text;
+  chat.appendChild(d);
+  window.scrollTo(0,document.body.scrollHeight);
+}
+
+function quick(text){
+  document.getElementById("input").value=text;
+}
+
+function send(){
+  let text=input.value.trim();
+  if(!text) return;
+  addMsg(text,"user");
   input.value="";
-  chat.scrollTop = chat.scrollHeight;
+  addMsg("🤖 (AI will respond here once API is connected)","bot");
 }
 
-/* Theme */
-function toggleTheme(){
-  document.body.classList.toggle('light');
-}
+/* PAGES */
+function showHome(){ location.reload(); }
 
-/* PWA: Manifest */
-const manifest = {
-  name:"Botfusion AI",
-  short_name:"Botfusion",
-  start_url:".",
-  display:"standalone",
-  background_color:"#121212",
-  theme_color:"#121212",
-  icons:[{
-    src:"data:image/png;base64,iVBORw0KGgo=",
-    sizes:"192x192",
-    type:"image/png"
-  }]
-};
-const blob = new Blob([JSON.stringify(manifest)],{type:'application/json'});
-const manifestURL = URL.createObjectURL(blob);
-const link = document.createElement('link');
-link.rel='manifest';
-link.href=manifestURL;
-document.head.appendChild(link);
-
-/* PWA: Service Worker */
-if('serviceWorker' in navigator){
-  const swCode = `
-    self.addEventListener('install',e=>self.skipWaiting());
-    self.addEventListener('fetch',e=>{});
+function showProfile(){
+  content.innerHTML=`
+    <h2>Profile</h2>
+    <p>Name:</p>
+    <input id="name" placeholder="Your name" />
+    <button onclick="saveName()">Save</button>
   `;
-  const swBlob = new Blob([swCode],{type:'text/javascript'});
-  const swURL = URL.createObjectURL(swBlob);
-  navigator.serviceWorker.register(swURL);
+  name.value=localStorage.name||"";
+}
+
+function saveName(){
+  localStorage.name=name.value;
+  alert("Saved");
+}
+
+function showSettings(){
+  content.innerHTML=`
+    <h2>Settings</h2>
+    <p>Theme</p>
+    <select onchange="setTheme(this.value)">
+      <option value="dark">Dark</option>
+      <option value="grey">Grey</option>
+      <option value="light">Light</option>
+    </select>
+  `;
+}
+
+function setTheme(t){
+  if(t==="light"){
+    document.documentElement.style.setProperty('--bg','#f2f2f2');
+    document.documentElement.style.setProperty('--text','#000');
+  }else if(t==="grey"){
+    document.documentElement.style.setProperty('--bg','#2c2c2c');
+    document.documentElement.style.setProperty('--text','#fff');
+  }else{
+    document.documentElement.style.setProperty('--bg','#1e1e1e');
+    document.documentElement.style.setProperty('--text','#fff');
+  }
+}
+
+/* PWA */
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js');
 }
 </script>
 
