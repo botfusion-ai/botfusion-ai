@@ -1,17 +1,8 @@
 import express from "express";
+import { chatHandler } from "../controllers/chatController.js";
 
 const router = express.Router();
 
-router.post("/", (req, res) => {
-  const { message } = req.body;
-
-  if (!message) {
-    return res.status(400).json({ error: "Message is required" });
-  }
-
-  res.json({
-    reply: `Botfusion received: ${message}`
-  });
-});
+router.post("/", chatHandler);
 
 export default router;
