@@ -2,7 +2,7 @@
 
 [![Node.js](https://img.shields.io/badge/Node.js-v25.2.1-brightgreen)](https://nodejs.org/)
 [![Express](https://img.shields.io/badge/Express-v4.18.2-blue)](https://expressjs.com/)
-[![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
+[![License](https://img.shields.io/badge/License-Apache2.0-green)](LICENSE)
 
 ---
 
