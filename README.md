@@ -1,50 +1,45 @@
-# BotFusion
+# BotFusion Backend
 
-**BotFusion** is a modern AI-powered chatbot platform that allows users to interact with advanced conversational AI models. It comes with a responsive UI, multi-language support, user authentication, chat history, and customizable settings.
-
----
-
-## Features
-
-- AI Chat: Human-like, context-aware responses  
-- User Authentication: Secure sign-up and login  
-- Profile Management: Personalize your account  
-- Chat History: View and manage past conversations  
-- Settings: Theme, language, notifications  
-- Multi-language Support: Over 200 languages  
-- Responsive Design: Works on desktop and mobile  
-- Easy Integration: Connect OpenAI API key for AI  
+[![Node.js](https://img.shields.io/badge/Node.js-v25.2.1-brightgreen)](https://nodejs.org/)
+[![Express](https://img.shields.io/badge/Express-v4.18.2-blue)](https://expressjs.com/)
+[![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
 ---
 
-## Tech Stack
+## 🔹 Overview
 
-- Frontend: HTML, CSS, JavaScript  
-- Backend: Node.js / Express.js (optional)  
-- Database: Firebase (Authentication + Firestore)  
-- AI Integration: OpenAI GPT API  
-- Hosting: Vercel / GitHub Pages  
+BotFusion Backend is the **server-side application** for the BotFusion AI project.  
+It is built using **Node.js** and **Express.js** and provides APIs for handling chat messages.  
+
+The backend:
+- Handles API requests from the frontend or other clients.
+- Responds to chat messages in JSON format.
+- Supports CORS for cross-origin requests.
+- Is ready to deploy on any platform (Termux, Railway, Render, Heroku, VPS, etc.).
+
+This backend is lightweight, fast, and modular, allowing easy integration with AI APIs or custom logic.
 
 ---
 
-git clone https://github.com/your-username/botfusion.git
-cd botfusion..
+## 🔹 Features
 
-npm install
+- **Express.js server**: Handles HTTP requests efficiently.
+- **Chat API**: `/api/chat` endpoint for POST requests.
+- **CORS enabled**: Allows frontend apps to communicate with backend.
+- **Environment-friendly**: Supports custom ports with `process.env.PORT`.
+- **Clean folder structure**: Organized routes and main server file.
+- **Production-ready**: Ready for deployment on servers or cloud platforms.
 
-http://localhost:3000
+---
 
-Contribution
-Fork the repo
-Create your branch: git checkout -b feature-name
-Commit: git commit -m "Add feature"
-Push: git push origin feature-name
-Open a Pull Request
-License
-This project is licensed under the Apache License 2.0. See LICENSE for details.
-Contact
-Email: botfusion12@gmail.com 
+## 🔹 Folder Structure
 
-# For more details visit:
-
-Website: https://botfusion-ai.my.canva.site
+```text
+backend/
+├── api/
+│   ├── index.js            # Main server entry point
+│   └── routes/
+│       └── chat.js         # Chat endpoint logic
+├── package.json            # Node.js project configuration
+├── .gitignore              # Ignore node_modules and sensitive files
+└── README.md               # Project documentation
