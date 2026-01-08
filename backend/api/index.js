@@ -1,23 +1,20 @@
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
-
-import chatRoutes from "./routes/chat.js";
-
-dotenv.config();
+import chatRouter from "./routes/chat.js";
 
 const app = express();
-const PORT = 3000;
 
 app.use(cors());
 app.use(express.json());
 
 app.get("/", (req, res) => {
-  res.send("🚀 BotFusion API is running");
+  res.send("BotFusion backend running");
 });
 
-app.use("/api/chat", chatRoutes);
+app.use("/api/chat", chatRouter);
+
+const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log(`✅ BotFusion backend running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
