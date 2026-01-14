@@ -1,45 +1,57 @@
-# BotFusion Backend
+# Botfusion AI
 
-[![Node.js](https://img.shields.io/badge/Node.js-v25.2.1-brightgreen)](https://nodejs.org/)
-[![Express](https://img.shields.io/badge/Express-v4.18.2-blue)](https://expressjs.com/)
-[![License](https://img.shields.io/badge/License-Apache2.0-green)](LICENSE)
+Botfusion AI is an intelligent AI platform designed to provide interactive, real-time AI solutions for businesses, developers, and educators. It combines natural language processing, AI-powered automation, and multi-platform support to create an accessible and scalable AI assistant experience.
 
 ---
 
-## 🔹 Overview
+## Features
 
-BotFusion Backend is the **server-side application** for the BotFusion AI project.  
-It is built using **Node.js** and **Express.js** and provides APIs for handling chat messages.  
-
-The backend:
-- Handles API requests from the frontend or other clients.
-- Responds to chat messages in JSON format.
-- Supports CORS for cross-origin requests.
-- Is ready to deploy on any platform (Termux, Railway, Render, Heroku, VPS, etc.).
-
-This backend is lightweight, fast, and modular, allowing easy integration with AI APIs or custom logic.
+- **AI Chat Assistant:** Interactive AI chatbot capable of understanding and responding to user queries in natural language.
+- **Multi-Platform Support:** Works seamlessly on web, mobile, and hybrid applications.
+- **Google Authentication:** Secure login via Google accounts.
+- **Language Switching:** Easily switch between multiple languages.
+- **Real-Time Updates:** Instant response to queries and tasks.
+- **Customizable UI:** User-friendly interface with a collapsible sidebar and flexible design.
+- **Extensible API Integration:** Integrates with third-party APIs for additional functionality.
 
 ---
 
-## 🔹 Features
+## Technology Stack
 
-- **Express.js server**: Handles HTTP requests efficiently.
-- **Chat API**: `/api/chat` endpoint for POST requests.
-- **CORS enabled**: Allows frontend apps to communicate with backend.
-- **Environment-friendly**: Supports custom ports with `process.env.PORT`.
-- **Clean folder structure**: Organized routes and main server file.
-- **Production-ready**: Ready for deployment on servers or cloud platforms.
+- **Frontend:** HTML, CSS, JavaScript
+- **Backend:** Node.js, Express.js
+- **Hosting:** Firebase Hosting / GitHub Pages / VPS / Cloud Platforms
+- **Authentication:** Firebase Authentication (Google Sign-In)
+- **Database:** Firebase Firestore or any preferred NoSQL database
+- **APIs:** Custom AI API endpoints for chat and automation
+- **Version Control:** Git & GitHub
 
 ---
 
-## 🔹 Folder Structure
+## Installation
 
-```text
-backend/
-├── api/
-│   ├── index.js            # Main server entry point
-│   └── routes/
-│       └── chat.js         # Chat endpoint logic
-├── package.json            # Node.js project configuration
-├── .gitignore              # Ignore node_modules and sensitive files
-└── README.md               # Project documentation
+1. **Clone the repository:**
+   ```bash
+  # cd botfusion-ai
+  # npm install
+
+  Usage
+Open the web app in your browser or mobile device.
+Use Google Sign-In to authenticate.
+Interact with the AI chatbot by typing queries.
+Switch languages via the language toggle in the sidebar.
+Explore integrations and custom API features.
+Contributing
+We welcome contributions! To contribute:
+Fork the repository.
+Create a new branch: git checkout -b feature-name
+Make your changes and commit: git commit -m 'Add feature'
+Push to your branch: git push origin feature-name
+Create a Pull Request on GitHub.
+License
+This project is licensed under the MIT License – see the LICENSE file for details.
+Contact
+Project: Botfusion AI
+Author: Atharv Pawar
+Email: botfusion12@gmail.com 
+Website: https://botfusion-ai.my.canva.site
