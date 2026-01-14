@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>BotFusion AI</title>
+
+<!-- Google Identity Services SDK -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 
 <style>
 :root{
@@ -13,9 +16,7 @@
   --accent:#19c37d;
   --card:#2f2f2f;
 }
-body{
-  overflow-x: hidden;
-}
+
 body{
   margin:0;
   font-family:system-ui,Segoe UI,Roboto;
@@ -24,6 +25,8 @@ body{
   height:100vh;
   display:flex;
   flex-direction:column;
+  overflow-x: hidden;
+  position: relative;
 }
 
 /* HEADER */
@@ -45,42 +48,50 @@ body{
   font-size:18px;
 }
 
+/* OVERLAY */
+.overlay{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100vw;
+  height:100vh;
+  background:rgba(0,0,0,0.4);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .3s;
+  z-index:1000;
+}
+
+.overlay.active{
+  opacity:1;
+  pointer-events:auto;
+}
+
 /* SIDEBAR */
 .sidebar{
   position:fixed;
   top:0;
   left:0;
   width:280px;
-  height:100%;
+  max-width:80vw;
+  height:100vh;
   background:var(--panel);
   padding:20px;
-  transform: translateX(-100%);
-  transition: transform .3s ease;
-  z-index:1000;
+  box-sizing:border-box;
+  transform: translateX(-110%);
+  transition: transform 0.3s ease;
+  z-index:1001;
 }
 
 .sidebar.active{
   transform: translateX(0);
 }
-.sidebar-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+
+.sidebar h3{
+  margin-top:0;
 }
 
-.close-btn{
-  font-size:22px;
-  cursor:pointer;
-}
-
-.sidebar label{
-  font-size:13px;
-  opacity:.8;
-}
-
-.sidebar button,
-.sidebar select,
-.sidebar input{
+.sidebar button, .sidebar select{
   width:100%;
   margin:10px 0;
   padding:10px;
@@ -89,20 +100,6 @@ body{
   background:#3a3a3a;
   color:white;
 }
-
-/* OVERLAY */
-.overlay{
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  background:rgba(0,0,0,.45);
-  display:none;
-  z-index:900;
-}
-
-.overlay.active{ display:block; }
 
 /* MAIN */
 .main{
@@ -115,17 +112,13 @@ body{
 }
 
 .icon{
-  width:36px;
-  height:36px;
-  background:var(--accent);
-  clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);
-  margin-bottom:12px;
+  font-size:42px;
+  color:var(--accent);
 }
 
 .title{
   font-size:22px;
-  margin:10px 0 20px;
-  text-align:center;
+  margin:15px 0;
 }
 
 .cards{
@@ -136,11 +129,12 @@ body{
 .card{
   background:var(--card);
   padding:14px;
-  border-radius:14px;
+  border-radius:12px;
   margin-bottom:12px;
+  cursor:pointer;
 }
 
-/* FOOTER */
+/* CHAT INPUT */
 .footer{
   padding:12px;
   background:#111;
@@ -164,6 +158,7 @@ body{
   border-radius:50%;
   width:42px;
   height:42px;
+  color:black;
   font-size:18px;
 }
 
@@ -178,20 +173,31 @@ body{
 
 <body>
 
+<!-- OVERLAY -->
+<div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+
 <!-- SIDEBAR -->
 <div class="sidebar" id="sidebar">
-  <div class="sidebar-header">
-    <h3>BotFusion AI</h3>
-    <span class="close-btn" onclick="toggleMenu()">✕</span>
-  </div>
+  <button onclick="toggleMenu()" style="
+    background:none;
+    border:none;
+    color:white;
+    font-size:20px;
+    margin-bottom:10px;
+  ">✕ Close</button>
 
-  <button onclick="googleLogin()">Google Login</button>
+  <h3>BotFusion AI</h3>
+
+  <div id="g_id_signin"></div>
+  <p id="user-email" style="font-size:14px;margin-top:5px;"></p>
 
   <label>Language</label>
-  <select onchange="setLanguage(this.value)">
+  <select id="lang-select">
     <option value="en">English</option>
     <option value="hi">Hindi</option>
-    <option value="mr">Marathi</option>
+    <option value="es">Spanish</option>
+    <option value="fr">French</option>
+    <option value="de">German</option>
   </select>
 
   <label>Theme</label>
@@ -205,16 +211,14 @@ body{
   </select>
 
   <label>Upload File</label>
-  <input type="file">
+  <input type="file" />
 
-  <button onclick="reportIssue()">Report</button>
+  <button onclick="alert('Report submitted')">Report</button>
 
   <p style="font-size:12px;opacity:.7">
     BotFusion AI does not provide illegal or harmful information.
   </p>
 </div>
-
-<div class="overlay" id="overlay" onclick="toggleMenu()"></div>
 
 <!-- HEADER -->
 <div class="header">
@@ -224,10 +228,10 @@ body{
 
 <!-- MAIN -->
 <div class="main">
-  <div class="icon"></div>
-  <div class="title" id="titleText">How can I help you today?</div>
+  <div class="icon">⬢</div>
+  <div class="title" id="main-title">How can I help you today?</div>
 
-  <div class="cards">
+  <div class="cards" id="cards-container">
     <div class="card">Explain quantum computing in simple terms</div>
     <div class="card">Write a creative story about a robot</div>
     <div class="card">Help me debug my code</div>
@@ -237,11 +241,15 @@ body{
 
 <!-- FOOTER -->
 <div class="footer">
-  <input placeholder="Message BotFusion...">
+  <input placeholder="Message BotFusion..." id="chat-input"/>
   <button>↑</button>
 </div>
 
 <script>
+const sidebar = document.getElementById('sidebar');
+const overlay = document.getElementById('overlay');
+const userEmail = document.getElementById('user-email');
+
 function toggleMenu(){
   sidebar.classList.toggle('active');
   overlay.classList.toggle('active');
@@ -251,20 +259,40 @@ function setTheme(theme){
   document.body.className = theme;
 }
 
-function setLanguage(lang){
-  const title = document.getElementById('titleText');
-  if(lang === 'hi') title.innerText = "मैं आपकी कैसे मदद कर सकता हूँ?";
-  else if(lang === 'mr') title.innerText = "मी तुम्हाला कशी मदत करू शकतो?";
-  else title.innerText = "How can I help you today?";
+// GOOGLE LOGIN
+function handleCredentialResponse(response) {
+  const jwt = response.credential;
+  // decode JWT if needed, here just displaying email placeholder
+  userEmail.textContent = "Logged in!";
 }
 
-function googleLogin(){
-  window.location.href = "http://localhost:5000/api/auth/google";
+// Initialize Google sign-in
+window.onload = function(){
+  google.accounts.id.initialize({
+    client_id: "YOUR_GOOGLE_CLIENT_ID",
+    callback: handleCredentialResponse
+  });
+
+  google.accounts.id.renderButton(
+    document.getElementById("g_id_signin"),
+    { theme: "outline", size: "large" }
+  );
+
+  google.accounts.id.prompt(); // show One Tap prompt
 }
 
-function reportIssue(){
-  alert("Report submitted. Thank you!");
-}
+// LANGUAGE CHANGE
+const langSelect = document.getElementById('lang-select');
+langSelect.addEventListener('change', function(){
+  const lang = this.value;
+  document.getElementById('main-title').textContent = {
+    en: "How can I help you today?",
+    hi: "मैं आज आपकी कैसे मदद कर सकता हूँ?",
+    es: "¿Cómo puedo ayudarte hoy?",
+    fr: "Comment puis-je vous aider aujourd'hui?",
+    de: "Wie kann ich Ihnen heute helfen?"
+  }[lang] || "How can I help you today?";
+});
 </script>
 
 </body>
