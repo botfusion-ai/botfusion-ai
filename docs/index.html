@@ -5,270 +5,203 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>BotFusion AI</title>
 
-<!-- Google Identity -->
-<script src="https://accounts.google.com/gsi/client" async defer></script>
-
 <style>
 :root{
-  --bg:#0b0f14;
-  --panel:#121822;
-  --text:#e8ecf1;
-  --accent:#4f8cff;
+  --bg:#1e1e1e;
+  --panel:#2a2a2a;
+  --text:#ffffff;
+  --accent:#19c37d;
+  --card:#2f2f2f;
 }
 
 body{
   margin:0;
-  font-family:Inter,system-ui,Arial;
+  font-family:system-ui,Segoe UI,Roboto;
   background:var(--bg);
   color:var(--text);
   height:100vh;
   display:flex;
+  flex-direction:column;
 }
 
-.sidebar{
-  width:260px;
-  background:var(--panel);
-  padding:20px;
+/* HEADER */
+.header{
   display:flex;
-  flex-direction:column;
+  align-items:center;
+  padding:14px;
+  background:#111;
+}
+
+.menu-btn{
+  font-size:22px;
+  cursor:pointer;
+  margin-right:12px;
 }
 
 .logo{
-  font-size:22px;
-  font-weight:700;
-  margin-bottom:20px;
+  font-weight:600;
+  font-size:18px;
 }
 
-.sidebar button{
-  margin:6px 0;
+/* SIDEBAR */
+.sidebar{
+  position:fixed;
+  top:0;
+  left:-260px;
+  width:260px;
+  height:100%;
+  background:var(--panel);
+  padding:20px;
+  transition:.3s;
+  z-index:1000;
+}
+
+.sidebar.active{ left:0; }
+
+.sidebar h3{
+  margin-top:0;
+}
+
+.sidebar button, .sidebar select{
+  width:100%;
+  margin:10px 0;
   padding:10px;
   border:none;
-  background:#1a2230;
-  color:var(--text);
   border-radius:8px;
-  cursor:pointer;
+  background:#3a3a3a;
+  color:white;
 }
 
-.sidebar button:hover{
-  background:var(--accent);
-}
-
+/* MAIN */
 .main{
   flex:1;
+  padding:20px;
   display:flex;
   flex-direction:column;
-}
-
-.header{
-  padding:15px;
-  background:#0f141c;
-  display:flex;
-  justify-content:space-between;
   align-items:center;
+  justify-content:center;
 }
 
-.chat{
-  flex:1;
-  padding:20px;
-  overflow-y:auto;
+.icon{
+  font-size:42px;
+  color:var(--accent);
 }
 
-.msg{
-  margin-bottom:14px;
-  max-width:75%;
-  padding:12px;
-  border-radius:10px;
+.title{
+  font-size:22px;
+  margin:15px 0;
 }
 
-.user{
-  background:var(--accent);
-  margin-left:auto;
+.cards{
+  width:100%;
+  max-width:420px;
 }
 
-.bot{
-  background:#1a2230;
-}
-
-.footer{
-  padding:15px;
-  display:flex;
-  gap:10px;
-  background:#0f141c;
-}
-
-input{
-  flex:1;
-  padding:12px;
-  border-radius:8px;
-  border:none;
-  outline:none;
-}
-
-.send{
-  padding:12px 18px;
-  background:var(--accent);
-  border:none;
-  border-radius:8px;
-  color:white;
+.card{
+  background:var(--card);
+  padding:14px;
+  border-radius:12px;
+  margin-bottom:12px;
   cursor:pointer;
 }
 
-.theme-select{
-  background:#1a2230;
-  color:white;
-  border:none;
-  padding:8px;
-  border-radius:6px;
-}
-
-.notice{
-  font-size:12px;
-  opacity:.7;
-  padding:10px;
-  text-align:center;
-}
-
-.report-modal{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.6);
-  display:none;
-  justify-content:center;
+/* CHAT INPUT */
+.footer{
+  padding:12px;
+  background:#111;
+  display:flex;
   align-items:center;
+  gap:8px;
 }
 
-.report-box{
-  background:#121822;
-  padding:20px;
-  width:300px;
-  border-radius:10px;
+.footer input{
+  flex:1;
+  padding:12px;
+  border-radius:20px;
+  border:none;
+  background:#2a2a2a;
+  color:white;
 }
 
-.report-box textarea{
-  width:100%;
-  height:80px;
+.footer button{
+  background:var(--accent);
+  border:none;
+  border-radius:50%;
+  width:42px;
+  height:42px;
+  color:black;
+  font-size:18px;
 }
+
+/* THEMES */
+.light{--bg:#f4f4f4;--panel:#ffffff;--text:#000;--card:#eaeaea;}
+.grey{--bg:#2b2b2b;--panel:#3a3a3a;}
+.blue{--bg:#0f172a;--panel:#1e293b;--accent:#3b82f6;}
+.green{--bg:#0b1a12;--panel:#0f2a1b;--accent:#22c55e;}
+.black{--bg:#000;--panel:#111;}
 </style>
 </head>
 
 <body>
 
 <!-- SIDEBAR -->
-<div class="sidebar">
-  <div class="logo">🤖 BotFusion AI</div>
+<div class="sidebar" id="sidebar">
+  <h3>BotFusion AI</h3>
 
-  <div id="googleBtn"></div>
+  <button onclick="alert('Login coming soon')">Google Login</button>
 
-  <button onclick="openReport()">🚩 Report</button>
-
-  <select class="theme-select" onchange="setTheme(this.value)">
-    <option value="dark">Dark</option>
-    <option value="blue">Blue</option>
-    <option value="purple">Purple</option>
-    <option value="green">Green</option>
+  <label>Theme</label>
+  <select onchange="setTheme(this.value)">
+    <option value="">Default</option>
+    <option value="grey">Grey</option>
     <option value="light">Light</option>
+    <option value="blue">Blue</option>
+    <option value="green">Green</option>
+    <option value="black">Black</option>
   </select>
 
-  <div class="notice">
-    BotFusion AI does not provide illegal, harmful, or unethical information.
-  </div>
+  <label>Upload File</label>
+  <input type="file" />
+
+  <button onclick="alert('Report submitted')">Report</button>
+
+  <p style="font-size:12px;opacity:.7">
+    BotFusion AI does not provide illegal or harmful information.
+  </p>
+</div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="menu-btn" onclick="toggleMenu()">☰</div>
+  <div class="logo">BotFusion</div>
 </div>
 
 <!-- MAIN -->
 <div class="main">
-  <div class="header">
-    <div>Chat</div>
-    <div id="user"></div>
-  </div>
+  <div class="icon">⬢</div>
+  <div class="title">How can I help you today?</div>
 
-  <div class="chat" id="chat"></div>
-
-  <div class="footer">
-    <input id="input" placeholder="Ask something..." />
-    <button class="send" onclick="send()">Send</button>
+  <div class="cards">
+    <div class="card">Explain quantum computing in simple terms</div>
+    <div class="card">Write a creative story about a robot</div>
+    <div class="card">Help me debug my code</div>
+    <div class="card">What's the best way to learn a new language?</div>
   </div>
 </div>
 
-<!-- REPORT MODAL -->
-<div class="report-modal" id="report">
-  <div class="report-box">
-    <h3>Report Issue</h3>
-    <textarea id="reportText"></textarea><br><br>
-    <button onclick="submitReport()">Submit</button>
-    <button onclick="closeReport()">Cancel</button>
-  </div>
+<!-- FOOTER -->
+<div class="footer">
+  <input placeholder="Message BotFusion..." />
+  <button>↑</button>
 </div>
 
 <script>
-/* ---------- THEMES ---------- */
-const themes={
- dark:{bg:'#0b0f14',panel:'#121822',accent:'#4f8cff'},
- blue:{bg:'#0b1220',panel:'#0f1b33',accent:'#3b82f6'},
- purple:{bg:'#120b1f',panel:'#1b1230',accent:'#a855f7'},
- green:{bg:'#0b1a12',panel:'#0f2a1b',accent:'#22c55e'},
- light:{bg:'#f4f6fb',panel:'#ffffff',accent:'#2563eb',text:'#000'}
-};
-
-function setTheme(t){
- const r=document.documentElement;
- r.style.setProperty('--bg',themes[t].bg);
- r.style.setProperty('--panel',themes[t].panel);
- r.style.setProperty('--accent',themes[t].accent);
- if(themes[t].text) r.style.setProperty('--text',themes[t].text);
+function toggleMenu(){
+  document.getElementById('sidebar').classList.toggle('active');
 }
 
-/* ---------- CHAT ---------- */
-async function send(){
- const input=document.getElementById('input');
- if(!input.value) return;
-
- addMsg(input.value,'user');
- const q=input.value;
- input.value='';
-
- try{
-  const res=await fetch('https://localhost:5000/api/chat',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({message:q})
-  });
-  const data=await res.json();
-  addMsg(data.reply || 'No response','bot');
- }catch{
-  addMsg('Server error','bot');
- }
-}
-
-function addMsg(text,cls){
- const d=document.createElement('div');
- d.className='msg '+cls;
- d.textContent=text;
- document.getElementById('chat').appendChild(d);
- d.scrollIntoView();
-}
-
-/* ---------- REPORT ---------- */
-function openReport(){document.getElementById('report').style.display='flex'}
-function closeReport(){document.getElementById('report').style.display='none'}
-function submitReport(){
- alert('Report submitted. Thank you.');
- closeReport();
-}
-
-/* ---------- GOOGLE LOGIN ---------- */
-window.onload=()=>{
- google.accounts.id.initialize({
-   client_id:'29653421578-hmm842utpcu63hdq8k43inonfid852ed.apps.googleusercontent.com',
-   callback:handleLogin
- });
- google.accounts.id.renderButton(
-   document.getElementById('googleBtn'),
-   {theme:'outline',size:'large'}
- );
-}
-
-function handleLogin(res){
- document.getElementById('user').textContent='Logged in';
+function setTheme(theme){
+  document.body.className = theme;
 }
 </script>
 
