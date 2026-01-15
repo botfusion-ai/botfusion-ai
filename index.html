@@ -4,7 +4,6 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>BotFusion AI</title>
-
 <style>
 :root{
   --bg:#1e1e1e;
@@ -47,22 +46,33 @@ body{
 .sidebar{
   position:fixed;
   top:0;
-  left:0px;
+  left:-260px;
   width:260px;
   height:100%;
   background:var(--panel);
   padding:20px;
   transition:.3s;
   z-index:1000;
+  overflow-y:auto;
 }
 
-.sidebar.active{ left:0; }
+.sidebar.active{
+  left:0;
+}
+
+.sidebar .close-btn{
+  display:block;
+  text-align:right;
+  font-size:20px;
+  cursor:pointer;
+  margin-bottom:10px;
+}
 
 .sidebar h3{
   margin-top:0;
 }
 
-.sidebar button, .sidebar select{
+.sidebar button, .sidebar select, .sidebar input[type="file"]{
   width:100%;
   margin:10px 0;
   padding:10px;
@@ -105,7 +115,7 @@ body{
   cursor:pointer;
 }
 
-/* CHAT INPUT / FOOTER */
+/* CHAT INPUT */
 .footer{
   padding:12px;
   background:#111;
@@ -123,16 +133,6 @@ body{
   color:white;
 }
 
-/* Hairpin Upload */
-.upload-btn {
-  font-size:22px;
-  cursor:pointer;
-  padding:8px;
-  color:var(--accent);
-  user-select: none;
-}
-.upload-btn:hover { opacity:0.8; }
-
 .footer button{
   background:var(--accent);
   border:none;
@@ -141,6 +141,7 @@ body{
   height:42px;
   color:black;
   font-size:18px;
+  cursor:pointer;
 }
 
 /* THEMES */
@@ -150,15 +151,22 @@ body{
 .green{--bg:#0b1a12;--panel:#0f2a1b;--accent:#22c55e;}
 .black{--bg:#000;--panel:#111;}
 </style>
+
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 
 <body>
 
 <!-- SIDEBAR -->
 <div class="sidebar" id="sidebar">
+  <span class="close-btn" onclick="toggleMenu()">×</span>
   <h3>BotFusion AI</h3>
 
-  <button onclick="googleLogin()">Google Login</button>
+  <div id="g_id_onload"
+       data-client_id="YOUR_GOOGLE_CLIENT_ID"
+       data-callback="handleCredentialResponse">
+  </div>
+  <div class="g_id_signin" data-type="standard"></div>
 
   <label>Theme</label>
   <select onchange="setTheme(this.value)">
@@ -171,14 +179,16 @@ body{
   </select>
 
   <label>Language</label>
-  <select id="language" onchange="changeLanguage(this.value)">
+  <select id="languageSelect">
     <option value="en">English</option>
     <option value="hi">Hindi</option>
     <option value="es">Spanish</option>
     <option value="fr">French</option>
     <option value="de">German</option>
-    <!-- Add more languages here -->
   </select>
+
+  <label>Upload File</label>
+  <input type="file" id="fileUpload" />
 
   <button onclick="alert('Report submitted')">Report</button>
 
@@ -206,58 +216,44 @@ body{
   </div>
 </div>
 
-<!-- FOOTER / CHATBAR -->
+<!-- FOOTER -->
 <div class="footer">
-  <!-- Hairpin Upload -->
-  <label for="fileUpload" class="upload-btn" title="Upload File">📎</label>
-  <input type="file" id="fileUpload" style="display:none;" onchange="handleFileUpload(event)" />
-
-  <!-- Chat Input -->
   <input id="chatInput" placeholder="Message BotFusion..." />
-
-  <!-- Send Button -->
-  <button onclick="sendMessage()">↑</button>
+  <button onclick="sendFile()">📎</button>
 </div>
 
 <script>
-/* Toggle Sidebar */
+// Sidebar toggle
 function toggleMenu(){
-  document.getElementById('sidebar').classList.toggle('active');
+  const sidebar = document.getElementById('sidebar');
+  sidebar.classList.toggle('active');
 }
 
-/* Theme Switcher */
+// Theme switch
 function setTheme(theme){
   document.body.className = theme;
 }
 
-/* Language Change (mock example) */
-function changeLanguage(lang){
-  alert('Language changed to '+lang);
-}
+// Language change
+document.getElementById('languageSelect').addEventListener('change', e=>{
+  alert('Language switched to '+e.target.value);
+});
 
-/* File Upload */
-function handleFileUpload(event){
-  const file = event.target.files[0];
-  if(file){
-    alert(`File selected: ${file.name}`);
-    // send to backend if needed
+// File upload
+function sendFile(){
+  const fileInput = document.getElementById('fileUpload');
+  if(fileInput.files.length>0){
+    alert('File selected: '+fileInput.files[0].name);
+  }else{
+    alert('No file selected!');
   }
 }
 
-/* Chat send */
-function sendMessage(){
-  const input = document.getElementById('chatInput');
-  if(input.value.trim() !== ''){
-    console.log('Send:', input.value);
-    input.value = '';
-  }
-}
-
-/* Google Login (mock) */
-function googleLogin(){
-  alert('Google Login clicked. Connect with backend OAuth.');
+// Google login callback
+function handleCredentialResponse(response){
+  console.log('Encoded JWT ID token: ' + response.credential);
+  alert('Google login successful!');
 }
 </script>
-
 </body>
 </html>
