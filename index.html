@@ -1,18 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BotFusion AI</title>
 
 <style>
+/* ================= ROOT THEMES ================= */
 :root{
-  --bg:#0f0f0f;
-  --panel:#1c1c1c;
+  --bg:#1e1e1e;
+  --panel:#2a2a2a;
   --text:#ffffff;
   --accent:#19c37d;
-  --card:#2a2a2a;
+  --card:#2f2f2f;
 }
+
+.light{--bg:#f4f4f4;--panel:#ffffff;--text:#000;--card:#eaeaea;}
+.grey{--bg:#2b2b2b;--panel:#3a3a3a;}
+.blue{--bg:#0f172a;--panel:#1e293b;--accent:#3b82f6;}
+.green{--bg:#0b1a12;--panel:#0f2a1b;--accent:#22c55e;}
+.black{--bg:#000;--panel:#111;}
 
 body{
   margin:0;
@@ -20,10 +27,12 @@ body{
   background:var(--bg);
   color:var(--text);
   height:100vh;
+  display:flex;
+  flex-direction:column;
   overflow:hidden;
 }
 
-/* HEADER */
+/* ================= HEADER ================= */
 .header{
   display:flex;
   align-items:center;
@@ -32,7 +41,7 @@ body{
 }
 
 .menu-btn{
-  font-size:22px;
+  font-size:24px;
   cursor:pointer;
   margin-right:12px;
 }
@@ -42,35 +51,37 @@ body{
   font-size:18px;
 }
 
-/* SIDEBAR */
+/* ================= SIDEBAR ================= */
 .sidebar{
   position:fixed;
   top:0;
-  left:-280px;
-  width:280px;
+  left:-100%;
+  width:260px;
   height:100%;
   background:var(--panel);
   padding:20px;
   transition:0.3s ease;
-  z-index:1000;
+  z-index:1001;
 }
 
 .sidebar.active{
   left:0;
 }
 
-.close-btn{
-  font-size:20px;
-  cursor:pointer;
-  float:right;
+.sidebar-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
 }
 
-.sidebar h3{
-  margin-top:10px;
+.close-btn{
+  font-size:22px;
+  cursor:pointer;
 }
 
 .sidebar button,
-.sidebar select{
+.sidebar select,
+.sidebar input{
   width:100%;
   margin:10px 0;
   padding:10px;
@@ -78,60 +89,63 @@ body{
   border-radius:8px;
   background:#3a3a3a;
   color:white;
-  cursor:pointer;
 }
 
-/* MAIN */
+/* ================= OVERLAY ================= */
+.overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.4);
+  display:none;
+  z-index:1000;
+}
+
+.overlay.active{
+  display:block;
+}
+
+/* ================= CHAT ================= */
 .main{
-  height:calc(100vh - 120px);
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
+  flex:1;
   padding:20px;
+  overflow-y:auto;
 }
 
-.icon{
-  font-size:42px;
-  color:var(--accent);
+.chat-box{
+  max-width:520px;
+  margin:auto;
 }
 
-.title{
-  font-size:22px;
-  margin:15px 0;
-}
-
-.cards{
-  width:100%;
-  max-width:420px;
-}
-
-.card{
-  background:var(--card);
-  padding:14px;
+.message{
+  padding:12px;
+  margin:10px 0;
   border-radius:12px;
-  margin-bottom:12px;
 }
 
-/* FOOTER */
+.user{
+  background:#3b82f6;
+  text-align:right;
+}
+
+.bot{
+  background:var(--card);
+}
+
+/* ================= FOOTER ================= */
 .footer{
-  height:60px;
+  padding:12px;
   background:#111;
   display:flex;
   align-items:center;
-  padding:10px;
   gap:8px;
 }
 
-.attach-btn{
+.upload-btn{
   font-size:20px;
   cursor:pointer;
-  background:#2a2a2a;
-  padding:10px;
-  border-radius:50%;
 }
 
-.footer input{
+.footer input[type=text]{
   flex:1;
   padding:12px;
   border-radius:20px;
@@ -149,28 +163,26 @@ body{
   font-size:18px;
   cursor:pointer;
 }
-
-/* THEMES */
-.light{--bg:#f4f4f4;--panel:#ffffff;--text:#000;--card:#eaeaea;}
-.grey{--bg:#2b2b2b;--panel:#3a3a3a;}
-.blue{--bg:#0f172a;--panel:#1e293b;--accent:#3b82f6;}
-.green{--bg:#0b1a12;--panel:#0f2a1b;--accent:#22c55e;}
-.black{--bg:#000;--panel:#111;}
 </style>
 </head>
 
 <body>
 
+<!-- OVERLAY -->
+<div class="overlay" id="overlay" onclick="closeMenu()"></div>
+
 <!-- SIDEBAR -->
 <div class="sidebar" id="sidebar">
-  <div class="close-btn" onclick="toggleMenu()">✕</div>
-  <h3>BotFusion AI</h3>
+  <div class="sidebar-header">
+    <h3>BotFusion AI</h3>
+    <span class="close-btn" onclick="closeMenu()">✖</span>
+  </div>
 
   <button onclick="googleLogin()">Google Login</button>
 
   <label>Theme</label>
   <select onchange="setTheme(this.value)">
-    <option value="">Dark (Default)</option>
+    <option value="">Default</option>
     <option value="grey">Grey</option>
     <option value="light">Light</option>
     <option value="blue">Blue</option>
@@ -179,18 +191,15 @@ body{
   </select>
 
   <label>Language</label>
-  <select onchange="changeLang(this.value)">
-    <option value="en">English</option>
-    <option value="hi">Hindi</option>
-    <option value="mr">Marathi</option>
-    <option value="fr">French</option>
-    <option value="de">German</option>
-    <option value="es">Spanish</option>
-    <option value="zh">Chinese</option>
-    <option value="ar">Arabic</option>
+  <select>
+    <option>English</option>
+    <option>Hindi</option>
+    <option>Marathi</option>
+    <option>Spanish</option>
+    <option>French</option>
   </select>
 
-  <button onclick="alert('Report submitted')">Report Issue</button>
+  <button onclick="alert('Report submitted')">Report</button>
 
   <p style="font-size:12px;opacity:.7">
     BotFusion AI does not provide illegal or harmful information.
@@ -199,58 +208,75 @@ body{
 
 <!-- HEADER -->
 <div class="header">
-  <div class="menu-btn" onclick="toggleMenu()">☰</div>
+  <div class="menu-btn" onclick="openMenu()">☰</div>
   <div class="logo">BotFusion</div>
 </div>
 
-<!-- MAIN -->
-<div class="main">
-  <div class="icon">⬢</div>
-  <div class="title">How can I help you today?</div>
-
-  <div class="cards">
-    <div class="card">Explain quantum computing in simple terms</div>
-    <div class="card">Write a creative story about a robot</div>
-    <div class="card">Help me debug my code</div>
-    <div class="card">Best way to learn a new language?</div>
+<!-- CHAT -->
+<div class="main" id="chat">
+  <div class="chat-box" id="chatBox">
+    <div class="message bot">How can I help you today?</div>
   </div>
 </div>
 
 <!-- FOOTER -->
 <div class="footer">
-  <label class="attach-btn">
-    📎
-    <input type="file" hidden onchange="fileSelected(this)">
+  <label class="upload-btn">📎
+    <input type="file" hidden>
   </label>
 
-  <input placeholder="Message BotFusion...">
-
-  <button>↑</button>
+  <input id="input" type="text" placeholder="Message BotFusion...">
+  <button onclick="send()">↑</button>
 </div>
 
 <script>
-function toggleMenu(){
-  document.getElementById('sidebar').classList.toggle('active');
-}
+const sidebar = document.getElementById("sidebar");
+const overlay = document.getElementById("overlay");
+const chatBox = document.getElementById("chatBox");
+const input = document.getElementById("input");
 
-function setTheme(theme){
-  document.body.className = theme;
+function openMenu(){
+  sidebar.classList.add("active");
+  overlay.classList.add("active");
 }
-
-function changeLang(lang){
-  alert("Language set to: " + lang);
+function closeMenu(){
+  sidebar.classList.remove("active");
+  overlay.classList.remove("active");
 }
-
-/* GOOGLE LOGIN */
+function setTheme(t){
+  document.body.className = t;
+}
 function googleLogin(){
   window.location.href = "http://localhost:5000/api/auth/google";
 }
 
-/* FILE UPLOAD */
-function fileSelected(input){
-  if(input.files.length > 0){
-    alert("Selected: " + input.files[0].names);
+/* CHAT */
+async function send(){
+  const text = input.value.trim();
+  if(!text) return;
+
+  add("user", text);
+  input.value="";
+
+  try{
+    const res = await fetch("http://localhost:5000/api/chat",{
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body:JSON.stringify({ message:text })
+    });
+    const data = await res.json();
+    add("bot", data.reply || "No response");
+  }catch{
+    add("bot","Server error");
   }
+}
+
+function add(role,text){
+  const div = document.createElement("div");
+  div.className = "message " + role;
+  div.innerText = text;
+  chatBox.appendChild(div);
+  chatBox.scrollTop = chatBox.scrollHeight;
 }
 </script>
 
