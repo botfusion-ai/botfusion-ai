@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>BotFusion AI</title>
+
 <style>
 :root{
   --bg:#1e1e1e;
@@ -21,6 +22,7 @@ body{
   height:100vh;
   display:flex;
   flex-direction:column;
+  overflow-x:hidden;
 }
 
 /* HEADER */
@@ -29,6 +31,7 @@ body{
   align-items:center;
   padding:14px;
   background:#111;
+  z-index:1001;
 }
 
 .menu-btn{
@@ -46,33 +49,25 @@ body{
 .sidebar{
   position:fixed;
   top:0;
-  left:-260px;
+  left:-300px; /* fully hidden */
   width:260px;
   height:100%;
   background:var(--panel);
   padding:20px;
-  transition:.3s;
+  transition:left 0.3s ease;
   z-index:1000;
   overflow-y:auto;
 }
 
 .sidebar.active{
-  left:0;
-}
-
-.sidebar .close-btn{
-  display:block;
-  text-align:right;
-  font-size:20px;
-  cursor:pointer;
-  margin-bottom:10px;
+  left:0; /* slide in */
 }
 
 .sidebar h3{
   margin-top:0;
 }
 
-.sidebar button, .sidebar select, .sidebar input[type="file"]{
+.sidebar button, .sidebar select{
   width:100%;
   margin:10px 0;
   padding:10px;
@@ -126,11 +121,12 @@ body{
 
 .footer input{
   flex:1;
-  padding:12px;
+  padding:12px 12px 12px 40px; /* space for file icon */
   border-radius:20px;
   border:none;
   background:#2a2a2a;
   color:white;
+  position:relative;
 }
 
 .footer button{
@@ -141,7 +137,15 @@ body{
   height:42px;
   color:black;
   font-size:18px;
-  cursor:pointer;
+}
+
+/* FILE UPLOAD ICON */
+.footer input::before{
+  content:'📎';
+  position:absolute;
+  left:12px;
+  top:50%;
+  transform:translateY(-50%);
 }
 
 /* THEMES */
@@ -151,22 +155,16 @@ body{
 .green{--bg:#0b1a12;--panel:#0f2a1b;--accent:#22c55e;}
 .black{--bg:#000;--panel:#111;}
 </style>
-
-<script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 
 <body>
 
 <!-- SIDEBAR -->
 <div class="sidebar" id="sidebar">
-  <span class="close-btn" onclick="toggleMenu()">×</span>
   <h3>BotFusion AI</h3>
 
-  <div id="g_id_onload"
-       data-client_id="YOUR_GOOGLE_CLIENT_ID"
-       data-callback="handleCredentialResponse">
-  </div>
-  <div class="g_id_signin" data-type="standard"></div>
+  <!-- Google Login -->
+  <button id="google-login">Login with Google</button>
 
   <label>Theme</label>
   <select onchange="setTheme(this.value)">
@@ -178,17 +176,8 @@ body{
     <option value="black">Black</option>
   </select>
 
-  <label>Language</label>
-  <select id="languageSelect">
-    <option value="en">English</option>
-    <option value="hi">Hindi</option>
-    <option value="es">Spanish</option>
-    <option value="fr">French</option>
-    <option value="de">German</option>
-  </select>
-
   <label>Upload File</label>
-  <input type="file" id="fileUpload" />
+  <input type="file" />
 
   <button onclick="alert('Report submitted')">Report</button>
 
@@ -218,42 +207,32 @@ body{
 
 <!-- FOOTER -->
 <div class="footer">
-  <input id="chatInput" placeholder="Message BotFusion..." />
-  <button onclick="sendFile()">📎</button>
+  <input placeholder="Message BotFusion..." />
+  <button>↑</button>
 </div>
 
 <script>
-// Sidebar toggle
 function toggleMenu(){
-  const sidebar = document.getElementById('sidebar');
-  sidebar.classList.toggle('active');
+  document.getElementById('sidebar').classList.toggle('active');
 }
 
-// Theme switch
 function setTheme(theme){
   document.body.className = theme;
 }
 
-// Language change
-document.getElementById('languageSelect').addEventListener('change', e=>{
-  alert('Language switched to '+e.target.value);
+// Close sidebar when clicking outside
+document.addEventListener('click', function(e){
+  const sidebar = document.getElementById('sidebar');
+  if(!sidebar.contains(e.target) && !e.target.classList.contains('menu-btn')){
+    sidebar.classList.remove('active');
+  }
 });
 
-// File upload
-function sendFile(){
-  const fileInput = document.getElementById('fileUpload');
-  if(fileInput.files.length>0){
-    alert('File selected: '+fileInput.files[0].name);
-  }else{
-    alert('No file selected!');
-  }
-}
-
-// Google login callback
-function handleCredentialResponse(response){
-  console.log('Encoded JWT ID token: ' + response.credential);
-  alert('Google login successful!');
-}
+// Google OAuth login
+document.getElementById('google-login').addEventListener('click', function(){
+  window.location.href = 'http://localhost:5000/api/auth/google'; // change port if needed
+});
 </script>
+
 </body>
 </html>
