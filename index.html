@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>BotFusion AI</title>
 
 <style>
-/* ================= ROOT THEMES ================= */
 :root{
   --bg:#1e1e1e;
   --panel:#2a2a2a;
@@ -14,12 +13,6 @@
   --accent:#19c37d;
   --card:#2f2f2f;
 }
-
-.light{--bg:#f4f4f4;--panel:#ffffff;--text:#000;--card:#eaeaea;}
-.grey{--bg:#2b2b2b;--panel:#3a3a3a;}
-.blue{--bg:#0f172a;--panel:#1e293b;--accent:#3b82f6;}
-.green{--bg:#0b1a12;--panel:#0f2a1b;--accent:#22c55e;}
-.black{--bg:#000;--panel:#111;}
 
 body{
   margin:0;
@@ -29,10 +22,9 @@ body{
   height:100vh;
   display:flex;
   flex-direction:column;
-  overflow:hidden;
 }
 
-/* ================= HEADER ================= */
+/* HEADER */
 .header{
   display:flex;
   align-items:center;
@@ -41,7 +33,7 @@ body{
 }
 
 .menu-btn{
-  font-size:24px;
+  font-size:22px;
   cursor:pointer;
   margin-right:12px;
 }
@@ -51,37 +43,26 @@ body{
   font-size:18px;
 }
 
-/* ================= SIDEBAR ================= */
+/* SIDEBAR */
 .sidebar{
   position:fixed;
   top:0;
-  left:-100%;
+  left:-260px;
   width:260px;
   height:100%;
   background:var(--panel);
   padding:20px;
-  transition:0.3s ease;
-  z-index:1001;
+  transition:.3s;
+  z-index:1000;
 }
 
-.sidebar.active{
-  left:0;
+.sidebar.active{ left:0; }
+
+.sidebar h3{
+  margin-top:0;
 }
 
-.sidebar-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-
-.close-btn{
-  font-size:22px;
-  cursor:pointer;
-}
-
-.sidebar button,
-.sidebar select,
-.sidebar input{
+.sidebar button, .sidebar select{
   width:100%;
   margin:10px 0;
   padding:10px;
@@ -91,47 +72,40 @@ body{
   color:white;
 }
 
-/* ================= OVERLAY ================= */
-.overlay{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.4);
-  display:none;
-  z-index:1000;
-}
-
-.overlay.active{
-  display:block;
-}
-
-/* ================= CHAT ================= */
+/* MAIN */
 .main{
   flex:1;
   padding:20px;
-  overflow-y:auto;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
 }
 
-.chat-box{
-  max-width:520px;
-  margin:auto;
+.icon{
+  font-size:42px;
+  color:var(--accent);
 }
 
-.message{
-  padding:12px;
-  margin:10px 0;
-  border-radius:12px;
+.title{
+  font-size:22px;
+  margin:15px 0;
 }
 
-.user{
-  background:#3b82f6;
-  text-align:right;
+.cards{
+  width:100%;
+  max-width:420px;
 }
 
-.bot{
+.card{
   background:var(--card);
+  padding:14px;
+  border-radius:12px;
+  margin-bottom:12px;
+  cursor:pointer;
 }
 
-/* ================= FOOTER ================= */
+/* CHAT INPUT / FOOTER */
 .footer{
   padding:12px;
   background:#111;
@@ -140,12 +114,7 @@ body{
   gap:8px;
 }
 
-.upload-btn{
-  font-size:20px;
-  cursor:pointer;
-}
-
-.footer input[type=text]{
+.footer input{
   flex:1;
   padding:12px;
   border-radius:20px;
@@ -154,29 +123,40 @@ body{
   color:white;
 }
 
+/* Hairpin Upload */
+.upload-btn {
+  font-size:22px;
+  cursor:pointer;
+  padding:8px;
+  color:var(--accent);
+  user-select: none;
+}
+.upload-btn:hover { opacity:0.8; }
+
 .footer button{
   background:var(--accent);
   border:none;
   border-radius:50%;
   width:42px;
   height:42px;
+  color:black;
   font-size:18px;
-  cursor:pointer;
 }
+
+/* THEMES */
+.light{--bg:#f4f4f4;--panel:#ffffff;--text:#000;--card:#eaeaea;}
+.grey{--bg:#2b2b2b;--panel:#3a3a3a;}
+.blue{--bg:#0f172a;--panel:#1e293b;--accent:#3b82f6;}
+.green{--bg:#0b1a12;--panel:#0f2a1b;--accent:#22c55e;}
+.black{--bg:#000;--panel:#111;}
 </style>
 </head>
 
 <body>
 
-<!-- OVERLAY -->
-<div class="overlay" id="overlay" onclick="closeMenu()"></div>
-
 <!-- SIDEBAR -->
 <div class="sidebar" id="sidebar">
-  <div class="sidebar-header">
-    <h3>BotFusion AI</h3>
-    <span class="close-btn" onclick="closeMenu()">✖</span>
-  </div>
+  <h3>BotFusion AI</h3>
 
   <button onclick="googleLogin()">Google Login</button>
 
@@ -191,12 +171,13 @@ body{
   </select>
 
   <label>Language</label>
-  <select>
-    <option>English</option>
-    <option>Hindi</option>
-    <option>Marathi</option>
-    <option>Spanish</option>
-    <option>French</option>
+  <select id="language" onchange="changeLanguage(this.value)">
+    <option value="en">English</option>
+    <option value="hi">Hindi</option>
+    <option value="es">Spanish</option>
+    <option value="fr">French</option>
+    <option value="de">German</option>
+    <!-- Add more languages here -->
   </select>
 
   <button onclick="alert('Report submitted')">Report</button>
@@ -208,75 +189,73 @@ body{
 
 <!-- HEADER -->
 <div class="header">
-  <div class="menu-btn" onclick="openMenu()">☰</div>
+  <div class="menu-btn" onclick="toggleMenu()">☰</div>
   <div class="logo">BotFusion</div>
 </div>
 
-<!-- CHAT -->
-<div class="main" id="chat">
-  <div class="chat-box" id="chatBox">
-    <div class="message bot">How can I help you today?</div>
+<!-- MAIN -->
+<div class="main">
+  <div class="icon">⬢</div>
+  <div class="title">How can I help you today?</div>
+
+  <div class="cards">
+    <div class="card">Explain quantum computing in simple terms</div>
+    <div class="card">Write a creative story about a robot</div>
+    <div class="card">Help me debug my code</div>
+    <div class="card">What's the best way to learn a new language?</div>
   </div>
 </div>
 
-<!-- FOOTER -->
+<!-- FOOTER / CHATBAR -->
 <div class="footer">
-  <label class="upload-btn">📎
-    <input type="file" hidden>
-  </label>
+  <!-- Hairpin Upload -->
+  <label for="fileUpload" class="upload-btn" title="Upload File">📎</label>
+  <input type="file" id="fileUpload" style="display:none;" onchange="handleFileUpload(event)" />
 
-  <input id="input" type="text" placeholder="Message BotFusion...">
-  <button onclick="send()">↑</button>
+  <!-- Chat Input -->
+  <input id="chatInput" placeholder="Message BotFusion..." />
+
+  <!-- Send Button -->
+  <button onclick="sendMessage()">↑</button>
 </div>
 
 <script>
-const sidebar = document.getElementById("sidebar");
-const overlay = document.getElementById("overlay");
-const chatBox = document.getElementById("chatBox");
-const input = document.getElementById("input");
-
-function openMenu(){
-  sidebar.classList.add("active");
-  overlay.classList.add("active");
-}
-function closeMenu(){
-  sidebar.classList.remove("active");
-  overlay.classList.remove("active");
-}
-function setTheme(t){
-  document.body.className = t;
-}
-function googleLogin(){
-  window.location.href = "http://localhost:5000/api/auth/google";
+/* Toggle Sidebar */
+function toggleMenu(){
+  document.getElementById('sidebar').classList.toggle('active');
 }
 
-/* CHAT */
-async function send(){
-  const text = input.value.trim();
-  if(!text) return;
+/* Theme Switcher */
+function setTheme(theme){
+  document.body.className = theme;
+}
 
-  add("user", text);
-  input.value="";
+/* Language Change (mock example) */
+function changeLanguage(lang){
+  alert('Language changed to '+lang);
+}
 
-  try{
-    const res = await fetch("http://localhost:5001/api/chat",{
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      body:JSON.stringify({ message:text })
-    });
-    const data = await res.json();
-    add("bot", data.reply || "No response");
-  }catch{
-    add("bot","Server error");
+/* File Upload */
+function handleFileUpload(event){
+  const file = event.target.files[0];
+  if(file){
+    alert(`File selected: ${file.name}`);
+    // send to backend if needed
   }
 }
 
-function add(role,text){
-  const div = document.createElement("div");
-  div.className = "message " + role;
-  div.innerText = text;
-  chatBox.appendChild(div);
-  chatBox.scrollTop = chatBox.scrollHeight;
+/* Chat send */
+function sendMessage(){
+  const input = document.getElementById('chatInput');
+  if(input.value.trim() !== ''){
+    console.log('Send:', input.value);
+    input.value = '';
+  }
+}
+
+/* Google Login (mock) */
+function googleLogin(){
+  alert('Google Login clicked. Connect with backend OAuth.');
 }
 </script>
 
