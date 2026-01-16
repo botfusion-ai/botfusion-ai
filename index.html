@@ -3,252 +3,250 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>BotFusion AI</title>
+<title>BotFusion</title>
 
 <style>
-/* ================= ROOT THEMES ================= */
 :root{
-  --bg:#0f0f0f;
-  --panel:#1c1c1c;
-  --text:#ffffff;
-  --accent:#19c37d;
+  --bg:#121212;
+  --panel:#1e1e1e;
   --card:#2a2a2a;
+  --accent:#19c39c;
+  --text:#ffffff;
+  --muted:#9a9a9a;
+}
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 body{
-  margin:0;
-  font-family:system-ui,Segoe UI,Roboto;
   background:var(--bg);
   color:var(--text);
   height:100vh;
   overflow:hidden;
 }
 
-/* ================= HEADER ================= */
-.header{
+/* ---------- HEADER ---------- */
+header{
+  height:56px;
+  background:var(--panel);
   display:flex;
   align-items:center;
-  padding:14px;
-  background:#000;
+  padding:0 14px;
 }
 
 .menu-btn{
-  font-size:22px;
+  font-size:24px;
   cursor:pointer;
-  margin-right:12px;
 }
 
 .logo{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-left:12px;
   font-weight:600;
-  font-size:18px;
 }
 
-/* ================= SIDEBAR ================= */
-.sidebar{
-  position:fixed;
-  top:0;
-  left:-100%;
-  width:260px;
-  height:100%;
-  background:var(--panel);
-  padding:20px;
-  transition:0.3s ease;
-  z-index:1000;
-}
-
-.sidebar.active{
-  left:0;
-}
-
-.close-btn{
-  font-size:20px;
-  cursor:pointer;
-  text-align:right;
-}
-
-.sidebar h3{
-  margin-top:10px;
-}
-
-.sidebar button,
-.sidebar select{
-  width:100%;
-  margin:10px 0;
-  padding:10px;
-  border:none;
-  border-radius:8px;
-  background:#3a3a3a;
-  color:white;
-}
-
-/* ================= MAIN ================= */
-.main{
-  height:calc(100vh - 120px);
-  padding:20px;
-  overflow-y:auto;
-}
-
-.icon{
-  font-size:40px;
+.logo span{
   color:var(--accent);
 }
 
-.title{
+/* ---------- SIDEBAR ---------- */
+.sidebar{
+  position:fixed;
+  top:0;
+  left:0;
+  width:260px;
+  height:100%;
+  background:#0f0f0f;
+  transform:translateX(-100%);
+  transition:0.3s ease;
+  z-index:1000;
+  padding-top:60px;
+}
+
+.sidebar.active{
+  transform:translateX(0);
+}
+
+.sidebar a{
+  display:block;
+  padding:14px 20px;
+  color:#ddd;
+  text-decoration:none;
+  font-size:15px;
+}
+
+.sidebar a:hover{
+  background:#1f1f1f;
+}
+
+.sidebar hr{
+  border:none;
+  border-top:1px solid #2b2b2b;
+  margin:10px 0;
+}
+
+/* overlay */
+.overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.6);
+  display:none;
+  z-index:900;
+}
+
+.overlay.show{
+  display:block;
+}
+
+/* ---------- MAIN ---------- */
+main{
+  height:calc(100vh - 56px);
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+}
+
+/* ---------- CENTER CONTENT ---------- */
+.center{
+  text-align:center;
+  margin-top:40px;
+}
+
+.center h1{
+  margin-top:20px;
   font-size:22px;
-  margin:12px 0;
+}
+
+.cards{
+  margin-top:30px;
+  padding:0 14px;
 }
 
 .card{
   background:var(--card);
+  border-radius:14px;
   padding:14px;
-  border-radius:12px;
   margin-bottom:12px;
-}
-
-/* ================= FOOTER ================= */
-.footer{
-  position:fixed;
-  bottom:0;
-  width:100%;
-  padding:12px;
-  background:#000;
+  color:#ddd;
   display:flex;
   align-items:center;
   gap:10px;
 }
 
-.file-label{
-  font-size:22px;
-  cursor:pointer;
-}
-
-.footer input[type="text"]{
-  flex:1;
+/* ---------- CHAT BAR ---------- */
+.chatbar{
   padding:12px;
-  border-radius:20px;
-  border:none;
-  background:#2a2a2a;
-  color:white;
+  background:var(--panel);
 }
 
-.footer button{
-  background:var(--accent);
+.chat-input{
+  display:flex;
+  align-items:center;
+  background:#2a2a2a;
+  border-radius:25px;
+  padding:8px 12px;
+}
+
+.chat-input input{
+  flex:1;
+  background:none;
   border:none;
-  border-radius:50%;
-  width:42px;
-  height:42px;
-  font-size:18px;
+  outline:none;
+  color:white;
+  font-size:15px;
+}
+
+.chat-input button{
+  background:none;
+  border:none;
+  color:#ccc;
+  font-size:20px;
+  margin-left:8px;
   cursor:pointer;
 }
 
-/* ================= THEMES ================= */
-.light{--bg:#f4f4f4;--panel:#ffffff;--text:#000;--card:#eaeaea;}
-.grey{--bg:#2b2b2b;--panel:#3a3a3a;}
-.blue{--bg:#0f172a;--panel:#1e293b;--accent:#3b82f6;}
-.green{--bg:#0b1a12;--panel:#0f2a1b;--accent:#22c55e;}
-.black{--bg:#000;--panel:#111;}
+.footer-text{
+  font-size:12px;
+  color:var(--muted);
+  text-align:center;
+  margin-top:6px;
+}
 </style>
 </head>
 
 <body>
 
-<!-- ================= SIDEBAR ================= -->
+<!-- SIDEBAR -->
 <div class="sidebar" id="sidebar">
-  <div class="close-btn" onclick="toggleMenu()">✕</div>
-  <h3>BotFusion AI</h3>
-
-  <button onclick="googleLogin()">Google Login</button>
-
-  <label>Theme</label>
-  <select onchange="setTheme(this.value)">
-    <option value="">Dark (Default)</option>
-    <option value="grey">Grey</option>
-    <option value="light">Light</option>
-    <option value="blue">Blue</option>
-    <option value="green">Green</option>
-    <option value="black">Black</option>
-  </select>
-
-  <label>Language</label>
-  <select>
-    <option>English</option>
-    <option>Hindi</option>
-    <option>Marathi</option>
-    <option>Spanish</option>
-    <option>French</option>
-  </select>
-
-  <button onclick="report()">Report</button>
-
-  <p style="font-size:12px;opacity:.7">
-    BotFusion AI does not provide illegal or harmful information.
-  </p>
+  <a href="#">🧠 New Chat</a>
+  <a href="#">📜 History</a>
+  <hr>
+  <a href="#">⚙️ Settings</a>
+  <a href="#">❓ Help</a>
+  <a href="#">🚪 Logout</a>
 </div>
 
-<!-- ================= HEADER ================= -->
-<div class="header">
-  <div class="menu-btn" onclick="toggleMenu()">☰</div>
-  <div class="logo">BotFusion</div>
-</div>
+<div class="overlay" id="overlay"></div>
 
-<!-- ================= MAIN ================= -->
-<div class="main" id="chat">
-  <div class="icon">⬢</div>
-  <div class="title">How can I help you today?</div>
+<!-- HEADER -->
+<header>
+  <div class="menu-btn" id="menuBtn">☰</div>
+  <div class="logo">
+    <span>⬡</span> BotFusion
+  </div>
+</header>
 
-  <div class="card">Explain quantum computing in simple terms</div>
-  <div class="card">Write a creative story about a robot</div>
-  <div class="card">Help me debug my code</div>
-</div>
+<!-- MAIN -->
+<main>
 
-<!-- ================= FOOTER ================= -->
-<div class="footer">
-  <label class="file-label">📎
-    <input type="file" hidden>
-  </label>
-  <input id="msg" type="text" placeholder="Message BotFusion..." />
-  <button onclick="send()">↑</button>
-</div>
+  <!-- CENTER -->
+  <div class="center">
+    <div style="font-size:48px;color:var(--accent)">⬡</div>
+    <h1>How can I help you today?</h1>
+
+    <div class="cards">
+      <div class="card">ℹ️ Explain quantum computing in simple terms</div>
+      <div class="card">✏️ Write a creative story about a robot</div>
+      <div class="card">💻 Help me debug my code</div>
+      <div class="card">🌍 What's the best way to learn a new language?</div>
+    </div>
+  </div>
+
+  <!-- CHAT BAR -->
+  <div class="chatbar">
+    <div class="chat-input">
+      <input type="file" id="fileInput" hidden />
+      <button onclick="document.getElementById('fileInput').click()">📎</button>
+      <input type="text" placeholder="Message BotFusion..." />
+      <button>⬆️</button>
+    </div>
+    <div class="footer-text">
+      BotFusion can make mistakes. Consider checking important information.
+    </div>
+  </div>
+
+</main>
 
 <script>
-const API = "http://localhost:5000";
+const sidebar = document.getElementById("sidebar");
+const overlay = document.getElementById("overlay");
+const menuBtn = document.getElementById("menuBtn");
 
-/* Sidebar */
-function toggleMenu(){
-  document.getElementById("sidebar").classList.toggle("active");
-}
+menuBtn.onclick = () => {
+  sidebar.classList.add("active");
+  overlay.classList.add("show");
+};
 
-/* Theme */
-function setTheme(theme){
-  document.body.className = theme;
-}
-
-/* Google Login */
-function googleLogin(){
-  window.location.href = API + "/api/auth/google";
-}
-
-/* Send Chat */
-async function send(){
-  const input = document.getElementById("msg");
-  if(!input.value) return;
-
-  const res = await fetch(API + "/api/chat",{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({message:input.value})
-  });
-
-  const data = await res.json();
-  alert(data.reply);
-  input.value="";
-}
-
-/* Report */
-function report(){
-  fetch(API + "/api/report",{method:"POST"});
-  alert("Report submitted");
-}
+overlay.onclick = () => {
+  sidebar.classList.remove("active");
+  overlay.classList.remove("show");
+};
 </script>
 
 </body>
