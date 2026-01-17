@@ -1,189 +1,247 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BotFusion AI</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>BotFusion</title>
 
 <style>
-:root{
-  --bg:#121212;
-  --panel:#1e1e1e;
-  --panel2:#232323;
-  --accent:#19c37d;
-  --text:#e5e5e5;
-  --muted:#9a9a9a;
-}
-*{box-sizing:border-box;font-family:system-ui}
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--text);
-  overflow:hidden;
+/* ---------- RESET ---------- */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-/* SIDEBAR */
-.sidebar{
-  position:fixed;
-  top:0;left:0;
-  width:260px;
-  height:100vh;
-  background:#181818;
-  padding:15px;
-  transform:translateX(-100%);
-  transition:.3s ease;
-  z-index:1000;
-}
-.sidebar.open{transform:translateX(0);}
-.sidebar h3{color:var(--accent)}
-.side-item{
-  padding:12px;
-  border-radius:10px;
-  cursor:pointer;
-  margin-bottom:8px;
-}
-.side-item:hover{background:#2a2a2a}
-
-/* OVERLAY */
-.overlay{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.4);
-  display:none;
-  z-index:900;
-}
-.overlay.show{display:block}
-
-/* MAIN */
-.main{height:100vh;display:flex;flex-direction:column}
-
-/* HEADER */
-.header{
-  height:56px;
-  background:#181818;
-  display:flex;
-  align-items:center;
-  padding:0 15px;
-  gap:15px;
-}
-.hamburger{font-size:22px;cursor:pointer}
-.logo span{color:var(--accent)}
-
-/* CHAT */
-.chat{
-  flex:1;
-  padding:25px 15px 120px;
-  text-align:center;
-}
-.hero-icon{
-  width:60px;height:60px;
-  margin:60px auto 20px;
-  background:var(--accent);
-  border-radius:12px;
-  clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);
-}
-.suggestion{
-  background:var(--panel2);
-  padding:15px;
-  border-radius:14px;
-  margin-bottom:12px;
-  cursor:pointer;
-  text-align:left;
+/* ---------- BODY ---------- */
+body {
+  background: #1e1e1e;
+  color: #fff;
+  height: 100vh;
+  overflow: hidden;
 }
 
-/* INPUT */
-.input-bar{
-  position:fixed;
-  bottom:0;
-  width:100%;
-  background:#181818;
-  padding:12px;
+/* ---------- HEADER ---------- */
+header {
+  height: 56px;
+  background: #111;
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  gap: 14px;
 }
-.input-wrap{
-  background:var(--panel2);
-  border-radius:25px;
-  display:flex;
-  align-items:center;
-  padding:8px 12px;
-  gap:10px;
+
+.menu-btn {
+  font-size: 22px;
+  cursor: pointer;
 }
-.input-wrap input{
-  flex:1;
-  background:none;
-  border:none;
-  outline:none;
-  color:white;
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
 }
-.send{
-  background:var(--accent);
-  border:none;
-  width:36px;height:36px;
-  border-radius:50%;
+
+.logo {
+  width: 22px;
+  height: 22px;
+  border: 2px solid #19c37d;
+  transform: rotate(45deg);
+}
+
+/* ---------- SIDEBAR ---------- */
+.sidebar {
+  position: fixed;
+  top: 56px;
+  left: -260px;
+  width: 260px;
+  height: calc(100vh - 56px);
+  background: #121212;
+  padding: 16px;
+  transition: left 0.3s ease;
+  z-index: 10;
+}
+
+.sidebar.open {
+  left: 0;
+}
+
+.sidebar h3 {
+  font-size: 14px;
+  margin-bottom: 10px;
+  color: #aaa;
+}
+
+.sidebar button {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  background: #1f1f1f;
+  border: none;
+  color: #fff;
+  border-radius: 8px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sidebar button:hover {
+  background: #2a2a2a;
+}
+
+/* ---------- OVERLAY ---------- */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: none;
+  z-index: 5;
+}
+
+.overlay.show {
+  display: block;
+}
+
+/* ---------- MAIN ---------- */
+main {
+  height: calc(100vh - 56px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+/* ---------- HERO ---------- */
+.hero-logo {
+  width: 50px;
+  height: 50px;
+  border: 3px solid #19c37d;
+  margin-bottom: 16px;
+  transform: rotate(45deg);
+}
+
+h1 {
+  margin-bottom: 20px;
+  font-size: 24px;
+}
+
+/* ---------- SUGGESTIONS ---------- */
+.suggestion {
+  width: 100%;
+  max-width: 420px;
+  background: #2a2a2a;
+  padding: 14px;
+  border-radius: 12px;
+  margin-bottom: 10px;
+  color: #ccc;
+}
+
+/* ---------- CHAT BAR ---------- */
+.chat-bar {
+  position: fixed;
+  bottom: 16px;
+  left: 16px;
+  right: 16px;
+  background: #2a2a2a;
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  gap: 10px;
+}
+
+.chat-bar input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #fff;
+  font-size: 15px;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.send-btn {
+  background: #19c37d;
+  border: none;
+  color: #000;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+/* ---------- GOOGLE LOGIN ---------- */
+.google-btn {
+  margin-top: 16px;
+  background: #fff;
+  color: #000;
+  padding: 12px;
+  width: 100%;
+  max-width: 260px;
+  border-radius: 10px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
 }
 </style>
 </head>
 
 <body>
 
-<!-- SIDEBAR -->
+<header>
+  <div class="menu-btn" onclick="toggleSidebar()">☰</div>
+  <div class="brand">
+    <div class="logo"></div>
+    BotFusion
+  </div>
+</header>
+
 <div class="sidebar" id="sidebar">
-  <h3>BotFusion</h3>
-
-  <div class="side-item" onclick="googleLogin()">🔐 Google Login</div>
-  <div class="side-item">➕ New Chat</div>
-  <div class="side-item">⚙️ Settings</div>
-  <div class="side-item">🚪 Logout</div>
-
-  <p style="font-size:12px;color:#aaa;margin-top:20px">
-    BotFusion AI does not provide illegal or harmful content.
-  </p>
+  <h3>MENU</h3>
+  <button>New Chat</button>
+  <button>History</button>
+  <button>Settings</button>
+  <button onclick="googleLogin()">Login with Google</button>
 </div>
 
-<div class="overlay" id="overlay"></div>
+<div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
 
-<!-- MAIN -->
-<div class="main">
+<main>
+  <div class="hero-logo"></div>
+  <h1>How can I help you today?</h1>
 
-  <div class="header">
-    <div class="hamburger" id="menuBtn">☰</div>
-    <div class="logo"><span>⬢</span> BotFusion</div>
-  </div>
+  <div class="suggestion">Explain quantum computing in simple terms</div>
+  <div class="suggestion">Write a creative story about a robot</div>
+  <div class="suggestion">Help me debug my code</div>
+  <div class="suggestion">What's the best way to learn a new language?</div>
 
-  <div class="chat">
-    <div class="hero-icon"></div>
-    <h2>How can I help you today?</h2>
+  <button class="google-btn" onclick="googleLogin()">Continue with Google</button>
+</main>
 
-    <div class="suggestion">Explain quantum computing in simple terms</div>
-    <div class="suggestion">Write a creative story about a robot</div>
-    <div class="suggestion">Help me debug my code</div>
-  </div>
-
-  <div class="input-bar">
-    <div class="input-wrap">
-      <button onclick="file.click()">📎</button>
-      <input type="file" id="file" hidden>
-      <input placeholder="Message BotFusion...">
-      <button class="send">↑</button>
-    </div>
-  </div>
-
+<div class="chat-bar">
+  <button class="icon-btn">📎</button>
+  <input type="text" placeholder="Message BotFusion..." />
+  <button class="send-btn">↑</button>
 </div>
 
 <script>
-const sidebar=document.getElementById("sidebar");
-const overlay=document.getElementById("overlay");
-
-menuBtn.onclick=()=>{
-  sidebar.classList.add("open");
-  overlay.classList.add("show");
-}
-overlay.onclick=()=>{
-  sidebar.classList.remove("open");
-  overlay.classList.remove("show");
+function toggleSidebar() {
+  document.getElementById("sidebar").classList.toggle("open");
+  document.getElementById("overlay").classList.toggle("show");
 }
 
-function googleLogin(){
-  window.location.href="http://localhost:5000/api/auth/google";
+/* ✅ GOOGLE LOGIN – FINAL & CORRECT */
+function googleLogin() {
+  window.location.href = "http://localhost:5000/api/auth/google";
 }
 </script>
 
