@@ -1,177 +1,160 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BotFusion</title>
 
 <style>
 :root{
   --bg:#121212;
   --panel:#1e1e1e;
-  --card:#2a2a2a;
-  --accent:#19c39c;
-  --text:#ffffff;
+  --panel2:#232323;
+  --accent:#19c37d;
+  --text:#e5e5e5;
   --muted:#9a9a9a;
 }
-
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-}
-
+*{box-sizing:border-box;font-family:system-ui,-apple-system,Segoe UI,Roboto}
 body{
+  margin:0;
   background:var(--bg);
   color:var(--text);
-  height:100vh;
   overflow:hidden;
 }
 
-/* ---------- HEADER ---------- */
-header{
+/* ===== SIDEBAR ===== */
+.sidebar{
+  position:fixed;
+  top:0;left:0;
+  width:260px;
+  height:100vh;
+  background:#181818;
+  padding:15px;
+  transform:translateX(-100%);
+  transition:.3s ease;
+  z-index:1000;
+}
+.sidebar.open{transform:translateX(0);}
+.sidebar h3{
+  margin:10px 0 20px;
+  color:var(--accent);
+}
+.side-item{
+  padding:12px;
+  border-radius:10px;
+  cursor:pointer;
+  margin-bottom:8px;
+}
+.side-item:hover{background:#2a2a2a}
+
+/* ===== MAIN ===== */
+.main{
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+
+/* HEADER */
+.header{
   height:56px;
-  background:var(--panel);
+  background:#181818;
   display:flex;
   align-items:center;
-  padding:0 14px;
+  padding:0 15px;
+  gap:15px;
 }
-
-.menu-btn{
-  font-size:24px;
+.hamburger{
+  font-size:22px;
   cursor:pointer;
 }
-
 .logo{
   display:flex;
   align-items:center;
   gap:8px;
-  margin-left:12px;
   font-weight:600;
 }
+.logo span{color:var(--accent)}
 
-.logo span{
-  color:var(--accent);
-}
-
-/* ---------- SIDEBAR ---------- */
-.sidebar{
-  position:fixed;
-  top:0;
-  left:0;
-  width:260px;
-  height:100%;
-  background:#0f0f0f;
-  transform:translateX(-100%);
-  transition:0.3s ease;
-  z-index:1000;
-  padding-top:60px;
-}
-
-.sidebar.active{
-  transform:translateX(0);
-}
-
-.sidebar a{
-  display:block;
-  padding:14px 20px;
-  color:#ddd;
-  text-decoration:none;
-  font-size:15px;
-}
-
-.sidebar a:hover{
-  background:#1f1f1f;
-}
-
-.sidebar hr{
-  border:none;
-  border-top:1px solid #2b2b2b;
-  margin:10px 0;
-}
-
-/* overlay */
-.overlay{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.6);
-  display:none;
-  z-index:900;
-}
-
-.overlay.show{
-  display:block;
-}
-
-/* ---------- MAIN ---------- */
-main{
-  height:calc(100vh - 56px);
-  display:flex;
-  flex-direction:column;
-  justify-content:space-between;
-}
-
-/* ---------- CENTER CONTENT ---------- */
-.center{
+/* CHAT AREA */
+.chat{
+  flex:1;
+  overflow-y:auto;
+  padding:25px 15px 120px;
   text-align:center;
-  margin-top:40px;
 }
-
-.center h1{
-  margin-top:20px;
-  font-size:22px;
+.hero-icon{
+  width:60px;height:60px;
+  margin:60px auto 20px;
+  background:var(--accent);
+  border-radius:12px;
+  clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);
 }
+.chat h1{margin-bottom:25px}
 
-.cards{
-  margin-top:30px;
-  padding:0 14px;
-}
-
-.card{
-  background:var(--card);
+/* SUGGESTIONS */
+.suggestion{
+  background:var(--panel2);
+  padding:15px;
   border-radius:14px;
-  padding:14px;
   margin-bottom:12px;
-  color:#ddd;
+  cursor:pointer;
+  text-align:left;
+}
+.suggestion:hover{background:#2c2c2c}
+
+/* INPUT BAR */
+.input-bar{
+  position:fixed;
+  bottom:0;
+  left:0;
+  width:100%;
+  background:#181818;
+  padding:12px;
+}
+.input-wrap{
+  background:var(--panel2);
+  border-radius:25px;
   display:flex;
   align-items:center;
+  padding:8px 12px;
   gap:10px;
 }
-
-/* ---------- CHAT BAR ---------- */
-.chatbar{
-  padding:12px;
-  background:var(--panel);
-}
-
-.chat-input{
-  display:flex;
-  align-items:center;
-  background:#2a2a2a;
-  border-radius:25px;
-  padding:8px 12px;
-}
-
-.chat-input input{
+.input-wrap input{
   flex:1;
   background:none;
   border:none;
   outline:none;
-  color:white;
+  color:var(--text);
   font-size:15px;
 }
-
-.chat-input button{
+.icon-btn{
   background:none;
   border:none;
-  color:#ccc;
-  font-size:20px;
-  margin-left:8px;
+  color:var(--muted);
+  font-size:18px;
+  cursor:pointer;
+}
+.send{
+  background:var(--accent);
+  border:none;
+  width:36px;height:36px;
+  border-radius:50%;
+  font-size:18px;
   cursor:pointer;
 }
 
-.footer-text{
+/* OVERLAY */
+.overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.4);
+  display:none;
+  z-index:900;
+}
+.overlay.show{display:block}
+
+/* FOOTER NOTE */
+.note{
   font-size:12px;
   color:var(--muted);
   text-align:center;
@@ -184,67 +167,61 @@ main{
 
 <!-- SIDEBAR -->
 <div class="sidebar" id="sidebar">
-  <a href="#">🧠 New Chat</a>
-  <a href="#">📜 History</a>
-  <hr>
-  <a href="#">⚙️ Settings</a>
-  <a href="#">❓ Help</a>
-  <a href="#">🚪 Logout</a>
+  <h3>BotFusion</h3>
+  <div class="side-item">New Chat</div>
+  <div class="side-item">History</div>
+  <div class="side-item">Settings ⚙️</div>
+  <div class="side-item">Logout</div>
 </div>
 
 <div class="overlay" id="overlay"></div>
 
-<!-- HEADER -->
-<header>
-  <div class="menu-btn" id="menuBtn">☰</div>
-  <div class="logo">
-    <span>⬡</span> BotFusion
-  </div>
-</header>
-
 <!-- MAIN -->
-<main>
+<div class="main">
 
-  <!-- CENTER -->
-  <div class="center">
-    <div style="font-size:48px;color:var(--accent)">⬡</div>
+  <!-- HEADER -->
+  <div class="header">
+    <div class="hamburger" id="menuBtn">☰</div>
+    <div class="logo">
+      <span>⬢</span> BotFusion
+    </div>
+  </div>
+
+  <!-- CHAT -->
+  <div class="chat">
+    <div class="hero-icon"></div>
     <h1>How can I help you today?</h1>
 
-    <div class="cards">
-      <div class="card">ℹ️ Explain quantum computing in simple terms</div>
-      <div class="card">✏️ Write a creative story about a robot</div>
-      <div class="card">💻 Help me debug my code</div>
-      <div class="card">🌍 What's the best way to learn a new language?</div>
-    </div>
+    <div class="suggestion">Explain quantum computing in simple terms</div>
+    <div class="suggestion">Write a creative story about a robot</div>
+    <div class="suggestion">Help me debug my code</div>
+    <div class="suggestion">What's the best way to learn a new language?</div>
   </div>
 
-  <!-- CHAT BAR -->
-  <div class="chatbar">
-    <div class="chat-input">
-      <input type="file" id="fileInput" hidden />
-      <button onclick="document.getElementById('fileInput').click()">📎</button>
-      <input type="text" placeholder="Message BotFusion..." />
-      <button>⬆️</button>
+  <!-- INPUT -->
+  <div class="input-bar">
+    <div class="input-wrap">
+      <button class="icon-btn" onclick="file.click()">📎</button>
+      <input type="file" id="file" hidden>
+      <input type="text" placeholder="Message BotFusion...">
+      <button class="send">↑</button>
     </div>
-    <div class="footer-text">
-      BotFusion can make mistakes. Consider checking important information.
-    </div>
+    <div class="note">BotFusion can make mistakes. Consider checking important information.</div>
   </div>
 
-</main>
+</div>
 
 <script>
-const sidebar = document.getElementById("sidebar");
-const overlay = document.getElementById("overlay");
-const menuBtn = document.getElementById("menuBtn");
+const sidebar=document.getElementById("sidebar");
+const overlay=document.getElementById("overlay");
+const menuBtn=document.getElementById("menuBtn");
 
-menuBtn.onclick = () => {
-  sidebar.classList.add("active");
+menuBtn.onclick=()=>{
+  sidebar.classList.add("open");
   overlay.classList.add("show");
 };
-
-overlay.onclick = () => {
-  sidebar.classList.remove("active");
+overlay.onclick=()=>{
+  sidebar.classList.remove("open");
   overlay.classList.remove("show");
 };
 </script>
