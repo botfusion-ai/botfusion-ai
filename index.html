@@ -1,248 +1,324 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>BotFusion</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BotFusion AI</title>
 
 <style>
-/* ---------- RESET ---------- */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+/* ================= THEME VARIABLES ================= */
+:root{
+  --bg:#0f0f0f;
+  --panel:#1a1a1a;
+  --card:#222;
+  --text:#ffffff;
+  --accent:#19c37d;
 }
 
-/* ---------- BODY ---------- */
-body {
-  background: #1e1e1e;
-  color: #fff;
-  height: 100vh;
-  overflow: hidden;
+body{
+  margin:0;
+  font-family:system-ui,Segoe UI,Roboto;
+  background:var(--bg);
+  color:var(--text);
+  height:100vh;
+  overflow:hidden;
 }
 
-/* ---------- HEADER ---------- */
-header {
-  height: 56px;
-  background: #111;
-  display: flex;
-  align-items: center;
-  padding: 0 14px;
-  gap: 14px;
+/* ================= HEADER ================= */
+.header{
+  height:56px;
+  display:flex;
+  align-items:center;
+  padding:0 16px;
+  background:#000;
 }
 
-.menu-btn {
-  font-size: 22px;
-  cursor: pointer;
+.menu-btn{
+  font-size:22px;
+  cursor:pointer;
 }
 
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: 600;
+.title{
+  margin-left:14px;
+  font-weight:600;
 }
 
-.logo {
-  width: 22px;
-  height: 22px;
-  border: 2px solid #19c37d;
-  transform: rotate(45deg);
+/* ================= SIDEBAR ================= */
+.sidebar{
+  position:fixed;
+  top:0;
+  left:-100%;
+  width:280px;
+  height:100%;
+  background:var(--panel);
+  padding:16px;
+  transition:.3s;
+  z-index:1000;
 }
 
-/* ---------- SIDEBAR ---------- */
-.sidebar {
-  position: fixed;
-  top: 56px;
-  left: -260px;
-  width: 260px;
-  height: calc(100vh - 56px);
-  background: #121212;
-  padding: 16px;
-  transition: left 0.3s ease;
-  z-index: 10;
+.sidebar.active{ left:0; }
+
+.close-btn{
+  font-size:20px;
+  cursor:pointer;
+  text-align:right;
 }
 
-.sidebar.open {
-  left: 0;
+.sidebar h3{
+  margin:10px 0;
 }
 
-.sidebar h3 {
-  font-size: 14px;
-  margin-bottom: 10px;
-  color: #aaa;
+.sidebar button, select{
+  width:100%;
+  margin:8px 0;
+  padding:10px;
+  border:none;
+  border-radius:8px;
+  background:#2a2a2a;
+  color:white;
+  cursor:pointer;
 }
 
-.sidebar button {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 10px;
-  background: #1f1f1f;
-  border: none;
-  color: #fff;
-  border-radius: 8px;
-  text-align: left;
-  cursor: pointer;
+/* ================= CHAT AREA ================= */
+.chat{
+  height:calc(100vh - 120px);
+  padding:16px;
+  overflow-y:auto;
+  display:flex;
+  flex-direction:column;
 }
 
-.sidebar button:hover {
-  background: #2a2a2a;
+.msg{
+  max-width:75%;
+  padding:12px;
+  border-radius:12px;
+  margin-bottom:10px;
 }
 
-/* ---------- OVERLAY ---------- */
-.overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.4);
-  display: none;
-  z-index: 5;
+.user{
+  align-self:flex-end;
+  background:var(--accent);
+  color:#000;
 }
 
-.overlay.show {
-  display: block;
+.bot{
+  align-self:flex-start;
+  background:var(--card);
 }
 
-/* ---------- MAIN ---------- */
-main {
-  height: calc(100vh - 56px);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
+/* ================= CHAT BAR ================= */
+.chatbar{
+  height:64px;
+  background:#000;
+  display:flex;
+  align-items:center;
+  padding:8px;
+  gap:8px;
 }
 
-/* ---------- HERO ---------- */
-.hero-logo {
-  width: 50px;
-  height: 50px;
-  border: 3px solid #19c37d;
-  margin-bottom: 16px;
-  transform: rotate(45deg);
+.chatbar input[type="text"]{
+  flex:1;
+  padding:12px 14px;
+  border-radius:24px;
+  border:none;
+  background:#222;
+  color:white;
 }
 
-h1 {
-  margin-bottom: 20px;
-  font-size: 24px;
+.chatbar button{
+  width:42px;
+  height:42px;
+  border-radius:50%;
+  border:none;
+  background:var(--accent);
+  font-size:18px;
+  cursor:pointer;
 }
 
-/* ---------- SUGGESTIONS ---------- */
-.suggestion {
-  width: 100%;
-  max-width: 420px;
-  background: #2a2a2a;
-  padding: 14px;
-  border-radius: 12px;
-  margin-bottom: 10px;
-  color: #ccc;
+.file-input{
+  display:none;
 }
 
-/* ---------- CHAT BAR ---------- */
-.chat-bar {
-  position: fixed;
-  bottom: 16px;
-  left: 16px;
-  right: 16px;
-  background: #2a2a2a;
-  border-radius: 24px;
-  display: flex;
-  align-items: center;
-  padding: 10px 12px;
-  gap: 10px;
+.file-label{
+  font-size:20px;
+  cursor:pointer;
+  color:white;
 }
 
-.chat-bar input {
-  flex: 1;
-  background: transparent;
-  border: none;
-  outline: none;
-  color: #fff;
-  font-size: 15px;
+/* ================= SETTINGS MODAL ================= */
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:2000;
 }
 
-.icon-btn {
-  background: none;
-  border: none;
-  color: #aaa;
-  font-size: 20px;
-  cursor: pointer;
+.modal.active{ display:flex; }
+
+.modal-content{
+  background:var(--panel);
+  width:90%;
+  max-width:400px;
+  padding:16px;
+  border-radius:12px;
 }
 
-.send-btn {
-  background: #19c37d;
-  border: none;
-  color: #000;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  cursor: pointer;
+.modal-content h3{
+  margin-top:0;
 }
 
-/* ---------- GOOGLE LOGIN ---------- */
-.google-btn {
-  margin-top: 16px;
-  background: #fff;
-  color: #000;
-  padding: 12px;
-  width: 100%;
-  max-width: 260px;
-  border-radius: 10px;
-  border: none;
-  font-weight: 600;
-  cursor: pointer;
-}
+/* ================= THEMES ================= */
+.light{--bg:#f5f5f5;--panel:#fff;--text:#000;--card:#eaeaea;}
+.grey{--bg:#2b2b2b;--panel:#3a3a3a;}
+.blue{--bg:#0f172a;--panel:#1e293b;--accent:#3b82f6;}
+.green{--bg:#0b1a12;--panel:#0f2a1b;--accent:#22c55e;}
+.black{--bg:#000;--panel:#111;}
 </style>
 </head>
 
 <body>
 
-<header>
-  <div class="menu-btn" onclick="toggleSidebar()">☰</div>
-  <div class="brand">
-    <div class="logo"></div>
-    BotFusion
-  </div>
-</header>
-
+<!-- ================= SIDEBAR ================= -->
 <div class="sidebar" id="sidebar">
-  <h3>MENU</h3>
-  <button>New Chat</button>
-  <button>History</button>
-  <button>Settings</button>
-  <button onclick="googleLogin()">Login with Google</button>
+  <div class="close-btn" onclick="toggleSidebar()">✖</div>
+  <h3>BotFusion</h3>
+
+  <button onclick="newChat()">➕ New Chat</button>
+  <button onclick="openSettings()">⚙ Settings</button>
+  <button onclick="showHistory()">📜 History</button>
+  <button onclick="googleLogin()">🔐 Google Login</button>
+  <button onclick="alert('Report submitted')">🚩 Report</button>
+  <button onclick="alert('Help coming soon')">❓ Help</button>
 </div>
 
-<div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+<!-- ================= HEADER ================= -->
+<div class="header">
+  <div class="menu-btn" onclick="toggleSidebar()">☰</div>
+  <div class="title">BotFusion AI</div>
+</div>
 
-<main>
-  <div class="hero-logo"></div>
-  <h1>How can I help you today?</h1>
+<!-- ================= CHAT ================= -->
+<div class="chat" id="chat">
+  <div class="bot msg">Hello 👋 How can I help you?</div>
+</div>
 
-  <div class="suggestion">Explain quantum computing in simple terms</div>
-  <div class="suggestion">Write a creative story about a robot</div>
-  <div class="suggestion">Help me debug my code</div>
-  <div class="suggestion">What's the best way to learn a new language?</div>
+<!-- ================= CHAT BAR ================= -->
+<div class="chatbar">
+  <label class="file-label" for="file">📎</label>
+  <input type="file" id="file" class="file-input">
+  <input type="text" id="input" placeholder="Message BotFusion..." oninput="startChat()">
+  <button onclick="send()">➤</button>
+</div>
 
-  <button class="google-btn" onclick="googleLogin()">Continue with Google</button>
-</main>
+<!-- ================= SETTINGS ================= -->
+<div class="modal" id="settings">
+  <div class="modal-content">
+    <h3>Settings</h3>
 
-<div class="chat-bar">
-  <button class="icon-btn">📎</button>
-  <input type="text" placeholder="Message BotFusion..." />
-  <button class="send-btn">↑</button>
+    <label>Theme</label>
+    <select onchange="setTheme(this.value)">
+      <option value="">Default</option>
+      <option value="light">Light</option>
+      <option value="grey">Grey</option>
+      <option value="blue">Blue</option>
+      <option value="green">Green</option>
+      <option value="black">Black</option>
+    </select>
+
+    <label>Language</label>
+    <select>
+      <option>English</option>
+      <option>Hindi</option>
+      <option>Marathi</option>
+    </select>
+
+    <h4>About BotFusion</h4>
+    <p style="font-size:13px;opacity:.8">
+      BotFusion is an AI assistant designed to help users learn, create and solve problems efficiently.
+    </p>
+
+    <button onclick="closeSettings()">Close</button>
+  </div>
 </div>
 
 <script>
-function toggleSidebar() {
-  document.getElementById("sidebar").classList.toggle("open");
-  document.getElementById("overlay").classList.toggle("show");
+let chats = JSON.parse(localStorage.getItem("botfusion_chats")) || [];
+let currentChat = [];
+
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('active');
 }
 
-/* ✅ GOOGLE LOGIN – FINAL & CORRECT */
-function googleLogin() {
-  window.location.href = "http://localhost:5000/api/auth/google";
+function openSettings(){
+  toggleSidebar();
+  document.getElementById('settings').classList.add('active');
 }
+
+function closeSettings(){
+  document.getElementById('settings').classList.remove('active');
+}
+
+function setTheme(t){
+  document.body.className=t;
+  localStorage.setItem("theme", t);
+}
+
+function startChat(){
+  if(document.querySelectorAll('.msg').length===1){
+    document.getElementById('chat').innerHTML='';
+  }
+}
+
+function send(){
+  const input = document.getElementById('input');
+  if(!input.value) return;
+
+  addMessage("user", input.value);
+
+  // Fake bot reply for now
+  setTimeout(()=>{
+    addMessage("bot","BotFusion response will come from backend 🤖");
+    saveChat();
+  },500);
+
+  input.value='';
+}
+
+function addMessage(role,text){
+  const chat=document.getElementById('chat');
+  chat.innerHTML+=`<div class="msg ${role}">${text}</div>`;
+  chat.scrollTop=chat.scrollHeight;
+  currentChat.push({role,text});
+}
+
+function saveChat(){
+  if(currentChat.length>0){
+    chats.push(currentChat);
+    localStorage.setItem("botfusion_chats", JSON.stringify(chats));
+  }
+}
+
+function newChat(){
+  currentChat=[];
+  document.getElementById('chat').innerHTML=
+    '<div class="bot msg">New chat started 👋</div>';
+  toggleSidebar();
+}
+
+function showHistory(){
+  let list = chats.map((c,i)=>`Chat ${i+1}`).join("\n");
+  alert("Saved Chats:\n"+list);
+}
+
+function googleLogin(){
+  window.location.href="http://localhost:5001/auth/google";
+}
+
+/* Load saved theme */
+document.body.className = localStorage.getItem("theme") || "";
 </script>
 
 </body>
