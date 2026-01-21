@@ -6,39 +6,45 @@
 <title>BotFusion AI</title>
 
 <style>
-/* ---------- THEME VARIABLES ---------- */
+/* ================= ROOT THEMES ================= */
 :root{
-  --bg:#1e1e1e;
-  --panel:#2a2a2a;
+  --bg:#0f0f0f;
+  --panel:#1a1a1a;
   --text:#ffffff;
   --accent:#19c37d;
-  --card:#2f2f2f;
+  --card:#242424;
 }
 
-/* ---------- BASE ---------- */
+body.light{--bg:#f5f5f5;--panel:#ffffff;--text:#000;--card:#eaeaea;}
+body.grey{--bg:#2b2b2b;--panel:#3a3a3a;}
+body.blue{--bg:#0f172a;--panel:#1e293b;--accent:#3b82f6;}
+body.green{--bg:#0b1a12;--panel:#0f2a1b;--accent:#22c55e;}
+body.black{--bg:#000;--panel:#111;}
+
 *{box-sizing:border-box}
+
 body{
   margin:0;
   font-family:system-ui,Segoe UI,Roboto;
   background:var(--bg);
   color:var(--text);
   height:100vh;
-  overflow:hidden;
+  display:flex;
+  flex-direction:column;
 }
 
-/* ---------- HEADER ---------- */
+/* ================= HEADER ================= */
 .header{
-  height:56px;
   display:flex;
   align-items:center;
-  padding:0 16px;
+  gap:14px;
+  padding:14px;
   background:#111;
 }
 
 .menu-btn{
-  font-size:24px;
+  font-size:22px;
   cursor:pointer;
-  margin-right:12px;
 }
 
 .logo{
@@ -46,18 +52,17 @@ body{
   font-size:18px;
 }
 
-/* ---------- SIDEBAR ---------- */
+/* ================= SIDEBAR ================= */
 .sidebar{
   position:fixed;
   top:0;
-  left:-280px;
-  width:280px;
+  left:-100%;
+  width:260px;
   height:100%;
   background:var(--panel);
   padding:16px;
   transition:0.3s ease;
   z-index:1000;
-  overflow-y:auto;
 }
 
 .sidebar.active{ left:0; }
@@ -69,7 +74,7 @@ body{
 }
 
 .close-btn{
-  font-size:22px;
+  font-size:20px;
   cursor:pointer;
 }
 
@@ -79,102 +84,102 @@ body{
   padding:10px;
   border:none;
   border-radius:8px;
-  background:#3a3a3a;
+  background:#333;
   color:white;
   cursor:pointer;
 }
 
 .sidebar h4{
-  margin-top:18px;
-  margin-bottom:6px;
+  margin-top:20px;
+  margin-bottom:8px;
   font-size:14px;
-  opacity:.8;
+  opacity:.7;
 }
 
-/* ---------- MAIN ---------- */
+/* ================= MAIN ================= */
 .main{
-  height:calc(100vh - 112px);
+  flex:1;
   padding:20px;
-  overflow-y:auto;
   display:flex;
   flex-direction:column;
   align-items:center;
   justify-content:center;
 }
 
-.empty-state{
+.welcome{
   text-align:center;
-  opacity:.9;
 }
 
-.empty-state h2{
-  margin-top:10px;
+.welcome h2{
+  margin:12px 0;
 }
 
-/* ---------- FOOTER ---------- */
+/* ================= CHAT ================= */
+.chat-area{
+  width:100%;
+  max-width:600px;
+  display:none;
+  flex-direction:column;
+  gap:12px;
+}
+
+.message{
+  background:var(--card);
+  padding:12px;
+  border-radius:12px;
+}
+
+/* ================= FOOTER ================= */
 .footer{
-  height:56px;
-  padding:8px;
+  padding:12px;
   background:#111;
   display:flex;
   align-items:center;
-  gap:8px;
+  gap:10px;
+}
+
+.upload-btn{
+  font-size:20px;
+  cursor:pointer;
 }
 
 .footer input{
   flex:1;
-  padding:12px 14px;
+  padding:12px;
   border-radius:20px;
   border:none;
   background:#2a2a2a;
   color:white;
-  outline:none;
 }
 
 .footer button{
-  border:none;
-  cursor:pointer;
-}
-
-.attach-btn{
-  background:none;
-  color:white;
-  font-size:20px;
-}
-
-.send-btn{
   background:var(--accent);
+  border:none;
   border-radius:50%;
   width:42px;
   height:42px;
   font-size:18px;
+  cursor:pointer;
 }
-
-/* ---------- THEMES ---------- */
-.light{--bg:#f4f4f4;--panel:#ffffff;--text:#000;--card:#eaeaea;}
-.grey{--bg:#2b2b2b;--panel:#3a3a3a;}
-.blue{--bg:#0f172a;--panel:#1e293b;--accent:#3b82f6;}
-.green{--bg:#0b1a12;--panel:#0f2a1b;--accent:#22c55e;}
-.black{--bg:#000;--panel:#111;}
 </style>
 </head>
 
-<body>
+<body class="black">
 
-<!-- SIDEBAR -->
+<!-- ================= SIDEBAR ================= -->
 <div class="sidebar" id="sidebar">
   <div class="sidebar-header">
-    <h3>BotFusion AI</h3>
-    <div class="close-btn" onclick="toggleMenu()">✖</div>
+    <strong>BotFusion AI</strong>
+    <span class="close-btn" onclick="toggleSidebar()">✕</span>
   </div>
 
   <button onclick="newChat()">➕ New Chat</button>
   <button>🕘 History</button>
+  <button>📄 Report</button>
 
   <h4>Settings</h4>
-  <label>Theme</label>
   <select onchange="setTheme(this.value)">
-    <option value="">Default</option>
+    <option value="">Dark (Default)</option>
     <option value="grey">Grey</option>
     <option value="light">Light</option>
     <option value="blue">Blue</option>
@@ -182,65 +187,68 @@ body{
     <option value="black">Black</option>
   </select>
 
-  <label>Language</label>
   <select>
+    <option>🌐 Language</option>
     <option>English</option>
     <option>Hindi</option>
     <option>Marathi</option>
-    <option>Spanish</option>
-    <option>French</option>
   </select>
 
-  <h4>More</h4>
-  <button>🔐 Google Login</button>
+  <button>ℹ️ About BotFusion</button>
   <button>❓ Help</button>
-  <button>🚩 Report</button>
-  <button>ℹ About BotFusion</button>
+  <button onclick="googleLogin()">🔐 Google Login</button>
 
-  <p style="font-size:12px;opacity:.6;margin-top:12px;">
+  <p style="font-size:12px;opacity:.6;margin-top:10px">
     BotFusion AI does not provide illegal or harmful information.
   </p>
 </div>
 
-<!-- HEADER -->
+<!-- ================= HEADER ================= -->
 <div class="header">
-  <div class="menu-btn" onclick="toggleMenu()">☰</div>
+  <div class="menu-btn" onclick="toggleSidebar()">☰</div>
   <div class="logo">BotFusion</div>
 </div>
 
-<!-- MAIN -->
-<div class="main" id="main">
-  <div class="empty-state" id="emptyState">
-    <div style="font-size:40px">⬢</div>
+<!-- ================= MAIN ================= -->
+<div class="main">
+  <div class="welcome" id="welcome">
     <h2>How can I help you today?</h2>
-    <p>Start typing to begin a new chat</p>
+    <p>Ask anything, upload files, or start a new chat.</p>
   </div>
+
+  <div class="chat-area" id="chatArea"></div>
 </div>
 
-<!-- FOOTER -->
+<!-- ================= FOOTER ================= -->
 <div class="footer">
-  <button class="attach-btn">📎</button>
-  <input id="chatInput" placeholder="Message BotFusion..." oninput="startChat()" />
-  <button class="send-btn">↑</button>
+  <span class="upload-btn">📎</span>
+  <input id="chatInput" placeholder="Message BotFusion..." oninput="startChat()"/>
+  <button>↑</button>
 </div>
 
 <script>
-function toggleMenu(){
-  document.getElementById('sidebar').classList.toggle('active');
+function toggleSidebar(){
+  document.getElementById("sidebar").classList.toggle("active");
 }
 
 function setTheme(theme){
   document.body.className = theme;
 }
 
-function newChat(){
-  document.getElementById('emptyState').style.display='block';
-  document.getElementById('chatInput').value='';
-  toggleMenu();
+function startChat(){
+  document.getElementById("welcome").style.display="none";
+  document.getElementById("chatArea").style.display="flex";
 }
 
-function startChat(){
-  document.getElementById('emptyState').style.display='none';
+function newChat(){
+  document.getElementById("chatArea").innerHTML="";
+  document.getElementById("welcome").style.display="block";
+  document.getElementById("chatArea").style.display="none";
+  toggleSidebar();
+}
+
+function googleLogin(){
+  alert("Google Login will connect with backend");
 }
 </script>
 
