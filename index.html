@@ -2,20 +2,22 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Botfusion AI</title>
+<title>BotFusion</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 :root{
-  --bg:#0f172a;
-  --panel:#020617;
-  --text:#e5e7eb;
-  --accent:#3b82f6;
+  --bg:#1f1f1f;
+  --card:#2a2a2a;
+  --text:#ffffff;
+  --sub:#b5b5b5;
+  --accent:#16a085;
 }
 .light{
-  --bg:#f8fafc;
-  --panel:#e5e7eb;
-  --text:#020617;
+  --bg:#f5f5f5;
+  --card:#ffffff;
+  --text:#111;
+  --sub:#555;
 }
 
 *{box-sizing:border-box;font-family:system-ui}
@@ -23,186 +25,184 @@ body{
   margin:0;
   background:var(--bg);
   color:var(--text);
-  display:flex;
-  height:100vh;
 }
 
-/* Sidebar */
-#sidebar{
-  width:260px;
-  background:var(--panel);
-  padding:15px;
+/* HEADER */
+header{
+  background:var(--accent);
+  padding:14px;
   display:flex;
-  flex-direction:column;
+  align-items:center;
+  gap:12px;
 }
-#sidebar h2{margin:0 0 10px}
-.btn{
+.menu{font-size:22px;cursor:pointer}
+.title{font-weight:600}
+
+/* DRAWER */
+#drawer{
+  position:fixed;
+  inset:0 30% 0 0;
+  background:var(--card);
+  padding:20px;
+  display:none;
+  z-index:10;
+}
+.drawer-btn{
+  display:block;
+  width:100%;
+  margin:10px 0;
   padding:10px;
-  margin:5px 0;
   border:none;
   background:var(--accent);
-  color:white;
+  color:#fff;
   border-radius:6px;
-  cursor:pointer;
-}
-.history{
-  flex:1;
-  overflow:auto;
-}
-.history div{
-  padding:8px;
-  margin-bottom:5px;
-  background:#1e293b;
-  border-radius:5px;
-  cursor:pointer;
 }
 
-/* Main */
-#main{
-  flex:1;
-  display:flex;
-  flex-direction:column;
+/* HOME */
+#home{
+  text-align:center;
+  padding:40px 16px;
 }
-#topbar{
-  padding:10px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  border-bottom:1px solid #334155;
+.logo{
+  font-size:60px;
+  color:var(--accent);
 }
+.suggestion{
+  background:var(--card);
+  padding:14px;
+  margin:10px auto;
+  border-radius:12px;
+  max-width:360px;
+  text-align:left;
+  color:var(--sub);
+}
+
+/* CHAT */
 #chat{
-  flex:1;
+  display:none;
   padding:15px;
-  overflow:auto;
+  padding-bottom:90px;
 }
-.msg{
-  margin-bottom:10px;
-}
-.user{color:#60a5fa}
-.bot{color:#34d399}
+.msg{margin-bottom:10px}
+.user{color:#4ade80}
+.bot{color:#60a5fa}
 
-/* Input */
+/* INPUT */
 #inputBar{
+  position:fixed;
+  bottom:0;
+  width:100%;
+  padding:12px;
+  background:var(--bg);
   display:flex;
-  padding:10px;
   gap:10px;
-  border-top:1px solid #334155;
 }
 #input{
   flex:1;
-  padding:10px;
-  border-radius:6px;
+  padding:14px;
+  border-radius:25px;
   border:none;
+  background:var(--card);
+  color:var(--text);
 }
-.iconBtn{
-  background:var(--accent);
+.icon{
+  background:var(--card);
   border:none;
-  padding:10px;
-  border-radius:6px;
-  color:white;
-  cursor:pointer;
+  padding:14px;
+  border-radius:50%;
+  color:var(--text);
 }
-
-/* Modals */
-.modal{
-  position:fixed;
-  inset:0;
-  background:#0009;
-  display:none;
-  align-items:center;
-  justify-content:center;
-}
-.modalContent{
-  background:var(--panel);
-  padding:20px;
-  border-radius:10px;
-  width:300px;
-}
-.modalContent h3{margin-top:0}
-.modalContent button{width:100%;margin-top:10px}
 </style>
 </head>
 
 <body>
-<!-- SIDEBAR -->
-<div id="sidebar">
-  <h2>🤖 Botfusion</h2>
-  <button class="btn" onclick="newChat()">➕ New Chat</button>
-  <button class="btn" onclick="openSettings()">⚙ Settings</button>
-  <button class="btn">🔐 Google Login</button>
 
-  <div class="history" id="history"></div>
+<header>
+  <span class="menu" onclick="drawer.style.display='block'">☰</span>
+  <span class="title">BotFusion</span>
+</header>
+
+<!-- DRAWER -->
+<div id="drawer">
+  <h3>Settings</h3>
+  <button class="drawer-btn" onclick="toggleTheme()">🌗 Theme</button>
+  <button class="drawer-btn" onclick="toggleLang()">🌐 Language</button>
+  <button class="drawer-btn" onclick="alert('BotFusion AI\nCreated by Atharv Pawar')">ℹ About</button>
+  <button class="drawer-btn" onclick="drawer.style.display='none'">❌ Close</button>
 </div>
 
-<!-- MAIN -->
-<div id="main">
-  <div id="topbar">
-    <b>Botfusion AI</b>
-    <span>Online</span>
+<!-- HOME -->
+<div id="home">
+  <div class="logo">⬡</div>
+  <h2 id="helpText">How can I help you today?</h2>
+
+  <div class="suggestion" onclick="quick('Explain quantum computing in simple terms')">
+    ℹ Explain quantum computing in simple terms
   </div>
-
-  <div id="chat"></div>
-
-  <div id="inputBar">
-    <input type="file" id="file" hidden>
-    <button class="iconBtn" onclick="file.click()">📎</button>
-    <input id="input" placeholder="Type a message..." oninput="typing()">
-    <button class="iconBtn" onclick="send()">➡</button>
+  <div class="suggestion" onclick="quick('Write a creative story about a robot')">
+    ✏ Write a creative story about a robot
+  </div>
+  <div class="suggestion" onclick="quick('Help me debug my code')">
+    &lt;/&gt; Help me debug my code
+  </div>
+  <div class="suggestion" onclick="quick('Best way to learn a new language')">
+    🌍 What's the best way to learn a new language?
   </div>
 </div>
 
-<!-- SETTINGS MODAL -->
-<div class="modal" id="settings">
-  <div class="modalContent">
-    <h3>Settings</h3>
-    <button onclick="toggleTheme()">🌗 Theme</button>
-    <button>🌐 Language</button>
-    <button onclick="alert('Botfusion AI\nCreated by Atharv Pawar')">ℹ About Botfusion</button>
-    <button onclick="alert('Help coming soon')">❓ Help</button>
-    <button onclick="alert('Report sent')">🚨 Report</button>
-    <button onclick="closeSettings()">❌ Close</button>
-  </div>
+<!-- CHAT -->
+<div id="chat"></div>
+
+<!-- INPUT -->
+<div id="inputBar">
+  <input type="file" hidden id="file">
+  <button class="icon" onclick="file.click()">📎</button>
+  <input id="input" placeholder="Message BotFusion…" oninput="startChat()">
+  <button class="icon" onclick="send()">⬆</button>
 </div>
 
 <script>
-let chatStarted=false;
-let chatCount=0;
+let started=false;
+let lang="en";
 
-function typing(){
-  if(!chatStarted){
-    chatStarted=true;
-    document.getElementById("chat").innerHTML="";
+function startChat(){
+  if(!started){
+    started=true;
+    home.style.display="none";
+    chat.style.display="block";
   }
 }
 
 function send(){
-  const input=document.getElementById("input");
   if(!input.value)return;
-  addMsg("user",input.value);
-  setTimeout(()=>addMsg("bot","This is a demo reply."),500);
+  add("user",input.value);
+  setTimeout(()=>add("bot","This is a demo response."),500);
   input.value="";
 }
 
-function addMsg(type,text){
-  const div=document.createElement("div");
-  div.className="msg "+type;
-  div.textContent=(type==="user"?"You: ":"Bot: ")+text;
-  chat.appendChild(div);
-  chat.scrollTop=chat.scrollHeight;
+function add(type,text){
+  const d=document.createElement("div");
+  d.className="msg "+type;
+  d.textContent=(type==="user"?"You: ":"Bot: ")+text;
+  chat.appendChild(d);
+  window.scrollTo(0,document.body.scrollHeight);
 }
 
-function newChat(){
-  chatStarted=false;
-  chat.innerHTML="<p>Start typing to begin a new chat…</p>";
-  chatCount++;
-  const h=document.createElement("div");
-  h.textContent="Chat "+chatCount;
-  history.prepend(h);
+function quick(text){
+  startChat();
+  input.value=text;
 }
 
-function openSettings(){settings.style.display="flex"}
-function closeSettings(){settings.style.display="none"}
-function toggleTheme(){document.body.classList.toggle("light")}
+function toggleTheme(){
+  document.body.classList.toggle("light");
+}
+
+function toggleLang(){
+  lang = lang==="en"?"hi":"en";
+  helpText.textContent = lang==="en"
+    ? "How can I help you today?"
+    : "मैं आपकी कैसे मदद कर सकता हूँ?";
+}
 </script>
 
 </body>
