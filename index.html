@@ -1,207 +1,162 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>BotFusion</title>
+<meta charset="UTF-8" />
+<title>Botfusion-AI</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<!-- Google Login -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+
 <style>
-:root{
-  --bg:#1f1f1f;
-  --card:#2a2a2a;
-  --text:#ffffff;
-  --sub:#b5b5b5;
-  --accent:#16a085;
-}
-.light{
-  --bg:#f5f5f5;
-  --card:#ffffff;
-  --text:#111;
-  --sub:#555;
-}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,system-ui}
+body{height:100vh;display:flex;flex-direction:column}
 
-*{box-sizing:border-box;font-family:system-ui}
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--text);
-}
+/* ===== THEMES ===== */
+body.dark{--bg:#0f1117;--panel:#161a23;--text:#eaeaf0;--border:#262b3a;--hover:#20263a;--accent:#4f7cff}
+body.light{--bg:#f5f7fb;--panel:#fff;--text:#1e1e2e;--border:#dcdfea;--hover:#eef1f8;--accent:#3b6cff}
+body.glass{--bg:#1b1e2b;--panel:rgba(255,255,255,.08);--text:#fff;--border:rgba(255,255,255,.2);--hover:rgba(255,255,255,.12);--accent:#7c9cff}
+body.cyber{--bg:#05080d;--panel:#0b1220;--text:#00ffcc;--border:#003333;--hover:#001f1f;--accent:#00ffaa}
+body.warm{--bg:#f6efe9;--panel:#fff7f0;--text:#3a2e2a;--border:#e2d6cc;--hover:#f0e4da;--accent:#d47c4a}
 
-/* HEADER */
-header{
-  background:var(--accent);
-  padding:14px;
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
-.menu{font-size:22px;cursor:pointer}
-.title{font-weight:600}
+body{background:var(--bg);color:var(--text);transition:.3s}
 
-/* DRAWER */
-#drawer{
-  position:fixed;
-  inset:0 30% 0 0;
-  background:var(--card);
-  padding:20px;
-  display:none;
-  z-index:10;
-}
-.drawer-btn{
-  display:block;
-  width:100%;
-  margin:10px 0;
-  padding:10px;
-  border:none;
-  background:var(--accent);
-  color:#fff;
-  border-radius:6px;
-}
+/* ===== HEADER ===== */
+header{height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:var(--panel);border-bottom:1px solid var(--border)}
+select,button,input{background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:6px}
+button:hover{background:var(--hover);cursor:pointer}
 
-/* HOME */
-#home{
-  text-align:center;
-  padding:40px 16px;
-}
-.logo{
-  font-size:60px;
-  color:var(--accent);
-}
-.suggestion{
-  background:var(--card);
-  padding:14px;
-  margin:10px auto;
-  border-radius:12px;
-  max-width:360px;
-  text-align:left;
-  color:var(--sub);
-}
+/* ===== LAYOUT ===== */
+.container{flex:1;display:flex}
+.sidebar{width:240px;padding:14px;background:var(--panel);border-right:1px solid var(--border)}
+.chat-area{flex:1;display:flex;flex-direction:column}
 
-/* CHAT */
-#chat{
-  display:none;
-  padding:15px;
-  padding-bottom:90px;
-}
-.msg{margin-bottom:10px}
-.user{color:#4ade80}
-.bot{color:#60a5fa}
+/* ===== CHAT ===== */
+.messages{flex:1;padding:16px;overflow-y:auto}
+.msg{max-width:70%;padding:12px;border-radius:12px;margin-bottom:10px}
+.bot{background:var(--panel)}
+.user{background:var(--accent);color:#fff;margin-left:auto}
+.input-area{display:flex;gap:10px;padding:12px;border-top:1px solid var(--border);background:var(--panel)}
+input{flex:1}
 
-/* INPUT */
-#inputBar{
-  position:fixed;
-  bottom:0;
-  width:100%;
-  padding:12px;
-  background:var(--bg);
-  display:flex;
-  gap:10px;
-}
-#input{
-  flex:1;
-  padding:14px;
-  border-radius:25px;
-  border:none;
-  background:var(--card);
-  color:var(--text);
-}
-.icon{
-  background:var(--card);
-  border:none;
-  padding:14px;
-  border-radius:50%;
-  color:var(--text);
-}
+/* ===== UTIL ===== */
+.badge{font-size:12px;opacity:.7}
+.hidden{display:none}
 </style>
 </head>
 
-<body>
+<body class="dark">
 
 <header>
-  <span class="menu" onclick="drawer.style.display='block'">☰</span>
-  <span class="title">BotFusion</span>
+  <strong>🤖 Botfusion-AI</strong>
+
+  <div style="display:flex;gap:8px;align-items:center">
+
+    <!-- THEME -->
+    <select onchange="setTheme(this.value)">
+      <option value="dark">Dark</option>
+      <option value="light">Light</option>
+      <option value="glass">Glass</option>
+      <option value="cyber">Cyber</option>
+      <option value="warm">Warm</option>
+    </select>
+
+    <!-- LANGUAGE -->
+    <select onchange="setLanguage(this.value)">
+      <option>English</option>
+      <option>Hindi</option>
+      <option>Marathi</option>
+      <option>Tamil</option>
+      <option>Telugu</option>
+      <option>Bengali</option>
+      <option>Urdu</option>
+    </select>
+
+    <!-- ROLE -->
+    <select onchange="setRole(this.value)">
+      <option>General AI</option>
+      <option>Teacher AI</option>
+      <option>Student AI</option>
+      <option>Developer AI</option>
+      <option>Business AI</option>
+      <option>Child Safe AI</option>
+    </select>
+
+    <!-- USER -->
+    <div id="userArea">
+      <div id="g_id_onload"
+        data-client_id="YOUR_GOOGLE_CLIENT_ID"
+        data-callback="onLogin">
+      </div>
+      <div class="g_id_signin"></div>
+    </div>
+  </div>
 </header>
 
-<!-- DRAWER -->
-<div id="drawer">
-  <h3>Settings</h3>
-  <button class="drawer-btn" onclick="toggleTheme()">🌗 Theme</button>
-  <button class="drawer-btn" onclick="toggleLang()">🌐 Language</button>
-  <button class="drawer-btn" onclick="alert('BotFusion AI\nCreated by Atharv Pawar')">ℹ About</button>
-  <button class="drawer-btn" onclick="drawer.style.display='none'">❌ Close</button>
-</div>
+<div class="container">
 
-<!-- HOME -->
-<div id="home">
-  <div class="logo">⬡</div>
-  <h2 id="helpText">How can I help you today?</h2>
+  <aside class="sidebar">
+    <h4>Chats</h4>
+    <div class="badge">AI Operating System</div>
+  </aside>
 
-  <div class="suggestion" onclick="quick('Explain quantum computing in simple terms')">
-    ℹ Explain quantum computing in simple terms
-  </div>
-  <div class="suggestion" onclick="quick('Write a creative story about a robot')">
-    ✏ Write a creative story about a robot
-  </div>
-  <div class="suggestion" onclick="quick('Help me debug my code')">
-    &lt;/&gt; Help me debug my code
-  </div>
-  <div class="suggestion" onclick="quick('Best way to learn a new language')">
-    🌍 What's the best way to learn a new language?
-  </div>
-</div>
+  <main class="chat-area">
+    <div class="messages" id="messages">
+      <div class="msg bot">Hello 👋 I am Botfusion-AI</div>
+    </div>
 
-<!-- CHAT -->
-<div id="chat"></div>
+    <div class="input-area">
+      <input id="input" placeholder="Type your message…" />
+      <button onclick="send()">Send</button>
+    </div>
+  </main>
 
-<!-- INPUT -->
-<div id="inputBar">
-  <input type="file" hidden id="file">
-  <button class="icon" onclick="file.click()">📎</button>
-  <input id="input" placeholder="Message BotFusion…" oninput="startChat()">
-  <button class="icon" onclick="send()">⬆</button>
 </div>
 
 <script>
-let started=false;
-let lang="en";
+let role="General AI", lang="English";
 
-function startChat(){
-  if(!started){
-    started=true;
-    home.style.display="none";
-    chat.style.display="block";
-  }
-}
+/* THEME */
+function setTheme(t){document.body.className=t}
 
+/* LANGUAGE */
+function setLanguage(l){lang=l;system(`Language set to ${l}`)}
+
+/* ROLE */
+function setRole(r){role=r;system(`Role switched to ${r}`)}
+
+/* CHAT */
 function send(){
-  if(!input.value)return;
-  add("user",input.value);
-  setTimeout(()=>add("bot","This is a demo response."),500);
-  input.value="";
+  const i=document.getElementById("input");
+  if(!i.value) return;
+  add("user",i.value);
+  add("bot",`(${role}, ${lang}) Processing your request…`);
+  i.value="";
 }
 
+/* UI MSG */
 function add(type,text){
-  const d=document.createElement("div");
-  d.className="msg "+type;
-  d.textContent=(type==="user"?"You: ":"Bot: ")+text;
-  chat.appendChild(d);
-  window.scrollTo(0,document.body.scrollHeight);
+  const m=document.createElement("div");
+  m.className="msg "+type;
+  m.textContent=text;
+  messages.appendChild(m);
+  messages.scrollTop=9999;
 }
+function system(t){add("bot","⚙️ "+t)}
 
-function quick(text){
-  startChat();
-  input.value=text;
+/* GOOGLE LOGIN */
+function onLogin(res){
+  const u=parseJwt(res.credential);
+  userArea.innerHTML=`
+    <span>${u.name}</span>
+    <img src="${u.picture}" width="32" style="border-radius:50%">
+    <button onclick="logout()">Logout</button>`;
 }
+function logout(){location.reload()}
 
-function toggleTheme(){
-  document.body.classList.toggle("light");
-}
-
-function toggleLang(){
-  lang = lang==="en"?"hi":"en";
-  helpText.textContent = lang==="en"
-    ? "How can I help you today?"
-    : "मैं आपकी कैसे मदद कर सकता हूँ?";
+/* JWT */
+function parseJwt(t){
+  return JSON.parse(atob(t.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
 }
 </script>
 
