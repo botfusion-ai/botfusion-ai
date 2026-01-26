@@ -2,77 +2,148 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>Botfusion-AI</title>
+<title>Botfusion AI</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<!-- Google Login -->
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,system-ui}
-body{height:100vh;display:flex;flex-direction:column}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:system-ui,-apple-system,Segoe UI;
+  background:#f7f7f8;color:#1f2937;
+  height:100vh;display:flex
+}
 
-/* ===== THEMES ===== */
-body.dark{--bg:#0f1117;--panel:#161a23;--text:#eaeaf0;--border:#262b3a;--hover:#20263a;--accent:#4f7cff}
-body.light{--bg:#f5f7fb;--panel:#fff;--text:#1e1e2e;--border:#dcdfea;--hover:#eef1f8;--accent:#3b6cff}
-body.glass{--bg:#1b1e2b;--panel:rgba(255,255,255,.08);--text:#fff;--border:rgba(255,255,255,.2);--hover:rgba(255,255,255,.12);--accent:#7c9cff}
-body.cyber{--bg:#05080d;--panel:#0b1220;--text:#00ffcc;--border:#003333;--hover:#001f1f;--accent:#00ffaa}
-body.warm{--bg:#f6efe9;--panel:#fff7f0;--text:#3a2e2a;--border:#e2d6cc;--hover:#f0e4da;--accent:#d47c4a}
+/* SIDEBAR */
+.sidebar{
+  width:260px;background:#fff;border-right:1px solid #e5e7eb;padding:16px
+}
+.sidebar h1{font-size:18px;margin-bottom:14px}
+.new-chat{
+  width:100%;padding:10px;border-radius:8px;
+  border:1px solid #e5e7eb;background:#fafafa;cursor:pointer
+}
 
-body{background:var(--bg);color:var(--text);transition:.3s}
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column}
 
-/* ===== HEADER ===== */
-header{height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:var(--panel);border-bottom:1px solid var(--border)}
-select,button,input{background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:6px}
-button:hover{background:var(--hover);cursor:pointer}
+/* TOP BAR */
+.topbar{
+  height:56px;display:flex;align-items:center;
+  justify-content:space-between;padding:0 20px;
+  border-bottom:1px solid #e5e7eb;background:#fff
+}
+.top-right{display:flex;align-items:center;gap:12px}
 
-/* ===== LAYOUT ===== */
-.container{flex:1;display:flex}
-.sidebar{width:240px;padding:14px;background:var(--panel);border-right:1px solid var(--border)}
-.chat-area{flex:1;display:flex;flex-direction:column}
+/* CHAT */
+.chat{flex:1;overflow-y:auto;padding:32px 0}
+.chat-inner{max-width:720px;margin:auto;padding:0 20px}
+.message{margin-bottom:28px;line-height:1.6}
+.user{font-weight:500}
+.ai{color:#111827}
 
-/* ===== CHAT ===== */
-.messages{flex:1;padding:16px;overflow-y:auto}
-.msg{max-width:70%;padding:12px;border-radius:12px;margin-bottom:10px}
-.bot{background:var(--panel)}
-.user{background:var(--accent);color:#fff;margin-left:auto}
-.input-area{display:flex;gap:10px;padding:12px;border-top:1px solid var(--border);background:var(--panel)}
-input{flex:1}
+/* INPUT */
+.input-area{
+  border-top:1px solid #e5e7eb;
+  padding:16px;background:#fff
+}
+.input-inner{
+  max-width:720px;margin:auto;display:flex;gap:12px
+}
+input{
+  flex:1;padding:12px 14px;border-radius:10px;
+  border:1px solid #d1d5db;font-size:15px
+}
+button{
+  padding:12px 16px;border-radius:10px;
+  border:none;background:#111827;color:#fff;cursor:pointer
+}
 
-/* ===== UTIL ===== */
-.badge{font-size:12px;opacity:.7}
-.hidden{display:none}
+/* SETTINGS MODAL */
+.modal{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.4);
+  display:none;align-items:center;justify-content:center
+}
+.modal-box{
+  width:360px;background:#fff;
+  border-radius:12px;padding:20px
+}
+.modal h3{margin-bottom:12px}
+.modal label{font-size:14px;margin-top:10px;display:block}
+.modal select{width:100%;padding:8px;margin-top:4px}
+
+/* DARK MODE */
+body.dark{background:#0f172a;color:#e5e7eb}
+body.dark .sidebar,
+body.dark .topbar,
+body.dark .input-area,
+body.dark .modal-box{
+  background:#020617;border-color:#1e293b
+}
+body.dark input{
+  background:#020617;color:#e5e7eb;border-color:#1e293b
+}
+body.dark .ai{color:#e5e7eb}
 </style>
 </head>
 
-<body class="dark">
+<body>
 
-<header>
-  <strong>🤖 Botfusion-AI</strong>
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <h1>Botfusion AI</h1>
+  <button class="new-chat">＋ New chat</button>
+</div>
 
-  <div style="display:flex;gap:8px;align-items:center">
+<!-- MAIN -->
+<div class="main">
 
-    <!-- THEME -->
+  <!-- TOP -->
+  <div class="topbar">
+    <div>Botfusion-AI</div>
+    <div class="top-right">
+      <span style="cursor:pointer" onclick="openSettings()">⚙️</span>
+      <div id="userArea">
+        <div id="g_id_onload"
+          data-client_id="29653421578-hmm842utpcu63hdq8k43inonfid852ed.apps.googleusercontent.com"
+          data-callback="onLogin"></div>
+        <div class="g_id_signin"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHAT -->
+  <div class="chat" id="chat">
+    <div class="chat-inner" id="chatInner">
+      <div class="message ai">
+        Hello. I’m Botfusion-AI. How can I help you today?
+      </div>
+    </div>
+  </div>
+
+  <!-- INPUT -->
+  <div class="input-area">
+    <div class="input-inner">
+      <input id="input" placeholder="Message Botfusion-AI…" />
+      <button onclick="send()">Send</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- SETTINGS -->
+<div class="modal" id="settings">
+  <div class="modal-box">
+    <h3>Settings</h3>
+
+    <label>Theme</label>
     <select onchange="setTheme(this.value)">
-      <option value="dark">Dark</option>
       <option value="light">Light</option>
-      <option value="glass">Glass</option>
-      <option value="cyber">Cyber</option>
-      <option value="warm">Warm</option>
+      <option value="dark">Dark</option>
     </select>
 
-    <!-- LANGUAGE -->
-    <select onchange="setLanguage(this.value)">
-      <option>English</option>
-      <option>Hindi</option>
-      <option>Marathi</option>
-      <option>Tamil</option>
-      <option>Telugu</option>
-      <option>Bengali</option>
-      <option>Urdu</option>
-    </select>
-
-    <!-- ROLE -->
+    <label>AI Role</label>
     <select onchange="setRole(this.value)">
       <option>General AI</option>
       <option>Teacher AI</option>
@@ -82,81 +153,64 @@ input{flex:1}
       <option>Child Safe AI</option>
     </select>
 
-    <!-- USER -->
-    <div id="userArea">
-      <div id="g_id_onload"
-        data-client_id="YOUR_GOOGLE_CLIENT_ID"
-        data-callback="onLogin">
-      </div>
-      <div class="g_id_signin"></div>
-    </div>
+    <button style="margin-top:14px;width:100%" onclick="closeSettings()">
+      Close
+    </button>
   </div>
-</header>
-
-<div class="container">
-
-  <aside class="sidebar">
-    <h4>Chats</h4>
-    <div class="badge">AI Operating System</div>
-  </aside>
-
-  <main class="chat-area">
-    <div class="messages" id="messages">
-      <div class="msg bot">Hello 👋 I am Botfusion-AI</div>
-    </div>
-
-    <div class="input-area">
-      <input id="input" placeholder="Type your message…" />
-      <button onclick="send()">Send</button>
-    </div>
-  </main>
-
 </div>
 
 <script>
-let role="General AI", lang="English";
+let role="General AI";
 
-/* THEME */
-function setTheme(t){document.body.className=t}
-
-/* LANGUAGE */
-function setLanguage(l){lang=l;system(`Language set to ${l}`)}
-
-/* ROLE */
-function setRole(r){role=r;system(`Role switched to ${r}`)}
-
-/* CHAT */
+/* SEND */
 function send(){
-  const i=document.getElementById("input");
+  const i=input;
   if(!i.value) return;
   add("user",i.value);
-  add("bot",`(${role}, ${lang}) Processing your request…`);
+
+  streamAI(
+    "Here is a thoughtful response generated according to your selected role. " +
+    "This text is streamed gradually to feel natural and calm, just like a real AI."
+  );
   i.value="";
 }
 
-/* UI MSG */
+/* ADD MESSAGE */
 function add(type,text){
-  const m=document.createElement("div");
-  m.className="msg "+type;
-  m.textContent=text;
-  messages.appendChild(m);
-  messages.scrollTop=9999;
+  const d=document.createElement("div");
+  d.className="message "+type;
+  d.textContent=text;
+  chatInner.appendChild(d);
+  chat.scrollTop=chat.scrollHeight;
 }
-function system(t){add("bot","⚙️ "+t)}
+
+/* STREAMING RESPONSE */
+function streamAI(text){
+  const d=document.createElement("div");
+  d.className="message ai";
+  chatInner.appendChild(d);
+
+  let i=0;
+  const interval=setInterval(()=>{
+    d.textContent+=text[i++];
+    chat.scrollTop=chat.scrollHeight;
+    if(i>=text.length) clearInterval(interval);
+  },25);
+}
+
+/* SETTINGS */
+function openSettings(){settings.style.display="flex"}
+function closeSettings(){settings.style.display="none"}
+function setTheme(t){document.body.className=t==="dark"?"dark":""}
+function setRole(r){role=r}
 
 /* GOOGLE LOGIN */
 function onLogin(res){
-  const u=parseJwt(res.credential);
+  const u=JSON.parse(atob(res.credential.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
   userArea.innerHTML=`
-    <span>${u.name}</span>
-    <img src="${u.picture}" width="32" style="border-radius:50%">
-    <button onclick="logout()">Logout</button>`;
-}
-function logout(){location.reload()}
-
-/* JWT */
-function parseJwt(t){
-  return JSON.parse(atob(t.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
+    <img src="${u.picture}" width="28" style="border-radius:50%">
+    ${u.name}
+  `;
 }
 </script>
 
