@@ -1,333 +1,310 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BotFusion AI</title>
 
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
 <style>
 :root{
---bg:#0f0f14;
---panel:#17171c;
---border:rgba(255,255,255,0.08);
---user:#2563eb;
---bot:#1e1e24;
---text:#ffffff;
---subtle:#9ca3af;
+  --bg:#0f0f14;
+  --panel:#1a1a22;
+  --text:#ffffff;
+  --sub:#9aa0a6;
+  --accent:#2f81f7;
 }
 
-*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,system-ui}
 body{
-background:var(--bg);
-color:var(--text);
-height:100vh;
-display:flex;
-overflow:hidden;
-transition:background 0.3s ease;
+  margin:0;
+  font-family:'Inter',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  display:flex;
+  height:100vh;
+  overflow:hidden;
+  transition:background .3s;
 }
 
 /* Sidebar */
 .sidebar{
-width:260px;
-background:var(--panel);
-border-right:1px solid var(--border);
-display:flex;
-flex-direction:column;
-transition:0.3s;
-}
-.sidebar.collapsed{width:70px}
-
-.topbar{
-padding:14px;
-font-weight:600;
-border-bottom:1px solid var(--border);
-display:flex;
-justify-content:space-between;
-align-items:center;
+  position:fixed;
+  left:-280px;
+  width:260px;
+  height:100%;
+  background:var(--panel);
+  transition:.35s;
+  padding:20px;
+  z-index:10;
+  display:flex;
+  flex-direction:column;
+  gap:15px;
 }
 
-.icon-btn{
-cursor:pointer;
-font-size:14px;
-color:var(--subtle);
+.sidebar.open{
+  left:0;
 }
 
-.chat-list{flex:1;overflow-y:auto}
-.chat-item{
-padding:12px;
-border-bottom:1px solid var(--border);
-cursor:pointer;
-white-space:nowrap;
-overflow:hidden;
-text-overflow:ellipsis;
+.overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.5);
+  opacity:0;
+  pointer-events:none;
+  transition:.3s;
 }
-.chat-item.active{background:#1f1f26}
-.chat-item:hover{background:#22222a}
+.overlay.show{
+  opacity:1;
+  pointer-events:auto;
+}
 
-/* Main */
-.main{flex:1;display:flex;flex-direction:column;position:relative}
+.menu-item{
+  padding:10px;
+  border-radius:8px;
+  cursor:pointer;
+  transition:.2s;
+}
+.menu-item:hover{
+  background:rgba(255,255,255,0.05);
+}
 
-.header{
-height:60px;
-display:flex;
-align-items:center;
-justify-content:center;
-background:var(--panel);
-border-bottom:1px solid var(--border);
-font-weight:600;
+header{
+  height:60px;
+  display:flex;
+  align-items:center;
+  padding:0 20px;
+  background:var(--panel);
+  flex-shrink:0;
+}
+
+.hamburger{
+  width:25px;
+  height:18px;
+  cursor:pointer;
+  position:relative;
+}
+.hamburger span{
+  position:absolute;
+  height:3px;
+  width:100%;
+  background:white;
+  border-radius:3px;
+  transition:.3s;
+}
+.hamburger span:nth-child(1){top:0}
+.hamburger span:nth-child(2){top:7px}
+.hamburger span:nth-child(3){bottom:0}
+
+.main{
+  flex:1;
+  display:flex;
+  flex-direction:column;
 }
 
 .chat{
-flex:1;
-overflow-y:auto;
-padding:20px;
-display:flex;
-flex-direction:column;
+  flex:1;
+  overflow-y:auto;
+  padding:20px;
+  display:flex;
+  flex-direction:column;
+  gap:15px;
 }
 
 .message{
-max-width:75%;
-padding:12px 14px;
-border-radius:14px;
-margin-bottom:10px;
-font-size:14px;
-line-height:1.5;
-animation:fadeUp 0.2s ease;
-}
-.user{
-background:var(--user);
-margin-left:auto;
-border-bottom-right-radius:4px;
-}
-.bot{
-background:var(--bot);
-border-bottom-left-radius:4px;
+  max-width:75%;
+  padding:12px 16px;
+  border-radius:14px;
+  font-size:14px;
+  line-height:1.5;
 }
 
-@keyframes fadeUp{
-from{opacity:0;transform:translateY(8px)}
-to{opacity:1;transform:translateY(0)}
+.user{
+  background:var(--accent);
+  align-self:flex-end;
+}
+.bot{
+  background:var(--panel);
+  align-self:flex-start;
 }
 
 .input-area{
-padding:12px;
-background:var(--panel);
-border-top:1px solid var(--border);
-display:flex;
-align-items:flex-end;
+  padding:15px;
+  background:var(--panel);
+  display:flex;
+  gap:10px;
 }
 
 textarea{
-flex:1;
-resize:none;
-border:none;
-outline:none;
-background:#1c1c22;
-color:white;
-padding:10px 12px;
-border-radius:12px;
-font-size:14px;
-max-height:120px;
-overflow-y:auto;
+  flex:1;
+  resize:none;
+  border:none;
+  outline:none;
+  border-radius:10px;
+  padding:10px;
+  font-family:inherit;
+  background:#262631;
+  color:white;
 }
 
-.send{
-width:40px;
-margin-left:8px;
-cursor:pointer;
-transition:0.2s;
+button{
+  border:none;
+  background:var(--accent);
+  color:white;
+  padding:10px 16px;
+  border-radius:10px;
+  cursor:pointer;
 }
-.send:hover{transform:translateX(3px)}
-svg{fill:white}
 
-.scroll-btn{
-position:absolute;
-bottom:90px;
-right:20px;
-background:#222;
-padding:8px 12px;
-border-radius:20px;
-cursor:pointer;
-display:none;
-font-size:12px;
+select{
+  padding:6px;
+  border-radius:6px;
+  border:none;
 }
-.scroll-btn.show{display:block}
 
-/* Elegant Themes */
-.theme-ocean{--bg:#001f3f}
-.theme-royal{--bg:#1a0025}
-.theme-crimson{--bg:#250000}
-.theme-emerald{--bg:#002b20}
-.theme-graphite{--bg:#111111}
-.theme-slate{--bg:#1a1f2b}
+.hidden{
+  display:none;
+}
+
+/* Themes */
+.theme-light{
+  --bg:#f5f5f5;
+  --panel:#ffffff;
+  --text:#000;
+  --sub:#555;
+  --accent:#0066ff;
+}
+.theme-blue{
+  --bg:#0e1628;
+  --panel:#172033;
+  --accent:#1f6feb;
+}
+.theme-green{
+  --bg:#0e1c16;
+  --panel:#162821;
+  --accent:#2ea043;
+}
+.theme-purple{
+  --bg:#1a1028;
+  --panel:#24153a;
+  --accent:#a371f7;
+}
 </style>
 </head>
 
 <body>
 
 <div class="sidebar" id="sidebar">
-<div class="topbar">
-<span id="newChatLabel">New Chat</span>
-<span class="icon-btn" onclick="createChat()">＋</span>
+  <div class="menu-item" onclick="newChat()">New Chat</div>
+  <div class="menu-item" onclick="showAccount()">Account</div>
+  <div class="menu-item" onclick="showSettings()">Settings</div>
+  <div class="menu-item" onclick="showReport()">Report</div>
+  <div>
+    <strong>Themes</strong>
+    <div class="menu-item" onclick="setTheme('')">Default</div>
+    <div class="menu-item" onclick="setTheme('theme-light')">Light</div>
+    <div class="menu-item" onclick="setTheme('theme-blue')">Blue</div>
+    <div class="menu-item" onclick="setTheme('theme-green')">Green</div>
+    <div class="menu-item" onclick="setTheme('theme-purple')">Purple</div>
+  </div>
+  <div>
+    <strong>Language</strong>
+    <select onchange="setLang(this.value)">
+      <option>English</option>
+      <option>Hindi</option>
+      <option>Spanish</option>
+      <option>French</option>
+      <option>German</option>
+      <option>Chinese</option>
+      <option>Japanese</option>
+      <option>Arabic</option>
+      <option>Russian</option>
+      <option>Portuguese</option>
+    </select>
+  </div>
 </div>
 
-<div style="padding:10px;border-bottom:1px solid var(--border)">
-<select id="themeSelect" onchange="changeTheme(this.value)">
-<option value="">Obsidian</option>
-<option value="theme-ocean">Ocean</option>
-<option value="theme-royal">Royal</option>
-<option value="theme-crimson">Crimson</option>
-<option value="theme-emerald">Emerald</option>
-<option value="theme-graphite">Graphite</option>
-<option value="theme-slate">Slate</option>
-</select>
-
-<br><br>
-
-<select id="languageSelect" onchange="changeLanguage(this.value)">
-</select>
-</div>
-
-<div class="chat-list" id="chatList"></div>
-</div>
+<div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
 
 <div class="main">
-<div class="header">BotFusion AI</div>
+<header>
+  <div class="hamburger" onclick="toggleSidebar()">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+  <h3 style="margin-left:15px;">BotFusion AI</h3>
+</header>
+
 <div class="chat" id="chat"></div>
-<div class="scroll-btn" id="scrollBtn" onclick="scrollBottom()">▼</div>
+
 <div class="input-area">
-<textarea id="input" rows="1" placeholder="Ask anything..."></textarea>
-<div class="send" onclick="sendMessage()">
-<svg viewBox="0 0 24 24">
-<path d="M2 21l21-9L2 3v7l15 2-15 2z"/>
-</svg>
-</div>
+  <input type="file" id="fileInput" class="hidden">
+  <button onclick="document.getElementById('fileInput').click()">+</button>
+  <textarea id="msg" rows="1" placeholder="Message BotFusion..."></textarea>
+  <button onclick="send()">Send</button>
 </div>
 </div>
 
 <script>
-let chats=JSON.parse(localStorage.getItem("bf_chats"))||[];
-let currentChat=null;
+const sidebar=document.getElementById("sidebar");
+const overlay=document.getElementById("overlay");
+const chat=document.getElementById("chat");
 
-const chatEl=document.getElementById("chat");
-const chatList=document.getElementById("chatList");
-const input=document.getElementById("input");
-const scrollBtn=document.getElementById("scrollBtn");
-const languageSelect=document.getElementById("languageSelect");
-
-/* 100+ Languages */
-const languages=["English","Spanish","French","German","Italian","Portuguese","Russian","Chinese","Japanese","Korean","Hindi","Arabic","Bengali","Urdu","Turkish","Dutch","Polish","Thai","Vietnamese","Indonesian","Malay","Greek","Hebrew","Swedish","Norwegian","Danish","Finnish","Ukrainian","Romanian","Hungarian","Czech","Slovak","Bulgarian","Serbian","Croatian","Slovenian","Lithuanian","Latvian","Estonian","Filipino","Swahili","Afrikaans","Icelandic","Irish","Welsh","Nepali","Sinhala","Tamil","Telugu","Kannada","Malayalam","Punjabi","Marathi","Gujarati","Odia","Assamese","Khmer","Lao","Mongolian","Persian","Pashto","Kazakh","Uzbek","Azerbaijani","Georgian","Armenian","Albanian","Macedonian","Bosnian","Malagasy","Haitian Creole","Yoruba","Zulu","Amharic","Somali","Tajik","Kurdish","Luxembourgish","Catalan","Basque","Galician","Esperanto","Fijian","Samoan","Tongan","Maori","Quechua","Aymara","Hausa","Igbo","Xhosa","Guarani","Latvian","Slovenian","Turkmen","Kyrgyz"];
-
-languages.forEach(l=>{
-let opt=document.createElement("option");
-opt.textContent=l;
-languageSelect.appendChild(opt);
-});
-
-function save(){localStorage.setItem("bf_chats",JSON.stringify(chats));}
-
-function createChat(){
-const id=Date.now();
-chats.unshift({id,title:"New Conversation",messages:[]});
-currentChat=id;
-save();renderChats();renderMessages();
+function toggleSidebar(){
+  sidebar.classList.toggle("open");
+  overlay.classList.toggle("show");
 }
 
-function renderChats(){
-chatList.innerHTML="";
-chats.forEach(c=>{
-let div=document.createElement("div");
-div.className="chat-item"+(c.id===currentChat?" active":"");
-div.textContent=c.title;
-div.onclick=()=>{currentChat=c.id;renderChats();renderMessages();}
-div.oncontextmenu=(e)=>{
-e.preventDefault();
-let name=prompt("Rename chat:",c.title);
-if(name){c.title=name;save();renderChats();}
-};
-chatList.appendChild(div);
-});
+function send(){
+  const msg=document.getElementById("msg");
+  if(!msg.value.trim())return;
+
+  addMessage(msg.value,"user");
+  setTimeout(()=>addMessage("This is a demo AI response.","bot"),800);
+  msg.value="";
 }
 
-function renderMessages(){
-chatEl.innerHTML="";
-let chatObj=chats.find(c=>c.id===currentChat);
-if(!chatObj)return;
-chatObj.messages.forEach(m=>{
-let div=document.createElement("div");
-div.className="message "+m.role;
-div.innerHTML=formatText(m.text);
-chatEl.appendChild(div);
-});
-scrollBottom();
+function addMessage(text,type){
+  const div=document.createElement("div");
+  div.className="message "+type;
+  div.innerText=text;
+  chat.appendChild(div);
+  chat.scrollTop=chat.scrollHeight;
 }
 
-function sendMessage(){
-if(!input.value.trim())return;
-let chatObj=chats.find(c=>c.id===currentChat);
-chatObj.messages.push({role:"user",text:input.value});
-renderMessages();
-
-let botMsg={role:"bot",text:""};
-chatObj.messages.push(botMsg);
-renderMessages();
-
-let full="Advanced frontend AI response simulation.";
-let i=0;
-let interval=setInterval(()=>{
-botMsg.text+=full[i];
-renderMessages();
-i++;
-if(i>=full.length){clearInterval(interval);save();}
-},25);
-
-input.value="";
-input.style.height="auto";
-save();
+function newChat(){
+  chat.innerHTML="";
+  toggleSidebar();
 }
 
-function formatText(text){
-return text.replace(/\*\*(.*?)\*\*/g,"<b>$1</b>").replace(/\n/g,"<br>");
+function showAccount(){
+  alert("Google Login / Guest Mode UI Placeholder");
 }
 
-function scrollBottom(){
-chatEl.scrollTop=chatEl.scrollHeight;
-scrollBtn.classList.remove("show");
+function showSettings(){
+  alert("Settings Panel Placeholder");
 }
 
-chatEl.addEventListener("scroll",()=>{
-if(chatEl.scrollTop+chatEl.clientHeight<chatEl.scrollHeight-50){
-scrollBtn.classList.add("show");
-}else{scrollBtn.classList.remove("show");}
-});
-
-input.addEventListener("input",()=>{
-input.style.height="auto";
-input.style.height=input.scrollHeight+"px";
-});
-
-input.addEventListener("keydown",(e)=>{
-if(e.key==="Enter"&&!e.shiftKey){
-e.preventDefault();
-sendMessage();
-}
-});
-
-function changeTheme(theme){
-document.body.className=theme;
-localStorage.setItem("bf_theme",theme);
+function showReport(){
+  alert("Report Modal Placeholder");
 }
 
-function changeLanguage(lang){
-localStorage.setItem("bf_lang",lang);
+function setTheme(theme){
+  document.body.className="";
+  if(theme)document.body.classList.add(theme);
+  localStorage.setItem("theme",theme);
+}
+
+function setLang(lang){
+  alert("Language switched to "+lang);
 }
 
 window.onload=()=>{
-let savedTheme=localStorage.getItem("bf_theme");
-if(savedTheme)document.body.className=savedTheme;
-if(chats.length===0)createChat();
-else{currentChat=chats[0].id;renderChats();renderMessages();}
-}
+  const saved=localStorage.getItem("theme");
+  if(saved)setTheme(saved);
+};
 </script>
 
 </body>
- </html>
+     </html>
