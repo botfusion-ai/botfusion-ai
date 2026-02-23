@@ -3,211 +3,320 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BotFusion AI</title>
+<title>Botfusion AI v2</title>
 
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 
 <style>
 :root{
- --bg:#121212;--panel:#1e1e1e;--text:#fff;--accent:#10a37f;
+ --bg:#0f172a;
+ --sidebar:#111827;
+ --chat:#1e293b;
+ --text:#ffffff;
+ --accent:#10a37f;
+ --transition:0.3s;
 }
-[data-theme="blue"]{--accent:#3b82f6}
-[data-theme="purple"]{--accent:#8b5cf6}
-[data-theme="red"]{--accent:#ef4444}
-[data-theme="gold"]{--accent:#facc15}
 
-*{box-sizing:border-box;margin:0;font-family:system-ui}
-body{background:var(--bg);color:var(--text);height:100vh;display:flex}
+body{
+ margin:0;
+ font-family:'Inter',sans-serif;
+ background:var(--bg);
+ color:var(--text);
+ display:flex;
+ height:100vh;
+ overflow:hidden;
+ transition:var(--transition);
+}
 
 /* Sidebar */
 .sidebar{
- width:260px;background:#0d0d0d;padding:16px;
- display:none;flex-direction:column
-}
-.sidebar h2{margin-bottom:10px}
-.sidebar select,.sidebar button{
- margin:6px 0;padding:8px;border-radius:6px;border:none
-}
-
-/* Main */
-.main{flex:1;display:flex;flex-direction:column}
-.topbar{
- height:56px;display:flex;align-items:center;
- padding:0 16px;border-bottom:1px solid #222
-}
-.menu{cursor:pointer}
-.title{margin-left:12px;font-weight:600}
-.auth{margin-left:auto}
-
-/* Center */
-.center{
- flex:1;display:flex;flex-direction:column;
- align-items:center;justify-content:center;text-align:center
-}
-.logo{font-size:64px;color:var(--accent)}
-.cards{max-width:520px;width:100%;margin-top:20px}
-.card{
- background:var(--panel);padding:14px;
- border-radius:12px;margin-bottom:12px;
- cursor:pointer;opacity:.85
+ position:fixed;
+ left:-260px;
+ width:260px;
+ height:100%;
+ background:var(--sidebar);
+ padding:15px;
+ transition:var(--transition);
+ display:flex;
+ flex-direction:column;
+ z-index:10;
 }
 
-/* Chat */
-.chat{flex:1;overflow:auto;padding:16px;display:none}
-.msg{max-width:75%;margin-bottom:10px;padding:10px;border-radius:10px}
-.user{background:var(--accent);color:#000;margin-left:auto}
-.bot{background:var(--panel)}
+.sidebar.active{ left:0; }
 
-/* Input */
-.inputbar{border-top:1px solid #222;padding:14px}
-.inputwrap{
- display:flex;align-items:center;
- background:var(--panel);border-radius:24px;padding:10px
-}
-.inputwrap input{
- flex:1;background:none;border:none;color:white;font-size:16px;outline:none
-}
-.icon{cursor:pointer;margin-left:10px}
+.sidebar h2{ margin:0 0 15px; }
 
-/* Buttons */
-button{
- background:var(--accent);border:none;
- padding:8px 14px;border-radius:6px;font-weight:600;cursor:pointer
+.sidebar button, select{
+ margin:5px 0;
+ padding:10px;
+ border:none;
+ border-radius:8px;
+ background:none;
+ color:var(--text);
+ cursor:pointer;
+ text-align:left;
+}
+
+.sidebar button:hover{ background:#1f2937; }
+
+.hamburger{
+ position:absolute;
+ top:15px;
+ left:15px;
+ font-size:22px;
+ cursor:pointer;
+ z-index:20;
+}
+
+/* Chat Area */
+.chat-container{
+ flex:1;
+ display:flex;
+ flex-direction:column;
+ margin-left:0;
+ width:100%;
+}
+
+.messages{
+ flex:1;
+ overflow-y:auto;
+ padding:70px 20px 20px 20px;
+ display:flex;
+ flex-direction:column;
+}
+
+.message{
+ padding:12px 16px;
+ margin:8px 0;
+ border-radius:14px;
+ max-width:75%;
+ animation:fade 0.3s ease;
+}
+
+.user{ background:var(--accent); align-self:flex-end; }
+.bot{ background:#374151; }
+
+@keyframes fade{
+ from{opacity:0; transform:translateY(10px);}
+ to{opacity:1; transform:translateY(0);}
+}
+
+/* Chatbar */
+.chatbar{
+ display:flex;
+ padding:15px;
+ background:var(--sidebar);
+}
+
+.chatbar input{
+ flex:1;
+ padding:12px;
+ border-radius:8px;
+ border:none;
+ outline:none;
+}
+
+.chatbar button{
+ margin-left:8px;
+ padding:12px;
+ border:none;
+ border-radius:8px;
+ background:var(--accent);
+ color:white;
+ cursor:pointer;
+}
+
+/* Modal */
+.modal{
+ position:fixed;
+ top:0;
+ left:0;
+ width:100%;
+ height:100%;
+ background:rgba(0,0,0,0.5);
+ display:none;
+ justify-content:center;
+ align-items:center;
+}
+.modal-content{
+ background:var(--chat);
+ padding:20px;
+ border-radius:12px;
+ width:90%;
+ max-width:400px;
+}
+.modal.active{ display:flex; }
+
+/* Themes */
+.theme-light{
+ --bg:#ffffff;
+ --sidebar:#f3f4f6;
+ --chat:#ffffff;
+ --text:#000000;
+ --accent:#2563eb;
+}
+.theme-blue{
+ --bg:#0a192f;
+ --sidebar:#112240;
+ --chat:#172a45;
+ --text:#ccd6f6;
+ --accent:#64ffda;
+}
+.theme-purple{
+ --bg:#1e1b4b;
+ --sidebar:#312e81;
+ --chat:#3730a3;
+ --text:#ffffff;
+ --accent:#a78bfa;
+}
+.theme-minimal{
+ --bg:#f9fafb;
+ --sidebar:#e5e7eb;
+ --chat:#ffffff;
+ --text:#111827;
+ --accent:#10b981;
 }
 </style>
 </head>
 
 <body>
 
-<!-- Sidebar -->
+<div class="hamburger" onclick="toggleSidebar()">☰</div>
+
 <div class="sidebar" id="sidebar">
-<h2>BotFusion</h2>
-<p id="userEmail"></p>
-
-<label>Theme</label>
-<select onchange="setTheme(this.value)">
- <option value="">Green</option>
- <option value="blue">Blue</option>
- <option value="purple">Purple</option>
- <option value="red">Red</option>
- <option value="gold">Gold</option>
-</select>
-
-<label>Language</label>
-<select onchange="setLang(this.value)">
- <option value="en">English</option>
- <option value="hi">Hindi</option>
- <option value="mr">Marathi</option>
- <option value="fr">French</option>
- <option value="es">Spanish</option>
-</select>
-
-<button onclick="logout()">Logout</button>
+<h2>Botfusion AI</h2>
+<button onclick="newChat()">+ New Chat</button>
+<button onclick="createFolder()">+ Create Folder</button>
+<div id="folders"></div>
+<hr>
+<button onclick="openAccount()">Account</button>
+<button onclick="openSettings()">Settings</button>
+<button onclick="reportIssue()">Report</button>
+<select id="languageSelect"></select>
+<button onclick="switchTheme()">Switch Theme</button>
 </div>
 
-<!-- Main -->
-<div class="main">
-<div class="topbar">
- <span class="material-icons menu" onclick="toggleSidebar()">menu</span>
- <span class="title">BotFusion</span>
- <div class="auth">
-  <button onclick="login()" id="loginBtn">Google Login</button>
- </div>
+<div class="chat-container">
+<div class="messages" id="messages"></div>
+
+<div class="chatbar">
+<button onclick="document.getElementById('fileInput').click()">📎</button>
+<input type="file" id="fileInput" hidden>
+<button onclick="startVoice()">🎤</button>
+<input type="text" id="input" placeholder="Send a message...">
+<button onclick="send()">Send</button>
+</div>
 </div>
 
-<div class="center" id="home">
- <div class="logo">⬢</div>
- <h2 id="headline">How can I help you today?</h2>
-
- <div class="cards">
-  <div class="card" onclick="quick('Explain quantum computing')">Explain quantum computing</div>
-  <div class="card" onclick="quick('Write a robot story')">Write a robot story</div>
-  <div class="card" onclick="quick('Debug my code')">Help me debug my code</div>
-  <div class="card" onclick="quick('Learn a new language')">How to learn a new language?</div>
- </div>
+<!-- Settings Modal -->
+<div class="modal" id="settingsModal">
+<div class="modal-content">
+<h3>Settings</h3>
+<p>Theme & Language auto-save enabled.</p>
+<button onclick="closeModal()">Close</button>
+</div>
 </div>
 
-<div class="chat" id="chat"></div>
-
-<div class="inputbar">
-<div class="inputwrap">
- <input id="input" placeholder="Message BotFusion...">
- <span class="material-icons icon" onclick="voice()">mic</span>
- <span class="material-icons icon" onclick="send()">arrow_upward</span>
-</div>
+<!-- Account Modal -->
+<div class="modal" id="accountModal">
+<div class="modal-content">
+<h3>Account</h3>
+<p>Guest Mode Active</p>
+<button onclick="closeModal()">Close</button>
 </div>
 </div>
 
 <script>
-/* 🔥 Firebase Config (REPLACE) */
-firebase.initializeApp({
-apiKey: "AIzaSyDA62eN5MEjX9Z-gw6w9UuR8L-Ke_6J7eE",
-  authDomain: "botfusion-ai-bd6d0.firebaseapp.com",
-  projectId: "botfusion-ai-bd6d0",
-  storageBucket: "botfusion-ai-bd6d0.firebasestorage.app",
-  messagingSenderId: "730477136598",
-  appId: "1:730477136598:web:c6b4e0d495744d12079777",
-  measurementId: "G-53FTWNQB8X"
-});
-const auth=firebase.auth();
-const provider=new firebase.auth.GoogleAuthProvider();
-
-/* Auth */
-function login(){auth.signInWithPopup(provider)}
-function logout(){auth.signOut()}
-auth.onAuthStateChanged(u=>{
- document.getElementById("loginBtn").style.display=u?"none":"block";
- document.getElementById("sidebar").style.display=u?"flex":"none";
- if(u) document.getElementById("userEmail").innerText=u.email;
-})
-
 /* Sidebar */
 function toggleSidebar(){
- sidebar.style.display=sidebar.style.display==="flex"?"none":"flex"
+ document.getElementById("sidebar").classList.toggle("active");
 }
-
-/* Themes */
-function setTheme(t){
- document.documentElement.dataset.theme=t;
- localStorage.theme=t
-}
-if(localStorage.theme) setTheme(localStorage.theme)
-
-/* Language */
-const text={
- hi:"मैं आपकी कैसे मदद कर सकता हूँ?",
- mr:"मी तुम्हाला कशी मदत करू?",
- fr:"Comment puis-je vous aider?",
- es:"¿Cómo puedo ayudarte?"
-}
-function setLang(l){
- headline.innerText=text[l]||"How can I help you today?"
- localStorage.lang=l
-}
-if(localStorage.lang) setLang(localStorage.lang)
 
 /* Chat */
-function quick(t){input.value=t;send()}
 function send(){
- if(!input.value) return
- home.style.display="none";chat.style.display="block"
- chat.innerHTML+=`<div class="msg user">${input.value}</div>`
- chat.innerHTML+=`<div class="msg bot">BotFusion is thinking...</div>`
- input.value=""
- chat.scrollTop=chat.scrollHeight
+ let text=document.getElementById("input").value;
+ if(!text) return;
+ addMessage(text,"user");
+ document.getElementById("input").value="";
+ setTimeout(()=>{
+   let reply="Botfusion AI upgraded response.";
+   addMessage(reply,"bot");
+   speak(reply);
+ },800);
 }
 
+function addMessage(text,type){
+ let div=document.createElement("div");
+ div.className="message "+type;
+ div.innerText=text;
+ document.getElementById("messages").appendChild(div);
+}
+
+/* Folders */
+function createFolder(){
+ let name=prompt("Folder name:");
+ if(!name) return;
+ let div=document.createElement("div");
+ div.innerText="📁 "+name;
+ document.getElementById("folders").appendChild(div);
+}
+
+/* Theme */
+let themes=["","theme-light","theme-blue","theme-purple","theme-minimal"];
+let themeIndex=localStorage.getItem("themeIndex")||0;
+document.body.className=themes[themeIndex];
+
+function switchTheme(){
+ themeIndex=(parseInt(themeIndex)+1)%themes.length;
+ document.body.className=themes[themeIndex];
+ localStorage.setItem("themeIndex",themeIndex);
+}
+
+/* Language */
+let languages=["English","Hindi","Marathi","Spanish","French","German","Chinese","Japanese","Arabic","Bengali","Punjabi","Tamil","Telugu","Gujarati","Malayalam","Urdu"];
+let select=document.getElementById("languageSelect");
+languages.forEach(l=>{
+ let option=document.createElement("option");
+ option.text=l;
+ select.add(option);
+});
+select.value=localStorage.getItem("language")||"English";
+select.onchange=function(){
+ localStorage.setItem("language",select.value);
+};
+
 /* Voice */
-function voice(){
- const r=new webkitSpeechRecognition()
- r.lang="en-US";r.start()
- r.onresult=e=>input.value=e.results[0][0].transcript
+function startVoice(){
+ const recognition=new(window.SpeechRecognition||window.webkitSpeechRecognition)();
+ recognition.lang="en-US";
+ recognition.start();
+ recognition.onresult=function(e){
+  document.getElementById("input").value=e.results[0][0].transcript;
+ };
+}
+
+/* Speech */
+function speak(text){
+ const speech=new SpeechSynthesisUtterance(text);
+ speechSynthesis.speak(speech);
+}
+
+/* Modals */
+function openSettings(){ document.getElementById("settingsModal").classList.add("active"); }
+function openAccount(){ document.getElementById("accountModal").classList.add("active"); }
+function closeModal(){
+ document.querySelectorAll(".modal").forEach(m=>m.classList.remove("active"));
+}
+
+function reportIssue(){
+ let issue=prompt("Describe issue:");
+ if(issue) alert("Reported: "+issue);
+}
+
+function newChat(){
+ document.getElementById("messages").innerHTML="";
 }
 </script>
 
 </body>
-</html>
+ </html>
