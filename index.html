@@ -5,306 +5,293 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BotFusion AI</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
 
 <style>
-:root{
-  --bg:#0f0f14;
-  --panel:#1a1a22;
-  --text:#ffffff;
-  --sub:#9aa0a6;
-  --accent:#2f81f7;
+:root {
+--bg:#0f0f0f;
+--sidebar:#161616;
+--text:#ffffff;
+--accent:#10a37f;
+--card:#1e1e1e;
 }
 
-body{
-  margin:0;
-  font-family:'Inter',sans-serif;
-  background:var(--bg);
-  color:var(--text);
-  display:flex;
-  height:100vh;
-  overflow:hidden;
-  transition:background .3s;
+body.light {
+--bg:#f5f5f5;
+--sidebar:#ffffff;
+--text:#000;
+--accent:#007aff;
+--card:#eaeaea;
 }
 
-/* Sidebar */
-.sidebar{
-  position:fixed;
-  left:-280px;
-  width:260px;
-  height:100%;
-  background:var(--panel);
-  transition:.35s;
-  padding:20px;
-  z-index:10;
-  display:flex;
-  flex-direction:column;
-  gap:15px;
+body.purple {
+--bg:#140f1f;
+--sidebar:#1d142c;
+--text:#ffffff;
+--accent:#9b5cff;
+--card:#221832;
 }
 
-.sidebar.open{
-  left:0;
+body.blue {
+--bg:#0d1b2a;
+--sidebar:#13293d;
+--text:#ffffff;
+--accent:#00b4ff;
+--card:#1b3358;
 }
 
-.overlay{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.5);
-  opacity:0;
-  pointer-events:none;
-  transition:.3s;
-}
-.overlay.show{
-  opacity:1;
-  pointer-events:auto;
+body.gold {
+--bg:#1a1400;
+--sidebar:#261c00;
+--text:#fff;
+--accent:#ffc300;
+--card:#2d2200;
 }
 
-.menu-item{
-  padding:10px;
-  border-radius:8px;
-  cursor:pointer;
-  transition:.2s;
-}
-.menu-item:hover{
-  background:rgba(255,255,255,0.05);
+* {margin:0;padding:0;box-sizing:border-box;font-family:Inter,sans-serif;}
+body {background:var(--bg);color:var(--text);display:flex;height:100vh;overflow:hidden;}
+
+#overlay {
+position:fixed;inset:0;background:rgba(0,0,0,0.5);
+opacity:0;pointer-events:none;transition:.3s;
 }
 
-header{
-  height:60px;
-  display:flex;
-  align-items:center;
-  padding:0 20px;
-  background:var(--panel);
-  flex-shrink:0;
+#overlay.active {opacity:1;pointer-events:auto;}
+
+#sidebar {
+position:fixed;left:-300px;top:0;width:280px;height:100%;
+background:var(--sidebar);padding:20px;transition:.4s;
+display:flex;flex-direction:column;z-index:1000;
 }
 
-.hamburger{
-  width:25px;
-  height:18px;
-  cursor:pointer;
-  position:relative;
-}
-.hamburger span{
-  position:absolute;
-  height:3px;
-  width:100%;
-  background:white;
-  border-radius:3px;
-  transition:.3s;
-}
-.hamburger span:nth-child(1){top:0}
-.hamburger span:nth-child(2){top:7px}
-.hamburger span:nth-child(3){bottom:0}
+#sidebar.active {left:0;}
 
-.main{
-  flex:1;
-  display:flex;
-  flex-direction:column;
+.hamburger {
+position:absolute;top:20px;left:20px;
+cursor:pointer;width:30px;height:22px;
+display:flex;flex-direction:column;justify-content:space-between;
 }
 
-.chat{
-  flex:1;
-  overflow-y:auto;
-  padding:20px;
-  display:flex;
-  flex-direction:column;
-  gap:15px;
+.hamburger span {
+height:4px;background:var(--text);border-radius:4px;
+transition:.4s;
 }
 
-.message{
-  max-width:75%;
-  padding:12px 16px;
-  border-radius:14px;
-  font-size:14px;
-  line-height:1.5;
+#main {
+flex:1;display:flex;flex-direction:column;margin-left:0;
 }
 
-.user{
-  background:var(--accent);
-  align-self:flex-end;
-}
-.bot{
-  background:var(--panel);
-  align-self:flex-start;
+.header {
+padding:20px;text-align:center;font-size:22px;font-weight:600;
 }
 
-.input-area{
-  padding:15px;
-  background:var(--panel);
-  display:flex;
-  gap:10px;
+#chatArea {
+flex:1;padding:20px;overflow-y:auto;
 }
 
-textarea{
-  flex:1;
-  resize:none;
-  border:none;
-  outline:none;
-  border-radius:10px;
-  padding:10px;
-  font-family:inherit;
-  background:#262631;
-  color:white;
+.message {
+background:var(--card);padding:12px;border-radius:12px;
+margin-bottom:10px;animation:fadeIn .3s ease;
 }
 
-button{
-  border:none;
-  background:var(--accent);
-  color:white;
-  padding:10px 16px;
-  border-radius:10px;
-  cursor:pointer;
+@keyframes fadeIn {
+from{opacity:0;transform:translateY(10px);}
+to{opacity:1;transform:translateY(0);}
 }
 
-select{
-  padding:6px;
-  border-radius:6px;
-  border:none;
+.chatbar {
+display:flex;padding:15px;background:var(--sidebar);
+gap:10px;
 }
 
-.hidden{
-  display:none;
+.chatbar input {
+flex:1;padding:12px;border:none;border-radius:10px;
+background:var(--card);color:var(--text);
 }
 
-/* Themes */
-.theme-light{
-  --bg:#f5f5f5;
-  --panel:#ffffff;
-  --text:#000;
-  --sub:#555;
-  --accent:#0066ff;
+.icon-btn {
+width:40px;height:40px;border-radius:10px;
+background:var(--card);display:flex;
+align-items:center;justify-content:center;
+cursor:pointer;transition:.3s;
 }
-.theme-blue{
-  --bg:#0e1628;
-  --panel:#172033;
-  --accent:#1f6feb;
+
+.icon-btn:hover {transform:scale(1.1);}
+
+select,button {
+background:var(--card);color:var(--text);
+border:none;padding:8px;border-radius:8px;
+margin-bottom:10px;
 }
-.theme-green{
-  --bg:#0e1c16;
-  --panel:#162821;
-  --accent:#2ea043;
+
+.modal {
+position:fixed;top:50%;left:50%;
+transform:translate(-50%,-50%) scale(0);
+background:var(--sidebar);padding:20px;
+border-radius:15px;z-index:2000;
+transition:.3s;width:300px;
 }
-.theme-purple{
-  --bg:#1a1028;
-  --panel:#24153a;
-  --accent:#a371f7;
-}
+
+.modal.active {transform:translate(-50%,-50%) scale(1);}
+
 </style>
 </head>
-
 <body>
 
-<div class="sidebar" id="sidebar">
-  <div class="menu-item" onclick="newChat()">New Chat</div>
-  <div class="menu-item" onclick="showAccount()">Account</div>
-  <div class="menu-item" onclick="showSettings()">Settings</div>
-  <div class="menu-item" onclick="showReport()">Report</div>
-  <div>
-    <strong>Themes</strong>
-    <div class="menu-item" onclick="setTheme('')">Default</div>
-    <div class="menu-item" onclick="setTheme('theme-light')">Light</div>
-    <div class="menu-item" onclick="setTheme('theme-blue')">Blue</div>
-    <div class="menu-item" onclick="setTheme('theme-green')">Green</div>
-    <div class="menu-item" onclick="setTheme('theme-purple')">Purple</div>
-  </div>
-  <div>
-    <strong>Language</strong>
-    <select onchange="setLang(this.value)">
-      <option>English</option>
-      <option>Hindi</option>
-      <option>Spanish</option>
-      <option>French</option>
-      <option>German</option>
-      <option>Chinese</option>
-      <option>Japanese</option>
-      <option>Arabic</option>
-      <option>Russian</option>
-      <option>Portuguese</option>
-    </select>
-  </div>
+<div id="overlay"></div>
+
+<div id="sidebar">
+<h3>BotFusion AI</h3>
+<button onclick="newChat()">+ New Chat</button>
+<div id="chatList"></div>
+
+<hr>
+
+<button onclick="openSettings()">Settings</button>
+<button onclick="openAccount()">Account</button>
+<button onclick="openReport()">Report</button>
+<button onclick="logout()">Logout</button>
 </div>
 
-<div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
-
-<div class="main">
-<header>
-  <div class="hamburger" onclick="toggleSidebar()">
-    <span></span>
-    <span></span>
-    <span></span>
-  </div>
-  <h3 style="margin-left:15px;">BotFusion AI</h3>
-</header>
-
-<div class="chat" id="chat"></div>
-
-<div class="input-area">
-  <input type="file" id="fileInput" class="hidden">
-  <button onclick="document.getElementById('fileInput').click()">+</button>
-  <textarea id="msg" rows="1" placeholder="Message BotFusion..."></textarea>
-  <button onclick="send()">Send</button>
+<div id="main">
+<div class="hamburger" onclick="toggleSidebar()">
+<span></span><span></span><span></span>
 </div>
+
+<div class="header">BotFusion AI</div>
+
+<div id="chatArea"></div>
+
+<div class="chatbar">
+<div class="icon-btn" onclick="uploadFile()">
+<svg width="20" height="20" fill="var(--accent)">
+<path d="M10 0v12M5 5l5-5 5 5"/>
+</svg>
+</div>
+
+<input id="chatInput" placeholder="Ask anything..." onkeydown="if(event.key==='Enter')sendMessage()">
+
+<div class="icon-btn" onclick="voiceInput()">
+<svg width="20" height="20" fill="var(--accent)">
+<circle cx="10" cy="6" r="4"/>
+<rect x="8" y="10" width="4" height="6"/>
+</svg>
+</div>
+
+<div class="icon-btn" onclick="sendMessage()">
+<svg width="20" height="20" fill="var(--accent)">
+<polygon points="0,10 20,0 15,20"/>
+</svg>
+</div>
+
+</div>
+</div>
+
+<div id="settingsModal" class="modal">
+<h3>Settings</h3>
+<label>Theme</label>
+<select onchange="changeTheme(this.value)">
+<option value="">Default</option>
+<option value="light">Light</option>
+<option value="purple">Purple</option>
+<option value="blue">Blue</option>
+<option value="gold">Gold</option>
+</select>
+
+<label>Language</label>
+<select>
+<option>English</option>
+<option>Hindi</option>
+<option>Spanish</option>
+<option>French</option>
+<option>German</option>
+<option>Chinese</option>
+<option>Arabic</option>
+<option>Russian</option>
+<option>Japanese</option>
+<option>Portuguese</option>
+</select>
+
+<button onclick="closeModal()">Close</button>
+</div>
+
+<div id="accountModal" class="modal">
+<h3>Account</h3>
+<button onclick="googleLogin()">Login with Google</button>
+<button onclick="guestMode()">Continue as Guest</button>
+<button onclick="closeModal()">Close</button>
+</div>
+
+<div id="reportModal" class="modal">
+<h3>Report Issue</h3>
+<textarea placeholder="Describe issue..." style="width:100%;height:80px;background:var(--card);color:var(--text);border:none;border-radius:8px;"></textarea>
+<button onclick="closeModal()">Submit</button>
 </div>
 
 <script>
-const sidebar=document.getElementById("sidebar");
-const overlay=document.getElementById("overlay");
-const chat=document.getElementById("chat");
+const firebaseConfig = {
+apiKey: "YOUR_KEY",
+authDomain: "YOUR_DOMAIN",
+projectId: "YOUR_PROJECT_ID"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+
+function googleLogin(){
+const provider = new firebase.auth.GoogleAuthProvider();
+auth.signInWithPopup(provider);
+}
+
+function logout(){auth.signOut();}
+
+function guestMode(){alert("Guest Mode Activated");}
 
 function toggleSidebar(){
-  sidebar.classList.toggle("open");
-  overlay.classList.toggle("show");
+document.getElementById("sidebar").classList.toggle("active");
+document.getElementById("overlay").classList.toggle("active");
 }
 
-function send(){
-  const msg=document.getElementById("msg");
-  if(!msg.value.trim())return;
+document.getElementById("overlay").onclick=toggleSidebar;
 
-  addMessage(msg.value,"user");
-  setTimeout(()=>addMessage("This is a demo AI response.","bot"),800);
-  msg.value="";
+function sendMessage(){
+const input=document.getElementById("chatInput");
+if(!input.value) return;
+const msg=document.createElement("div");
+msg.className="message";
+msg.innerText=input.value;
+document.getElementById("chatArea").appendChild(msg);
+input.value="";
 }
 
-function addMessage(text,type){
-  const div=document.createElement("div");
-  div.className="message "+type;
-  div.innerText=text;
-  chat.appendChild(div);
-  chat.scrollTop=chat.scrollHeight;
+function changeTheme(theme){
+document.body.className=theme;
 }
 
-function newChat(){
-  chat.innerHTML="";
-  toggleSidebar();
+function openSettings(){
+document.getElementById("settingsModal").classList.add("active");
 }
 
-function showAccount(){
-  alert("Google Login / Guest Mode UI Placeholder");
+function openAccount(){
+document.getElementById("accountModal").classList.add("active");
 }
 
-function showSettings(){
-  alert("Settings Panel Placeholder");
+function openReport(){
+document.getElementById("reportModal").classList.add("active");
 }
 
-function showReport(){
-  alert("Report Modal Placeholder");
+function closeModal(){
+document.querySelectorAll(".modal").forEach(m=>m.classList.remove("active"));
 }
 
-function setTheme(theme){
-  document.body.className="";
-  if(theme)document.body.classList.add(theme);
-  localStorage.setItem("theme",theme);
-}
+function uploadFile(){alert("Upload feature backend pending");}
+function voiceInput(){alert("Voice feature backend pending");}
+function newChat(){alert("New Chat Created");}
 
-function setLang(lang){
-  alert("Language switched to "+lang);
-}
-
-window.onload=()=>{
-  const saved=localStorage.getItem("theme");
-  if(saved)setTheme(saved);
-};
 </script>
 
 </body>
-     </html>
+  </html>
