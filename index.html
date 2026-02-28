@@ -5,399 +5,313 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BotFusion AI</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
-/* ================= ROOT VARIABLES ================= */
 :root{
- --bg:#0f172a;
- --card:#1e293b;
- --text:#ffffff;
- --accent:#6366f1;
- --border:#2d3748;
+--bg:#101518;
+--panel:#161c22;
+--primary:#5b8cff;
+--text:#ffffff;
+--sub:#9aa4af;
 }
 
-/* ================= BASE ================= */
 body{
- margin:0;
- font-family:'Inter',sans-serif;
- background:var(--bg);
- color:var(--text);
- transition:.3s;
+margin:0;
+font-family:'Inter',sans-serif;
+background:var(--bg);
+color:var(--text);
+overflow:hidden;
 }
 
-button{
- cursor:pointer;
- border:none;
- border-radius:8px;
- padding:8px 12px;
+.header{
+height:60px;
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:0 20px;
+background:var(--panel);
 }
 
-.icon{
- width:22px;
- height:22px;
- stroke:var(--text);
- cursor:pointer;
+.icon-btn{
+background:none;
+border:none;
+cursor:pointer;
+color:var(--text);
+display:flex;
+align-items:center;
 }
 
-/* ================= TOPBAR ================= */
-.topbar{
- height:60px;
- display:flex;
- align-items:center;
- justify-content:space-between;
- padding:0 20px;
- position:fixed;
- width:100%;
- top:0;
- background:rgba(15,23,42,.95);
- backdrop-filter:blur(10px);
- border-bottom:1px solid var(--border);
- z-index:1000;
+.icon-btn svg{
+width:22px;
+height:22px;
 }
 
-/* ================= SIDEBAR ================= */
 .sidebar{
- position:fixed;
- top:0;
- left:0;
- width:260px;
- height:100%;
- background:var(--card);
- transform:translateX(-100%);
- transition:.3s;
- padding:20px;
- border-right:1px solid var(--border);
- z-index:1200;
-}
-.sidebar.active{transform:translateX(0);}
-
-.overlay{
- position:fixed;
- width:100%;
- height:100%;
- background:rgba(0,0,0,.5);
- opacity:0;
- pointer-events:none;
- transition:.3s;
- z-index:1100;
-}
-.overlay.active{
- opacity:1;
- pointer-events:auto;
+position:fixed;
+left:-260px;
+top:0;
+width:260px;
+height:100%;
+background:var(--panel);
+transition:.3s;
+padding:20px;
+box-shadow:2px 0 10px rgba(0,0,0,.4);
+z-index:10;
 }
 
-/* ================= SETTINGS PANEL ================= */
-.settings{
- position:fixed;
- right:0;
- top:0;
- width:320px;
- height:100%;
- background:var(--card);
- transform:translateX(100%);
- transition:.3s;
- padding:20px;
- border-left:1px solid var(--border);
- z-index:1300;
-}
-.settings.active{transform:translateX(0);}
-
-/* ================= ADMIN PANEL ================= */
-.admin{
- position:fixed;
- top:50%;
- left:50%;
- transform:translate(-50%,-50%) scale(.8);
- background:var(--card);
- padding:25px;
- border-radius:12px;
- opacity:0;
- pointer-events:none;
- transition:.3s;
- z-index:1400;
-}
-.admin.active{
- opacity:1;
- pointer-events:auto;
- transform:translate(-50%,-50%) scale(1);
+.sidebar.active{
+left:0;
 }
 
-/* ================= CHAT ================= */
-.chat-container{
- max-width:850px;
- margin:100px auto 120px;
- padding:20px;
+.sidebar-header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:20px;
+}
+
+.sidebar ul{
+list-style:none;
+padding:0;
+}
+
+.sidebar li{
+margin:15px 0;
+cursor:pointer;
+color:var(--sub);
+}
+
+.sidebar li:hover{
+color:var(--primary);
+}
+
+.chat{
+height:calc(100vh - 120px);
+overflow-y:auto;
+padding:20px;
+display:flex;
+flex-direction:column;
 }
 
 .message{
- padding:12px 16px;
- margin-bottom:12px;
- border-radius:12px;
- max-width:75%;
+margin:8px 0;
+padding:12px 16px;
+border-radius:14px;
+max-width:70%;
 }
+
 .user{
- background:var(--accent);
- margin-left:auto;
+background:var(--primary);
+align-self:flex-end;
 }
+
 .bot{
- background:var(--card);
+background:#1f252c;
 }
 
-/* ================= CHATBAR ================= */
-.chatbar{
- position:fixed;
- bottom:0;
- width:100%;
- display:flex;
- gap:10px;
- padding:10px 15px;
- background:var(--card);
- border-top:1px solid var(--border);
-}
-.chatbar input, select{
- flex:1;
- padding:10px;
- border-radius:8px;
- border:none;
- outline:none;
+.input-bar{
+height:60px;
+display:flex;
+align-items:center;
+padding:0 10px;
+background:var(--panel);
+gap:10px;
 }
 
-/* ================= THEMES ================= */
-.theme-light{
- --bg:#f3f4f6;
- --card:#ffffff;
- --text:#111827;
- --accent:#4f46e5;
- --border:#e5e7eb;
+.input-bar input{
+flex:1;
+height:40px;
+border:none;
+outline:none;
+background:#1f252c;
+color:white;
+border-radius:8px;
+padding:0 10px;
 }
-.theme-ocean{
- --bg:#0f2027;
- --card:#203a43;
- --accent:#2c5364;
+
+select{
+width:100%;
+padding:8px;
+background:#1f252c;
+color:white;
+border:none;
+border-radius:6px;
+margin-bottom:15px;
 }
-.theme-rose{
- --bg:#1f1c2c;
- --card:#928dab;
- --accent:#ff758c;
+
+.theme-gold{--primary:#d4af37;}
+.theme-purple{--primary:#9b5cff;}
+.theme-teal{--primary:#00c2a8;}
+.theme-rose{--primary:#ff4f81;}
+
+.modal{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,.6);
+display:none;
+align-items:center;
+justify-content:center;
+z-index:20;
 }
-.theme-neon{
- --bg:#000000;
- --card:#111111;
- --text:#39ff14;
- --accent:#ff00ff;
+
+.modal-content{
+background:var(--panel);
+padding:20px;
+width:300px;
+border-radius:12px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="overlay" id="overlay" onclick="closeAll()"></div>
+<!-- HEADER -->
+<div class="header">
+<button class="icon-btn" onclick="toggleSidebar()">☰</button>
+<strong>BotFusion AI</strong>
+<button class="icon-btn" onclick="openSettings()">⚙</button>
+</div>
 
 <!-- SIDEBAR -->
 <div class="sidebar" id="sidebar">
-<h4>Chat</h4>
-<button onclick="newChat()">New Chat</button>
-
-<h4>Account</h4>
-<button onclick="googleLogin()">Login</button>
-<button onclick="logout()">Logout</button>
-
-<h4>System</h4>
-<button onclick="openSettings()">Settings</button>
-<button onclick="openAdmin()">Admin</button>
+<div class="sidebar-header">
+<strong>Menu</strong>
+<button onclick="toggleSidebar()">✕</button>
 </div>
 
-<!-- SETTINGS -->
-<div class="settings" id="settings">
-<h3>Settings</h3>
+<ul>
+<li onclick="loginGoogle()">Google Login</li>
+<li onclick="guestMode()">Guest Mode</li>
+<li onclick="openSettings()">Settings</li>
+<li onclick="openReport()">Report Issue</li>
+</ul>
+</div>
+
+<!-- CHAT -->
+<div class="chat" id="chat">
+<div class="message bot">Welcome to BotFusion AI</div>
+</div>
+
+<!-- INPUT -->
+<div class="input-bar">
+<input type="file" id="fileUpload" hidden>
+<button onclick="document.getElementById('fileUpload').click()">📎</button>
+<input type="text" id="msg" placeholder="Ask anything...">
+<button onclick="startVoice()">🎤</button>
+<button onclick="sendMessage()">➤</button>
+</div>
+
+<!-- SETTINGS PANEL -->
+<div class="sidebar" id="settings" style="right:-260px;left:auto;">
+<div class="sidebar-header">
+<strong>Settings</strong>
+<button onclick="closeSettings()">✕</button>
+</div>
 
 <h4>Theme</h4>
-<button onclick="setTheme('')">Dark</button>
-<button onclick="setTheme('theme-light')">Light</button>
-<button onclick="setTheme('theme-ocean')">Ocean</button>
-<button onclick="setTheme('theme-rose')">Rose</button>
-<button onclick="setTheme('theme-neon')">Neon</button>
+<select onchange="changeTheme(this.value)">
+<option value="">Default</option>
+<option value="theme-gold">Gold</option>
+<option value="theme-purple">Purple</option>
+<option value="theme-teal">Teal</option>
+<option value="theme-rose">Rose</option>
+</select>
 
 <h4>Language</h4>
-<select onchange="changeLanguage(this.value)">
-<option value="en">English</option>
-<option value="hi">Hindi</option>
-<option value="fr">French</option>
-<option value="de">German</option>
-<option value="es">Spanish</option>
-</select>
-
-<h4>Report</h4>
-<button onclick="reportIssue()">Report Issue</button>
+<select id="languageSelect"></select>
 </div>
 
-<!-- ADMIN -->
-<div class="admin" id="adminPanel">
-<h3>Admin Dashboard</h3>
-<div id="adminData">Loading...</div>
-<button onclick="closeAll()">Close</button>
+<!-- REPORT MODAL -->
+<div class="modal" id="reportModal">
+<div class="modal-content">
+<h3>Report Issue</h3>
+<textarea style="width:100%;height:80px;"></textarea>
+<button onclick="closeReport()">Close</button>
+</div>
 </div>
 
-<!-- TOPBAR -->
-<div class="topbar">
-<svg class="icon" onclick="toggleSidebar()" fill="none" stroke-width="2" viewBox="0 0 24 24">
-<path d="M4 6h16M4 12h16M4 18h16"/>
-</svg>
-<div id="userDisplay">BotFusion AI</div>
-<svg class="icon" onclick="openSettings()" fill="none" stroke-width="2" viewBox="0 0 24 24">
-<circle cx="12" cy="12" r="3"/>
-</svg>
-</div>
+<script>
 
-<div class="chat-container" id="chat"></div>
+/* ---------- BASIC UI ---------- */
+function toggleSidebar(){
+document.getElementById("sidebar").classList.toggle("active");
+}
 
-<div class="chatbar">
-<select id="modelSelect">
-<option value="gpt-4o-mini">GPT-4o Mini</option>
-<option value="gpt-4o">GPT-4o</option>
-</select>
-<input type="text" id="messageInput" placeholder="Type message...">
-<button onclick="sendMessage()">Send</button>
-</div>
+function openSettings(){
+document.getElementById("settings").style.right="0";
+}
 
-<script type="module">
+function closeSettings(){
+document.getElementById("settings").style.right="-260px";
+}
 
-/* ================= FIREBASE ================= */
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
-from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, getDocs, query, where }
-from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+function openReport(){
+document.getElementById("reportModal").style.display="flex";
+}
 
-const firebaseConfig = {
- apiKey:"YOUR_KEY",
- authDomain:"YOUR_DOMAIN",
- projectId:"YOUR_ID",
- appId:"YOUR_APP_ID"
-};
+function closeReport(){
+document.getElementById("reportModal").style.display="none";
+}
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-const provider = new GoogleAuthProvider();
+/* ---------- CHAT ---------- */
+function sendMessage(){
+let input=document.getElementById("msg");
+if(!input.value.trim()) return;
 
-let currentUser=null;
+let chat=document.getElementById("chat");
 
-/* ================= AUTH ================= */
-window.googleLogin=()=>signInWithPopup(auth,provider);
-window.logout=()=>signOut(auth);
+let user=document.createElement("div");
+user.className="message user";
+user.innerText=input.value;
 
-onAuthStateChanged(auth,user=>{
- currentUser=user;
- document.getElementById("userDisplay").innerText=
- user? user.displayName:"BotFusion AI";
- loadChats();
+chat.appendChild(user);
+chat.scrollTop=chat.scrollHeight;
+input.value="";
+}
+
+/* ---------- THEMES ---------- */
+function changeTheme(theme){
+document.body.className=theme;
+}
+
+/* ---------- LANGUAGE 100+ ---------- */
+let langs = Intl.supportedValuesOf("language");
+let select = document.getElementById("languageSelect");
+langs.forEach(lang=>{
+let opt=document.createElement("option");
+opt.value=lang;
+opt.textContent=lang;
+select.appendChild(opt);
 });
 
-/* ================= CHAT ================= */
-window.sendMessage=async()=>{
- let text=document.getElementById("messageInput").value;
- if(!text) return;
- addMessage(text,"user");
-
- let res=await fetch("https://YOUR_BACKEND_URL/api/chat",{
-  method:"POST",
-  headers:{"Content-Type":"application/json"},
-  body:JSON.stringify({
-   message:text,
-   model:document.getElementById("modelSelect").value
-  })
- });
-
- let data=await res.json();
- addMessage(data.choices[0].message.content,"bot");
-
- if(currentUser){
-  await addDoc(collection(db,"chats"),{
-   uid:currentUser.uid,
-   text:text,
-   role:"user",
-   timestamp:Date.now()
-  });
- }
-
- document.getElementById("messageInput").value="";
+/* ---------- VOICE ---------- */
+function startVoice(){
+let recognition=new(window.SpeechRecognition||window.webkitSpeechRecognition)();
+recognition.lang="en-US";
+recognition.start();
+recognition.onresult=function(e){
+document.getElementById("msg").value=e.results[0][0].transcript;
 };
-
-/* ================= LOAD CHAT ================= */
-async function loadChats(){
- if(!currentUser) return;
- document.getElementById("chat").innerHTML="";
- const q=query(collection(db,"chats"),where("uid","==",currentUser.uid));
- const snap=await getDocs(q);
- snap.forEach(doc=>{
-  let d=doc.data();
-  addMessage(d.text,d.role);
- });
 }
 
-function addMessage(text,type){
- let div=document.createElement("div");
- div.className="message "+type;
- div.innerText=text;
- document.getElementById("chat").appendChild(div);
+/* ---------- GUEST MODE ---------- */
+function guestMode(){
+sessionStorage.setItem("mode","guest");
+alert("Guest Mode Activated");
 }
 
-/* ================= ADMIN ================= */
-window.openAdmin=async()=>{
- document.getElementById("adminPanel").classList.add("active");
- let res=await fetch("https://YOUR_BACKEND_URL/api/admin");
- let data=await res.json();
- document.getElementById("adminData").innerText=
- "Users: "+data.users+" | Active: "+data.active;
-};
+/* ---------- GOOGLE LOGIN (Firebase Required) ---------- */
+/* Replace config below with your Firebase project */
 
-/* ================= REPORT ================= */
-window.reportIssue=async()=>{
- if(!currentUser) return alert("Login required");
- await addDoc(collection(db,"reports"),{
-  uid:currentUser.uid,
-  timestamp:Date.now()
- });
- alert("Report Submitted");
-};
-
-/* ================= UI ================= */
-window.toggleSidebar=()=>{
- document.getElementById("sidebar").classList.toggle("active");
- document.getElementById("overlay").classList.toggle("active");
-};
-window.openSettings=()=>{
- document.getElementById("settings").classList.add("active");
- document.getElementById("overlay").classList.add("active");
-};
-window.closeAll=()=>{
- document.getElementById("sidebar").classList.remove("active");
- document.getElementById("settings").classList.remove("active");
- document.getElementById("adminPanel").classList.remove("active");
- document.getElementById("overlay").classList.remove("active");
-};
-
-window.setTheme=(t)=>{
- document.body.className="";
- if(t) document.body.classList.add(t);
- localStorage.setItem("theme",t);
-};
-
-window.changeLanguage=(l)=>{
- localStorage.setItem("lang",l);
-};
-
-/* ================= PWA ================= */
-if('serviceWorker' in navigator){
- navigator.serviceWorker.register(URL.createObjectURL(
-  new Blob([`
-   self.addEventListener('install',e=>self.skipWaiting());
-  `],{type:'text/javascript'})
- ));
+function loginGoogle(){
+alert("Connect Firebase to enable Google Login");
 }
 
 </script>
+
 </body>
-             </html>
+ </html>
