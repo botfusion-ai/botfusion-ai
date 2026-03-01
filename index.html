@@ -5,176 +5,230 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BOTFUSION AI</title>
 
-<!-- Firebase v9 Modular -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signInAnonymously, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+<!-- Inter Font -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-const firebaseConfig = {
-  apiKey: "AIzaSyDA62eN5MEjX9Z-gw6w9UuR8L-Ke_6J7eE",
-  authDomain: "botfusion-ai-bd6d0.firebaseapp.com",
-  projectId: "botfusion-ai-bd6d0",
-  storageBucket: "botfusion-ai-bd6d0.firebasestorage.app",
-  messagingSenderId: "730477136598",
-  appId: "1:730477136598:web:c6b4e0d495744d12079777",
-  measurementId: "G-53FTWNQB8X"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-
-window.googleLogin = async () => {
-  const provider = new GoogleAuthProvider();
-  await signInWithPopup(auth, provider);
-  alert("Logged in successfully");
-};
-
-window.guestLogin = async () => {
-  await signInAnonymously(auth);
-  alert("Guest mode enabled");
-};
-
-window.logoutUser = async () => {
-  await signOut(auth);
-  alert("Logged out");
-};
-</script>
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
 
 <style>
 :root{
-  --bg:#000000;
-  --panel:#0f0f0f;
-  --card:#161616;
-  --accent:#00ffae;
-  --text:#ffffff;
-  --muted:#8b949e;
+--bg:#0b0f14;
+--surface:#11161d;
+--surface-2:#151b23;
+--border:rgba(255,255,255,0.06);
+--text:#ffffff;
+--text-muted:#9aa4b2;
+--accent:#4f8cff;
 }
 
-*{box-sizing:border-box;}
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Inter',sans-serif;
+}
 
 body{
-  margin:0;
-  font-family:"Segoe UI",system-ui;
-  background:var(--bg);
-  color:var(--text);
-  display:flex;
-  transition:.3s;
+background:var(--bg);
+color:var(--text);
+height:100vh;
+display:flex;
+overflow:hidden;
 }
 
 /* Sidebar */
 .sidebar{
-  width:260px;
-  background:var(--panel);
-  height:100vh;
-  position:fixed;
-  left:-260px;
-  transition:.3s;
-  padding:20px;
-  border-right:1px solid #1f1f1f;
-  overflow:auto;
+position:fixed;
+left:-270px;
+top:0;
+width:270px;
+height:100%;
+background:var(--surface);
+border-right:1px solid var(--border);
+transition:.3s ease;
+padding:20px;
+z-index:200;
 }
-.sidebar.open{ left:0; }
 
+.sidebar.active{ left:0; }
+
+.sidebar h2{
+font-size:16px;
+margin-bottom:20px;
+font-weight:600;
+}
+
+.sidebar button{
+width:100%;
+background:var(--surface-2);
+border:1px solid var(--border);
+color:var(--text);
+padding:10px;
+border-radius:8px;
+margin-bottom:10px;
+cursor:pointer;
+}
+
+/* Main Layout */
 .main{
-  flex:1;
-  display:flex;
-  flex-direction:column;
-  height:100vh;
+flex:1;
+display:flex;
+flex-direction:column;
+width:100%;
 }
 
-/* Topbar */
-.topbar{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:15px 20px;
-  background:var(--panel);
-  border-bottom:1px solid #1f1f1f;
+/* Header */
+.header{
+height:60px;
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:0 20px;
+border-bottom:1px solid var(--border);
+background:var(--surface);
+}
+
+.header h1{
+font-size:16px;
+font-weight:600;
+letter-spacing:.5px;
+}
+
+/* Icon Buttons */
+.icon-btn{
+width:40px;
+height:40px;
+border-radius:10px;
+background:transparent;
+border:none;
+display:flex;
+align-items:center;
+justify-content:center;
+cursor:pointer;
+color:var(--text-muted);
+transition:.2s;
+}
+
+.icon-btn:hover{
+background:var(--surface-2);
+color:var(--text);
 }
 
 /* Chat */
 .chat{
-  flex:1;
-  overflow:auto;
-  padding:25px;
+flex:1;
+overflow-y:auto;
+padding:40px 20px 120px 20px;
+max-width:840px;
+margin:auto;
+width:100%;
 }
+
 .message{
-  background:var(--card);
-  padding:12px 15px;
-  border-radius:12px;
-  margin-bottom:10px;
-  max-width:70%;
+margin-bottom:20px;
+padding:14px 18px;
+border-radius:12px;
+max-width:75%;
+font-size:14px;
+line-height:1.6;
+animation:fadeIn .2s ease;
 }
 
-/* Input */
-.input-area{
-  display:flex;
-  align-items:center;
-  padding:12px 15px;
-  background:var(--panel);
-  border-top:1px solid #1f1f1f;
-}
-input{
-  flex:1;
-  padding:12px;
-  background:var(--card);
-  border:none;
-  color:white;
-  border-radius:8px;
-  outline:none;
-}
-button{
-  background:none;
-  border:none;
-  cursor:pointer;
-  margin:0 6px;
-}
-.icon{
-  width:22px;
-  height:22px;
-  fill:var(--text);
-  opacity:.8;
-  transition:.2s;
-}
-.icon:hover{
-  fill:var(--accent);
-  opacity:1;
+@keyframes fadeIn{
+from{opacity:0;transform:translateY(5px);}
+to{opacity:1;transform:translateY(0);}
 }
 
-/* Panels */
-.panel{
-  position:fixed;
-  right:-400px;
-  top:0;
-  width:350px;
-  height:100vh;
-  background:var(--panel);
-  transition:.3s;
-  padding:25px;
-  border-left:1px solid #1f1f1f;
-  overflow:auto;
+.user{
+background:var(--accent);
+color:white;
+margin-left:auto;
 }
-.panel.open{ right:0; }
 
-.theme-btn{
-  display:block;
-  padding:10px;
-  margin:8px 0;
-  background:var(--card);
-  border-radius:8px;
-  cursor:pointer;
+.ai{
+background:var(--surface-2);
+border:1px solid var(--border);
 }
-.theme-btn:hover{
-  background:var(--accent);
-  color:#000;
+
+/* Floating Input */
+.input-wrapper{
+position:fixed;
+bottom:20px;
+left:50%;
+transform:translateX(-50%);
+width:92%;
+max-width:840px;
+background:var(--surface);
+border:1px solid var(--border);
+border-radius:18px;
+display:flex;
+align-items:center;
+padding:8px;
+box-shadow:0 10px 30px rgba(0,0,0,.4);
 }
-select{
-  width:100%;
-  padding:10px;
-  background:var(--card);
-  color:white;
-  border:none;
-  border-radius:8px;
+
+.input-wrapper input{
+flex:1;
+background:transparent;
+border:none;
+outline:none;
+color:var(--text);
+padding:10px;
+font-size:14px;
+}
+
+.input-wrapper button{
+width:40px;
+height:40px;
+border-radius:10px;
+border:none;
+background:transparent;
+display:flex;
+align-items:center;
+justify-content:center;
+cursor:pointer;
+color:var(--text-muted);
+}
+
+.input-wrapper button:hover{
+background:var(--surface-2);
+color:var(--text);
+}
+
+/* Settings Panel */
+.settings{
+position:fixed;
+right:-330px;
+top:0;
+width:330px;
+height:100%;
+background:var(--surface);
+border-left:1px solid var(--border);
+padding:20px;
+transition:.3s;
+z-index:200;
+overflow-y:auto;
+}
+
+.settings.active{ right:0; }
+
+.settings h2{
+font-size:16px;
+margin-bottom:20px;
+}
+
+.settings select,
+.settings button{
+width:100%;
+padding:10px;
+margin-bottom:15px;
+border-radius:8px;
+border:1px solid var(--border);
+background:var(--surface-2);
+color:var(--text);
+cursor:pointer;
 }
 </style>
 </head>
@@ -182,151 +236,152 @@ select{
 
 <!-- Sidebar -->
 <div class="sidebar" id="sidebar">
-  <h3>Chats</h3>
-  <button onclick="createChat()">New Chat</button>
-  <div id="chatHistory"></div>
+<h2>Chats</h2>
+<button onclick="newChat()">New Chat</button>
+<button onclick="renameChat()">Rename</button>
+<button onclick="toggleSidebar()">Close</button>
+<div id="history"></div>
 </div>
 
-<!-- Settings Panel -->
-<div class="panel" id="settingsPanel">
-  <button onclick="closePanel('settingsPanel')">X</button>
-  <h3>Settings</h3>
-
-  <h4>Themes</h4>
-  <div class="theme-btn" onclick="setTheme('obsidian')">Obsidian Black</div>
-  <div class="theme-btn" onclick="setTheme('midnight')">Midnight Blue</div>
-  <div class="theme-btn" onclick="setTheme('carbon')">Carbon Gray</div>
-  <div class="theme-btn" onclick="setTheme('indigo')">Royal Indigo</div>
-  <div class="theme-btn" onclick="setTheme('emerald')">Emerald Tech</div>
-  <div class="theme-btn" onclick="setTheme('crimson')">Crimson Pro</div>
-
-  <h4>Language</h4>
-  <select id="languageSelect"></select>
-
-  <h4>Report</h4>
-  <button onclick="alert('Report sent')">Report Issue</button>
-</div>
-
-<!-- Account Panel -->
-<div class="panel" id="accountPanel">
-  <button onclick="closePanel('accountPanel')">X</button>
-  <h3>Account</h3>
-  <button onclick="googleLogin()">Login with Google</button>
-  <button onclick="guestLogin()">Continue as Guest</button>
-  <button onclick="logoutUser()">Logout</button>
-</div>
-
-<!-- Main -->
 <div class="main">
-  <div class="topbar">
-    <button onclick="toggleSidebar()">
-      <svg class="icon" viewBox="0 0 24 24">
-        <path d="M3 6h18M3 12h18M3 18h18"/>
-      </svg>
-    </button>
 
-    <h3>BOTFUSION AI</h3>
+<div class="header">
+<button class="icon-btn" onclick="toggleSidebar()">
+<svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+<path d="M3 6h18M3 12h18M3 18h18"/>
+</svg>
+</button>
 
-    <div>
-      <button onclick="openPanel('settingsPanel')">
-        <svg class="icon" viewBox="0 0 24 24">
-          <path d="M12 8a4 4 0 100 8 4 4 0 000-8z"/>
-        </svg>
-      </button>
+<h1>BOTFUSION AI</h1>
 
-      <button onclick="openPanel('accountPanel')">
-        <svg class="icon" viewBox="0 0 24 24">
-          <path d="M12 12a5 5 0 100-10 5 5 0 000 10zM4 22a8 8 0 0116 0"/>
-        </svg>
-      </button>
-    </div>
-  </div>
+<div style="display:flex;gap:8px;">
+<button class="icon-btn" onclick="toggleSettings()">
+<svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+<path d="M12 8a4 4 0 100 8 4 4 0 000-8z"/>
+</svg>
+</button>
+<button class="icon-btn" onclick="googleLogin()">
+<svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+<path d="M12 12a5 5 0 100-10 5 5 0 000 10zM4 22a8 8 0 0116 0"/>
+</svg>
+</button>
+</div>
+</div>
 
-  <div class="chat" id="chatBox"></div>
+<div class="chat" id="chat">
+<div class="message ai">Welcome to BOTFUSION AI.</div>
+</div>
 
-  <div class="input-area">
-    <input type="file" id="fileInput" hidden>
+</div>
 
-    <button onclick="document.getElementById('fileInput').click()">
-      <svg class="icon" viewBox="0 0 24 24">
-        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-      </svg>
-    </button>
+<!-- Floating Input -->
+<div class="input-wrapper">
+<input type="file" id="fileInput" hidden>
 
-    <input id="userInput" placeholder="Type your message...">
+<button onclick="document.getElementById('fileInput').click()">
+<svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+</svg>
+</button>
 
-    <button onclick="startVoice()">
-      <svg class="icon" viewBox="0 0 24 24">
-        <path d="M12 1a3 3 0 013 3v8a3 3 0 01-6 0V4a3 3 0 013-3z"/>
-      </svg>
-    </button>
+<input type="text" id="messageInput" placeholder="Type your message...">
 
-    <button onclick="sendMessage()">
-      <svg class="icon" viewBox="0 0 24 24">
-        <path d="M2 12l19-9-5 9 5 9-19-9z"/>
-      </svg>
-    </button>
-  </div>
+<button onclick="startVoice()">
+<svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+<path d="M12 1a3 3 0 013 3v8a3 3 0 01-6 0V4a3 3 0 013-3z"/>
+</svg>
+</button>
+
+<button onclick="sendMessage()">
+<svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+<path d="M2 12l19-9-5 9 5 9-19-9z"/>
+</svg>
+</button>
+</div>
+
+<!-- Settings -->
+<div class="settings" id="settings">
+<h2>Settings</h2>
+
+<select onchange="changeTheme(this.value)">
+<option value="default">Corporate Black</option>
+<option value="blue">Blue</option>
+<option value="green">Green</option>
+<option value="purple">Purple</option>
+<option value="gray">Gray</option>
+</select>
+
+<select id="languageSelect"></select>
+
+<button onclick="alert('Report sent')">Report Issue</button>
+<button onclick="logout()">Logout</button>
+<button onclick="toggleSettings()">Close</button>
 </div>
 
 <script>
-function toggleSidebar(){ document.getElementById("sidebar").classList.toggle("open"); }
-function openPanel(id){ document.getElementById(id).classList.add("open"); }
-function closePanel(id){ document.getElementById(id).classList.remove("open"); }
+const firebaseConfig = {
+apiKey: "AIzaSyDA62eN5MEjX9Z-gw6w9UuR8L-Ke_6J7eE",
+authDomain: "botfusion-ai-bd6d0.firebaseapp.com",
+projectId: "botfusion-ai-bd6d0",
+storageBucket: "botfusion-ai-bd6d0.firebasestorage.app",
+messagingSenderId: "730477136598",
+appId: "1:730477136598:web:c6b4e0d495744d12079777"
+};
 
-function createChat(){
-  const div=document.createElement("div");
-  div.textContent="Chat "+(chatHistory.children.length+1);
-  div.ondblclick=()=>div.contentEditable=true;
-  chatHistory.appendChild(div);
-}
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const provider = new firebase.auth.GoogleAuthProvider();
+
+function googleLogin(){ auth.signInWithPopup(provider); }
+function logout(){ auth.signOut(); }
+
+function toggleSidebar(){ sidebar.classList.toggle('active'); }
+function toggleSettings(){ settings.classList.toggle('active'); }
 
 function sendMessage(){
-  const input=document.getElementById("userInput");
-  if(!input.value) return;
-  const msg=document.createElement("div");
-  msg.className="message";
-  msg.textContent=input.value;
-  chatBox.appendChild(msg);
-  speak(input.value);
-  input.value="";
+const input=messageInput;
+if(!input.value)return;
+const user=document.createElement('div');
+user.className='message user';
+user.innerText=input.value;
+chat.appendChild(user);
+
+const ai=document.createElement('div');
+ai.className='message ai';
+ai.innerText="AI response coming from backend tomorrow.";
+chat.appendChild(ai);
+
+input.value="";
+chat.scrollTop=chat.scrollHeight;
 }
 
-function speak(text){
-  const utter=new SpeechSynthesisUtterance(text);
-  speechSynthesis.speak(utter);
-}
+function newChat(){ chat.innerHTML=""; }
+function renameChat(){ alert("Rename enabled in backend phase."); }
 
 function startVoice(){
-  const rec=new(window.SpeechRecognition||window.webkitSpeechRecognition)();
-  rec.onresult=e=>{ userInput.value=e.results[0][0].transcript; };
-  rec.start();
+const rec=new(window.SpeechRecognition||window.webkitSpeechRecognition)();
+rec.onresult=e=>{ messageInput.value=e.results[0][0].transcript; };
+rec.start();
 }
 
-function setTheme(name){
-  const themes={
-    obsidian:{bg:"#000",panel:"#0f0f0f",card:"#161616",accent:"#00ffae"},
-    midnight:{bg:"#0a192f",panel:"#112240",card:"#1b2a4a",accent:"#64ffda"},
-    carbon:{bg:"#111",panel:"#1c1c1c",card:"#242424",accent:"#f5f5f5"},
-    indigo:{bg:"#0d0f1a",panel:"#151935",card:"#1e234d",accent:"#7f5af0"},
-    emerald:{bg:"#061a14",panel:"#0d2b22",card:"#123f33",accent:"#00ff99"},
-    crimson:{bg:"#140b0b",panel:"#1f1111",card:"#2a1717",accent:"#ff4d4d"}
-  };
-  const t=themes[name];
-  document.documentElement.style.setProperty('--bg',t.bg);
-  document.documentElement.style.setProperty('--panel',t.panel);
-  document.documentElement.style.setProperty('--card',t.card);
-  document.documentElement.style.setProperty('--accent',t.accent);
+function changeTheme(theme){
+const root=document.documentElement;
+if(theme==="blue") root.style.setProperty('--accent','#3b82f6');
+if(theme==="green") root.style.setProperty('--accent','#22c55e');
+if(theme==="purple") root.style.setProperty('--accent','#a855f7');
+if(theme==="gray") root.style.setProperty('--accent','#64748b');
+if(theme==="default") root.style.setProperty('--accent','#4f8cff');
 }
 
-const languages=["English","Spanish","French","German","Hindi","Arabic","Chinese","Japanese","Korean"];
-while(languages.length<110){ languages.push("Language "+languages.length); }
+/* 100+ languages */
+const languages=["English","Hindi","Spanish","French","German","Arabic","Chinese","Japanese","Korean"];
+while(languages.length<110){languages.push("Language "+languages.length);}
 languages.forEach(l=>{
-  const opt=document.createElement("option");
-  opt.textContent=l;
-  languageSelect.appendChild(opt);
+const opt=document.createElement("option");
+opt.textContent=l;
+languageSelect.appendChild(opt);
 });
 </script>
 
 </body>
-    </html>
+  </html>
