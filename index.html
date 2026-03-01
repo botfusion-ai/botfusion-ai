@@ -48,14 +48,24 @@ background:none;
 border:none;
 color:var(--text);
 cursor:pointer;
-font-size:20px;
 padding:6px;
 border-radius:8px;
 transition:.2s;
+display:flex;
+align-items:center;
+justify-content:center;
 }
 
 .icon-btn:hover{
 background:rgba(255,255,255,0.05);
+}
+
+.icon{
+width:22px;
+height:22px;
+stroke:currentColor;
+stroke-width:2;
+fill:none;
 }
 
 /* SIDEBAR */
@@ -97,34 +107,6 @@ color:var(--muted);
 color:var(--primary);
 }
 
-/* SETTINGS */
-.settings{
-position:fixed;
-top:0;
-right:-260px;
-width:260px;
-height:100%;
-background:var(--panel);
-transition:.3s;
-padding:20px;
-z-index:110;
-border-left:1px solid var(--border);
-}
-
-.settings.active{
-right:0;
-}
-
-.settings select{
-width:100%;
-padding:8px;
-border-radius:8px;
-background:#1f252c;
-border:none;
-color:white;
-margin-bottom:20px;
-}
-
 /* CHAT */
 .chat{
 flex:1;
@@ -155,12 +137,6 @@ align-self:flex-start;
 background:#1f252c;
 }
 
-.typing{
-font-size:13px;
-color:var(--muted);
-padding-left:5px;
-}
-
 @keyframes fadeIn{
 from{opacity:0;transform:translateY(5px);}
 to{opacity:1;transform:translateY(0);}
@@ -189,56 +165,47 @@ padding:0 12px;
 font-size:14px;
 }
 
-/* THEMES */
-.theme-gold{--primary:#d4af37;}
-.theme-purple{--primary:#9b5cff;}
-.theme-teal{--primary:#00c2a8;}
-.theme-rose{--primary:#ff4f81;}
+.user-info{
+font-size:12px;
+color:var(--muted);
+}
 </style>
 </head>
 
 <body>
 
-<!-- HEADER -->
 <div class="header">
-<button class="icon-btn" onclick="toggleSidebar()">☰</button>
+
+<button class="icon-btn" onclick="toggleSidebar()">
+<svg class="icon" viewBox="0 0 24 24">
+<line x1="3" y1="6" x2="21" y2="6"/>
+<line x1="3" y1="12" x2="21" y2="12"/>
+<line x1="3" y1="18" x2="21" y2="18"/>
+</svg>
+</button>
+
 <div>BotFusion AI</div>
-<button class="icon-btn" onclick="toggleSettings()">⚙</button>
+
+<div id="userDisplay" class="user-info">Guest</div>
+
 </div>
 
 <!-- SIDEBAR -->
 <div class="sidebar" id="sidebar">
 <div class="sidebar-header">
 <strong>Menu</strong>
-<button class="icon-btn" onclick="toggleSidebar()">✕</button>
+<button class="icon-btn" onclick="toggleSidebar()">
+<svg class="icon" viewBox="0 0 24 24">
+<line x1="6" y1="6" x2="18" y2="18"/>
+<line x1="18" y1="6" x2="6" y2="18"/>
+</svg>
+</button>
 </div>
+
 <ul>
-<li onclick="newChat()">New Chat</li>
-<li>Google Login</li>
-<li>Guest Mode</li>
-<li>Report Issue</li>
+<li onclick="googleLogin()">Google Login</li>
+<li onclick="logout()">Logout</li>
 </ul>
-</div>
-
-<!-- SETTINGS -->
-<div class="settings" id="settings">
-<div class="sidebar-header">
-<strong>Settings</strong>
-<button class="icon-btn" onclick="toggleSettings()">✕</button>
-</div>
-
-<h4>Theme</h4>
-<select onchange="changeTheme(this.value)">
-<option value="">Default</option>
-<option value="theme-gold">Gold</option>
-<option value="theme-purple">Purple</option>
-<option value="theme-teal">Teal</option>
-<option value="theme-rose">Rose</option>
-</select>
-
-<h4>Language</h4>
-<select id="languageSelect"></select>
-
 </div>
 
 <!-- CHAT -->
@@ -248,29 +215,62 @@ font-size:14px;
 
 <!-- INPUT -->
 <div class="input-bar">
-<input type="file" id="fileUpload" hidden>
-<button class="icon-btn" onclick="document.getElementById('fileUpload').click()">📎</button>
-
 <input type="text" id="msg" placeholder="Ask anything...">
 
-<button class="icon-btn" onclick="startVoice()">🎤</button>
-<button class="icon-btn" onclick="sendMessage()">➤</button>
+<button class="icon-btn" onclick="sendMessage()">
+<svg class="icon" viewBox="0 0 24 24">
+<line x1="22" y1="2" x2="11" y2="13"/>
+<polygon points="22 2 15 22 11 13 2 9 22 2"/>
+</svg>
+</button>
 </div>
 
-<script>
+<!-- FIREBASE SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
+const firebaseConfig = {
+  apiKey: "AIzaSyDA62eN5MEjX9Z-gw6w9UuR8L-Ke_6J7eE",
+  authDomain: "botfusion-ai-bd6d0.firebaseapp.com",
+  projectId: "botfusion-ai-bd6d0",
+  storageBucket: "botfusion-ai-bd6d0.firebasestorage.app",
+  messagingSenderId: "730477136598",
+  appId: "1:730477136598:web:c6b4e0d495744d12079777",
+  measurementId: "G-53FTWNQB8X"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+
+window.googleLogin = async function(){
+  try{
+    await signInWithPopup(auth, provider);
+    toggleSidebar();
+  }catch(e){
+    alert("Login Failed");
+  }
+}
+
+window.logout = async function(){
+  await signOut(auth);
+  toggleSidebar();
+}
+
+onAuthStateChanged(auth,(user)=>{
+  const display = document.getElementById("userDisplay");
+  if(user){
+    display.innerText = user.displayName;
+  } else {
+    display.innerText = "Guest";
+  }
+});
+</script>
+
+<script>
 function toggleSidebar(){
 document.getElementById("sidebar").classList.toggle("active");
-}
-
-function toggleSettings(){
-document.getElementById("settings").classList.toggle("active");
-}
-
-function newChat(){
-document.getElementById("chat").innerHTML=
-'<div class="message bot">New conversation started.</div>';
-toggleSidebar();
 }
 
 function sendMessage(){
@@ -284,63 +284,9 @@ user.className="message user";
 user.innerText=input.value;
 
 chat.appendChild(user);
-
 input.value="";
 chat.scrollTop=chat.scrollHeight;
-
-showTyping();
-
-setTimeout(()=>{
-removeTyping();
-let bot=document.createElement("div");
-bot.className="message bot";
-bot.innerText="This is a smart response from BotFusion AI.";
-chat.appendChild(bot);
-chat.scrollTop=chat.scrollHeight;
-},1200);
 }
-
-function showTyping(){
-let chat=document.getElementById("chat");
-let typing=document.createElement("div");
-typing.className="typing";
-typing.id="typing";
-typing.innerText="BotFusion is typing...";
-chat.appendChild(typing);
-}
-
-function removeTyping(){
-let typing=document.getElementById("typing");
-if(typing) typing.remove();
-}
-
-function changeTheme(theme){
-document.body.className=theme;
-}
-
-let langs=Intl.supportedValuesOf("language");
-let select=document.getElementById("languageSelect");
-langs.forEach(l=>{
-let opt=document.createElement("option");
-opt.value=l;
-opt.textContent=l;
-select.appendChild(opt);
-});
-
-function startVoice(){
-if(!('webkitSpeechRecognition' in window)) return alert("Voice not supported");
-let rec=new webkitSpeechRecognition();
-rec.lang="en-US";
-rec.start();
-rec.onresult=e=>{
-document.getElementById("msg").value=e.results[0][0].transcript;
-};
-}
-
-document.getElementById("msg").addEventListener("keypress",function(e){
-if(e.key==="Enter") sendMessage();
-});
-
 </script>
 
 </body>
