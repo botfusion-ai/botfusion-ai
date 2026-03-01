@@ -1,30 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BOTFUSION AI</title>
 
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js"></script>
+<!-- Firebase v9 Modular -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInAnonymously, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDA62eN5MEjX9Z-gw6w9UuR8L-Ke_6J7eE",
+  authDomain: "botfusion-ai-bd6d0.firebaseapp.com",
+  projectId: "botfusion-ai-bd6d0",
+  storageBucket: "botfusion-ai-bd6d0.firebasestorage.app",
+  messagingSenderId: "730477136598",
+  appId: "1:730477136598:web:c6b4e0d495744d12079777",
+  measurementId: "G-53FTWNQB8X"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+window.googleLogin = async () => {
+  const provider = new GoogleAuthProvider();
+  await signInWithPopup(auth, provider);
+  alert("Logged in successfully");
+};
+
+window.guestLogin = async () => {
+  await signInAnonymously(auth);
+  alert("Guest mode enabled");
+};
+
+window.logoutUser = async () => {
+  await signOut(auth);
+  alert("Logged out");
+};
+</script>
 
 <style>
 :root{
-  --bg:#101518;
-  --panel:#161c22;
-  --accent:#00c896;
+  --bg:#000000;
+  --panel:#0f0f0f;
+  --card:#161616;
+  --accent:#00ffae;
   --text:#ffffff;
-  --muted:#9aa4af;
+  --muted:#8b949e;
 }
+
+*{box-sizing:border-box;}
+
 body{
   margin:0;
-  font-family:system-ui;
+  font-family:"Segoe UI",system-ui;
   background:var(--bg);
   color:var(--text);
   display:flex;
+  transition:.3s;
 }
+
+/* Sidebar */
 .sidebar{
   width:260px;
   background:var(--panel);
@@ -32,51 +69,79 @@ body{
   position:fixed;
   left:-260px;
   transition:.3s;
+  padding:20px;
+  border-right:1px solid #1f1f1f;
   overflow:auto;
-  padding:15px;
 }
 .sidebar.open{ left:0; }
+
 .main{
   flex:1;
-  margin-left:0;
   display:flex;
   flex-direction:column;
   height:100vh;
 }
+
+/* Topbar */
 .topbar{
   display:flex;
   justify-content:space-between;
-  padding:10px 15px;
+  align-items:center;
+  padding:15px 20px;
   background:var(--panel);
+  border-bottom:1px solid #1f1f1f;
 }
-.icon{
-  width:22px;
-  height:22px;
-  cursor:pointer;
-  fill:var(--text);
-}
+
+/* Chat */
 .chat{
   flex:1;
   overflow:auto;
-  padding:20px;
+  padding:25px;
 }
+.message{
+  background:var(--card);
+  padding:12px 15px;
+  border-radius:12px;
+  margin-bottom:10px;
+  max-width:70%;
+}
+
+/* Input */
 .input-area{
   display:flex;
-  padding:10px;
+  align-items:center;
+  padding:12px 15px;
   background:var(--panel);
+  border-top:1px solid #1f1f1f;
 }
 input{
   flex:1;
-  padding:10px;
-  background:#1f252b;
+  padding:12px;
+  background:var(--card);
   border:none;
   color:white;
+  border-radius:8px;
+  outline:none;
 }
 button{
   background:none;
   border:none;
   cursor:pointer;
+  margin:0 6px;
 }
+.icon{
+  width:22px;
+  height:22px;
+  fill:var(--text);
+  opacity:.8;
+  transition:.2s;
+}
+.icon:hover{
+  fill:var(--accent);
+  opacity:1;
+}
+
+/* Panels */
 .panel{
   position:fixed;
   right:-400px;
@@ -85,71 +150,73 @@ button{
   height:100vh;
   background:var(--panel);
   transition:.3s;
-  padding:20px;
+  padding:25px;
+  border-left:1px solid #1f1f1f;
   overflow:auto;
 }
 .panel.open{ right:0; }
-.close-btn{
-  float:right;
+
+.theme-btn{
+  display:block;
+  padding:10px;
+  margin:8px 0;
+  background:var(--card);
+  border-radius:8px;
+  cursor:pointer;
+}
+.theme-btn:hover{
+  background:var(--accent);
+  color:#000;
 }
 select{
   width:100%;
-  padding:8px;
-  background:#1f252b;
+  padding:10px;
+  background:var(--card);
   color:white;
   border:none;
-}
-.theme-btn{
-  display:block;
-  margin:5px 0;
-  padding:8px;
-  background:#1f252b;
-  cursor:pointer;
+  border-radius:8px;
 }
 </style>
 </head>
 <body>
 
-<!-- SIDEBAR -->
+<!-- Sidebar -->
 <div class="sidebar" id="sidebar">
   <h3>Chats</h3>
-  <button onclick="newChat()">New Chat</button>
+  <button onclick="createChat()">New Chat</button>
   <div id="chatHistory"></div>
 </div>
 
-<!-- SETTINGS PANEL -->
+<!-- Settings Panel -->
 <div class="panel" id="settingsPanel">
-  <button class="close-btn" onclick="closePanel('settingsPanel')">
-    <svg class="icon" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
-  </button>
+  <button onclick="closePanel('settingsPanel')">X</button>
   <h3>Settings</h3>
 
-  <h4>Theme</h4>
-  <div class="theme-btn" onclick="setTheme('#101518')">Dark</div>
-  <div class="theme-btn" onclick="setTheme('#ffffff','#000')">Light</div>
-  <div class="theme-btn" onclick="setTheme('#0f2027')">Blue</div>
-  <div class="theme-btn" onclick="setTheme('#1a1a2e')">Purple</div>
-  <div class="theme-btn" onclick="setTheme('#002b36')">Teal</div>
+  <h4>Themes</h4>
+  <div class="theme-btn" onclick="setTheme('obsidian')">Obsidian Black</div>
+  <div class="theme-btn" onclick="setTheme('midnight')">Midnight Blue</div>
+  <div class="theme-btn" onclick="setTheme('carbon')">Carbon Gray</div>
+  <div class="theme-btn" onclick="setTheme('indigo')">Royal Indigo</div>
+  <div class="theme-btn" onclick="setTheme('emerald')">Emerald Tech</div>
+  <div class="theme-btn" onclick="setTheme('crimson')">Crimson Pro</div>
 
-  <h4>Language (100+)</h4>
+  <h4>Language</h4>
   <select id="languageSelect"></select>
 
   <h4>Report</h4>
-  <button onclick="reportIssue()">Report Issue</button>
+  <button onclick="alert('Report sent')">Report Issue</button>
 </div>
 
-<!-- ACCOUNT PANEL -->
+<!-- Account Panel -->
 <div class="panel" id="accountPanel">
-  <button class="close-btn" onclick="closePanel('accountPanel')">
-    <svg class="icon" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
-  </button>
+  <button onclick="closePanel('accountPanel')">X</button>
   <h3>Account</h3>
   <button onclick="googleLogin()">Login with Google</button>
   <button onclick="guestLogin()">Continue as Guest</button>
-  <button onclick="logout()">Logout</button>
+  <button onclick="logoutUser()">Logout</button>
 </div>
 
-<!-- MAIN -->
+<!-- Main -->
 <div class="main">
   <div class="topbar">
     <button onclick="toggleSidebar()">
@@ -157,13 +224,16 @@ select{
         <path d="M3 6h18M3 12h18M3 18h18"/>
       </svg>
     </button>
+
     <h3>BOTFUSION AI</h3>
+
     <div>
       <button onclick="openPanel('settingsPanel')">
         <svg class="icon" viewBox="0 0 24 24">
           <path d="M12 8a4 4 0 100 8 4 4 0 000-8z"/>
         </svg>
       </button>
+
       <button onclick="openPanel('accountPanel')">
         <svg class="icon" viewBox="0 0 24 24">
           <path d="M12 12a5 5 0 100-10 5 5 0 000 10zM4 22a8 8 0 0116 0"/>
@@ -176,6 +246,7 @@ select{
 
   <div class="input-area">
     <input type="file" id="fileInput" hidden>
+
     <button onclick="document.getElementById('fileInput').click()">
       <svg class="icon" viewBox="0 0 24 24">
         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
@@ -199,87 +270,63 @@ select{
 </div>
 
 <script>
-// Firebase Config
-const firebaseConfig = {
-  apiKey: "AIzaSyDA62eN5MEjX9Z-gw6w9UuR8L-Ke_6J7eE",
-  authDomain: "botfusion-ai-bd6d0.firebaseapp.com",
-  projectId: "botfusion-ai-bd6d0",
-  storageBucket: "botfusion-ai-bd6d0.firebasestorage.app",
-  messagingSenderId: "730477136598",
-  appId: "1:730477136598:web:c6b4e0d495744d12079777",
-  measurementId: "G-53FTWNQB8X"
-};
+function toggleSidebar(){ document.getElementById("sidebar").classList.toggle("open"); }
+function openPanel(id){ document.getElementById(id).classList.add("open"); }
+function closePanel(id){ document.getElementById(id).classList.remove("open"); }
 
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-
-// UI Functions
-function toggleSidebar(){
-  document.getElementById("sidebar").classList.toggle("open");
-}
-function openPanel(id){
-  document.getElementById(id).classList.add("open");
-}
-function closePanel(id){
-  document.getElementById(id).classList.remove("open");
-}
-function setTheme(bg,color){
-  document.documentElement.style.setProperty('--bg', bg);
-  if(color) document.documentElement.style.setProperty('--text', color);
-}
-function newChat(){
+function createChat(){
   const div=document.createElement("div");
-  div.textContent="Chat "+(document.getElementById("chatHistory").children.length+1);
-  div.onclick=()=>div.contentEditable=true;
-  document.getElementById("chatHistory").appendChild(div);
+  div.textContent="Chat "+(chatHistory.children.length+1);
+  div.ondblclick=()=>div.contentEditable=true;
+  chatHistory.appendChild(div);
 }
+
 function sendMessage(){
   const input=document.getElementById("userInput");
-  const msg=input.value;
-  if(!msg) return;
-  const p=document.createElement("p");
-  p.textContent="You: "+msg;
-  document.getElementById("chatBox").appendChild(p);
-  speak(msg);
+  if(!input.value) return;
+  const msg=document.createElement("div");
+  msg.className="message";
+  msg.textContent=input.value;
+  chatBox.appendChild(msg);
+  speak(input.value);
   input.value="";
 }
+
 function speak(text){
   const utter=new SpeechSynthesisUtterance(text);
   speechSynthesis.speak(utter);
 }
+
 function startVoice(){
   const rec=new(window.SpeechRecognition||window.webkitSpeechRecognition)();
-  rec.onresult=e=>{
-    document.getElementById("userInput").value=e.results[0][0].transcript;
-  };
+  rec.onresult=e=>{ userInput.value=e.results[0][0].transcript; };
   rec.start();
 }
 
-// Auth
-function googleLogin(){
-  const provider=new firebase.auth.GoogleAuthProvider();
-  auth.signInWithPopup(provider);
-}
-function guestLogin(){
-  auth.signInAnonymously();
-}
-function logout(){
-  auth.signOut();
+function setTheme(name){
+  const themes={
+    obsidian:{bg:"#000",panel:"#0f0f0f",card:"#161616",accent:"#00ffae"},
+    midnight:{bg:"#0a192f",panel:"#112240",card:"#1b2a4a",accent:"#64ffda"},
+    carbon:{bg:"#111",panel:"#1c1c1c",card:"#242424",accent:"#f5f5f5"},
+    indigo:{bg:"#0d0f1a",panel:"#151935",card:"#1e234d",accent:"#7f5af0"},
+    emerald:{bg:"#061a14",panel:"#0d2b22",card:"#123f33",accent:"#00ff99"},
+    crimson:{bg:"#140b0b",panel:"#1f1111",card:"#2a1717",accent:"#ff4d4d"}
+  };
+  const t=themes[name];
+  document.documentElement.style.setProperty('--bg',t.bg);
+  document.documentElement.style.setProperty('--panel',t.panel);
+  document.documentElement.style.setProperty('--card',t.card);
+  document.documentElement.style.setProperty('--accent',t.accent);
 }
 
-// Languages 100+
-const languages=["English","Spanish","French","German","Hindi","Arabic","Chinese","Japanese","Korean","Russian","Portuguese","Italian","Dutch","Turkish","Bengali","Urdu","Tamil","Telugu","Malayalam","Thai","Vietnamese","Polish","Greek","Swedish","Norwegian","Finnish","Danish","Czech","Hungarian","Romanian","Slovak","Ukrainian","Hebrew","Persian","Indonesian","Malay","Filipino","Swahili","Zulu","Afrikaans"];
+const languages=["English","Spanish","French","German","Hindi","Arabic","Chinese","Japanese","Korean"];
 while(languages.length<110){ languages.push("Language "+languages.length); }
-const select=document.getElementById("languageSelect");
-languages.forEach(lang=>{
+languages.forEach(l=>{
   const opt=document.createElement("option");
-  opt.textContent=lang;
-  select.appendChild(opt);
+  opt.textContent=l;
+  languageSelect.appendChild(opt);
 });
-
-function reportIssue(){
-  alert("Report submitted successfully.");
-}
 </script>
+
 </body>
-  </html>
+    </html>
