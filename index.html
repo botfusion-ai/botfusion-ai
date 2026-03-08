@@ -2,478 +2,139 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>AI Platform</title>
-
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Botfusion AI - Unicorn SaaS AI</title>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.3/dist/tailwind.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 <style>
-
-body{
-background:#0f172a;
-color:white;
-font-family:system-ui;
-}
-
-.glass{
-background:rgba(255,255,255,0.05);
-backdrop-filter:blur(18px);
-border:1px solid rgba(255,255,255,0.1);
-}
-
-.message{
-padding:12px;
-border-radius:10px;
-margin:8px 0;
-max-width:70%;
-}
-
-.user{
-background:#2563eb;
-margin-left:auto;
-}
-
-.bot{
-background:#1e293b;
-}
-
-.typing span{
-animation:blink 1.2s infinite;
-}
-
-.typing span:nth-child(2){animation-delay:.2s}
-.typing span:nth-child(3){animation-delay:.4s}
-
-@keyframes blink{
-0%{opacity:.2}
-50%{opacity:1}
-100%{opacity:.2}
-}
-
+body { font-family:'Inter',sans-serif; background:#101518; color:#f1f5f9; }
+.glass { background:rgba(16,21,24,0.7); backdrop-filter:blur(14px); border-radius:12px; }
+.sidebar svg, .icon-button svg { width:24px;height:24px; stroke-width:1.5; color:#9ca3af; transition:0.2s; }
+.sidebar svg:hover, .icon-button svg:hover { color:#0ea5e9; transform:scale(1.1); }
+.chat-bubble { background:linear-gradient(135deg,#0f172a,#1e293b); color:#fff; padding:0.75rem 1rem; border-radius:12px; margin-bottom:0.5rem; max-width:80%; box-shadow:0 4px 12px rgba(0,0,0,0.4); }
+.input-bar { background:rgba(30,41,59,0.95); border-radius:9999px; padding:0.5rem 1rem; display:flex; align-items:center; gap:0.5rem; }
+.tab { cursor:pointer; padding:0.5rem 1rem; border-radius:12px; transition:0.2s; }
+.tab.active { background:#1e293b; color:#0ea5e9; }
+.upload-menu { display:none; position:absolute; bottom:3rem; left:0; background:#1e293b; border-radius:12px; padding:0.5rem; flex-direction:column; gap:0.5rem; z-index:50; }
+.upload-menu button { display:flex; align-items:center; gap:0.5rem; padding:0.5rem 1rem; border-radius:8px; transition:0.2s; }
+.upload-menu button:hover { background:#334155; }
+.command-palette { display:none; position:fixed; top:20%; left:50%; transform:translateX(-50%); background:#1e293b; border-radius:12px; padding:1rem; width:300px; z-index:100; }
+.command-palette input { width:100%; padding:0.5rem; border-radius:8px; outline:none; background:#101518; color:#fff; }
+.command-palette button { width:100%; padding:0.5rem; margin-top:0.25rem; border-radius:8px; background:#334155; color:#fff; text-align:left; }
+.typing { display:inline-block; border-right:2px solid #0ea5e9; animation: blink 1s infinite; }
+@keyframes blink {0%,50%,100%{border-color:#0ea5e9}25%,75%{border-color:transparent}}
 </style>
-
 </head>
-
-<body class="h-screen flex overflow-hidden">
-
-<!-- SIDEBAR -->
-
-<div class="w-72 glass p-4 flex flex-col">
-
-<h1 class="text-xl font-bold mb-4">AI Workspace</h1>
-
-<button onclick="newChat()" class="bg-blue-600 p-2 rounded mb-3">
-+ New Chat
-</button>
-
-<div id="chatList" class="flex-1 overflow-y-auto space-y-2"></div>
-
-<hr class="my-4 border-white/10">
-
-<h2 class="text-sm opacity-60 mb-2">Agents</h2>
-
-<button onclick="openAgents()" class="p-2 glass rounded w-full text-left mb-2">
-Agent Manager
-</button>
-
-<button onclick="openWorkflow()" class="p-2 glass rounded w-full text-left">
-Workflow Builder
-</button>
-
-<hr class="my-4 border-white/10">
-
-<h2 class="text-sm opacity-60 mb-2">Resources</h2>
-
-<button onclick="openKnowledge()" class="p-2 glass rounded w-full text-left mb-2">
-Knowledge Base
-</button>
-
-<button onclick="openMarketplace()" class="p-2 glass rounded w-full text-left">
-Plugins
-</button>
-
-</div>
-
-<!-- MAIN AREA -->
-
-<div class="flex-1 flex flex-col">
-
-<!-- TOP BAR -->
-
-<div class="glass p-3 flex justify-between">
-
-<div class="flex gap-3 items-center">
-
-<select id="model" class="bg-black/30 p-2 rounded">
-<option>gpt-4o</option>
-<option>gpt-4-turbo</option>
-<option>claude-3</option>
-</select>
-
-<input type="file" id="fileUpload">
-
-</div>
-
-<div class="flex gap-4">
-
-<button onclick="openDashboard()">Analytics</button>
-<button onclick="openBilling()">Billing</button>
-
-</div>
-
-</div>
-
-<!-- CHAT -->
-
-<div id="chat" class="flex-1 overflow-y-auto p-6"></div>
-
-<div id="typing" class="px-6 hidden">
-<div class="typing opacity-60">
-AI typing<span>.</span><span>.</span><span>.</span>
-</div>
-</div>
-
-<!-- INPUT -->
-
-<div class="glass p-4 flex gap-3">
-
-<input
-id="input"
-class="flex-1 bg-black/30 p-3 rounded"
-placeholder="Ask AI..."
-onkeydown="enterSend(event)"
->
-
-<button onclick="sendMessage()" class="bg-blue-600 px-4 rounded">
-Send
-</button>
-
-</div>
-
-</div>
-
-<!-- COMMAND PALETTE -->
-
-<div id="palette" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center">
-
-<div class="glass p-6 w-96 rounded">
-
-<input
-placeholder="Search commands..."
-class="w-full bg-black/30 p-3 rounded"
->
-
-<div class="mt-4 text-sm opacity-70">
-
-<p>Open Marketplace</p>
-<p>Open Agents</p>
-<p>Open Analytics</p>
-<p>Open Billing</p>
-
-</div>
-
-</div>
-
-</div>
-
-<!-- PLUGIN MARKETPLACE -->
-
-<div id="marketplace" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center">
-
-<div class="glass p-6 w-[700px] rounded">
-
-<h2 class="text-xl mb-4">Plugin Marketplace</h2>
-
-<div class="grid grid-cols-3 gap-4">
-
-<div class="glass p-4 rounded">
-Slack
-<button class="block mt-2 text-sm bg-blue-600 px-2 rounded">Install</button>
-</div>
-
-<div class="glass p-4 rounded">
-Notion
-<button class="block mt-2 text-sm bg-blue-600 px-2 rounded">Install</button>
-</div>
-
-<div class="glass p-4 rounded">
-Zapier
-<button class="block mt-2 text-sm bg-blue-600 px-2 rounded">Install</button>
-</div>
-
-</div>
-
-<button onclick="closeMarketplace()" class="mt-4">Close</button>
-
-</div>
-
-</div>
-
-<!-- AGENTS -->
-
-<div id="agents" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center">
-
-<div class="glass p-6 w-[600px] rounded">
-
-<h2 class="text-xl mb-4">AI Agents</h2>
-
-<div class="space-y-3">
-
-<div class="glass p-3 rounded flex justify-between">
-Research Agent
-<button class="bg-blue-600 px-2 rounded text-sm">Edit</button>
-</div>
-
-<div class="glass p-3 rounded flex justify-between">
-Marketing Agent
-<button class="bg-blue-600 px-2 rounded text-sm">Edit</button>
-</div>
-
-</div>
-
-<button onclick="closeAgents()" class="mt-4">Close</button>
-
-</div>
-
-</div>
-
-<!-- ANALYTICS -->
-
-<div id="dashboard" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center">
-
-<div class="glass p-6 w-[700px] rounded">
-
-<h2 class="text-xl mb-4">Usage Analytics</h2>
-
-<canvas id="chart"></canvas>
-
-<button onclick="closeDashboard()" class="mt-4">Close</button>
-
-</div>
-
-</div>
-
-<!-- WORKFLOW -->
-
-<div id="workflow" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center">
-
-<div class="glass p-6 w-[700px] rounded">
-
-<h2 class="text-xl mb-4">Workflow Builder</h2>
-
-<div class="grid grid-cols-3 gap-3">
-
-<div class="glass p-3 rounded">User Input</div>
-<div class="glass p-3 rounded">AI Agent</div>
-<div class="glass p-3 rounded">API Call</div>
-
-</div>
-
-<button onclick="closeWorkflow()" class="mt-4">Close</button>
-
-</div>
-
-</div>
-
-<!-- KNOWLEDGE BASE -->
-
-<div id="knowledge" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center">
-
-<div class="glass p-6 w-[600px] rounded">
-
-<h2 class="text-xl mb-4">Vector Knowledge Base</h2>
-
-<input type="file" class="mb-3">
-
-<p class="text-sm opacity-70">
-Upload documents to build AI knowledge.
-</p>
-
-<button onclick="closeKnowledge()" class="mt-4">Close</button>
-
-</div>
-
-</div>
-
-<!-- BILLING -->
-
-<div id="billing" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center">
-
-<div class="glass p-6 w-[600px] rounded">
-
-<h2 class="text-xl mb-4">Plans</h2>
-
-<div class="grid grid-cols-3 gap-4">
-
-<div class="glass p-4 rounded">
-Free
-<p>$0</p>
-</div>
-
-<div class="glass p-4 rounded">
-Pro
-<p>$20/mo</p>
-</div>
-
-<div class="glass p-4 rounded">
-Team
-<p>$50/mo</p>
-</div>
-
-</div>
-
-<button onclick="closeBilling()" class="mt-4">Close</button>
-
-</div>
-
-</div>
+<body class="flex h-screen overflow-hidden">
+
+<!-- Sidebar -->
+<aside class="sidebar w-20 md:w-64 bg-gray-900 flex flex-col items-center md:items-start py-4 px-2 glass relative">
+  <button class="icon-button mb-6" id="hamburger">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+  </button>
+  <nav class="flex flex-col gap-4 w-full" id="sidebar-nav">
+    <button class="flex items-center gap-3 px-4 py-2 hover:bg-gray-800 rounded-lg"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg><span class="hidden md:inline">New Chat</span></button>
+    <button class="flex items-center gap-3 px-4 py-2 hover:bg-gray-800 rounded-lg"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 7h18v14H3V7zm0 0L12 2l9 5"/></svg><span class="hidden md:inline">Folders</span></button>
+    <button class="flex items-center gap-3 px-4 py-2 hover:bg-gray-800 rounded-lg"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 1 1-9-9"/></svg><span class="hidden md:inline">History</span></button>
+    <button class="flex items-center gap-3 px-4 py-2 hover:bg-gray-800 rounded-lg mt-8"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg><span class="hidden md:inline">Account</span></button>
+    <button class="flex items-center gap-3 px-4 py-2 hover:bg-gray-800 rounded-lg"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg><span class="hidden md:inline">Settings</span></button>
+  </nav>
+</aside>
+
+<!-- Main Area -->
+<main class="flex-1 flex flex-col justify-between p-4 overflow-auto relative">
+  <div class="flex gap-2 mb-4">
+    <div class="tab active" data-tab="chat">Chat</div>
+    <div class="tab" data-tab="code">Code</div>
+    <div class="tab" data-tab="images">Images</div>
+    <div class="tab" data-tab="analysis">Analysis</div>
+  </div>
+
+  <div class="flex-1 flex flex-col gap-2 overflow-auto mb-4" id="chat-workspace">
+    <div class="chat-bubble self-start"><span class="typing">Hello! I am Botfusion AI...</span></div>
+  </div>
+
+  <div class="input-bar relative">
+    <button class="icon-button" id="upload-btn"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg></button>
+    <div class="upload-menu" id="upload-menu">
+      <button id="upload-camera">Camera</button>
+      <button id="upload-gallery">Gallery</button>
+      <button id="upload-files">Files</button>
+      <button id="upload-websearch">Web Search</button>
+      <button id="upload-data">Data Analysis</button>
+    </div>
+    <input type="text" id="chat-input" placeholder="Ask Botfusion..." class="flex-1 bg-transparent focus:outline-none text-white placeholder-gray-400"/>
+    <button class="icon-button" id="voice-btn"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 1v22m0-22a7 7 0 0 1 0 14"/></svg></button>
+    <button class="icon-button" id="send-btn"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M22 2L11 13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+  </div>
+
+  <div class="command-palette" id="command-palette">
+    <input type="text" placeholder="Type a command...">
+    <button>New Chat</button>
+    <button>Switch Theme</button>
+    <button>Open Folder</button>
+    <button>Start Code Mode</button>
+    <button>Start Image Mode</button>
+  </div>
+</main>
 
 <script>
+// Firebase Config
+const firebaseConfig={apiKey:"AIzaSyDA62eN5MEjX9Z-gw6w9UuR8L-Ke_6J7eE",authDomain:"botfusion-ai-bd6d0.firebaseapp.com",projectId:"botfusion-ai-bd6d0",storageBucket:"botfusion-ai-bd6d0.firebasestorage.app",messagingSenderId:"730477136598",appId:"1:730477136598:web:c6b4e0d495744d12079777",measurementId:"G-53FTWNQB8X"};
+firebase.initializeApp(firebaseConfig);
+const auth=firebase.auth(), db=firebase.firestore(), storage=firebase.storage();
 
-let chats=[]
-let currentChat=0
+// Sidebar Hamburger
+document.getElementById('hamburger').addEventListener('click',()=>document.getElementById('sidebar-nav').classList.toggle('hidden'));
 
-function newChat(){
+// Tabs
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); tab.classList.add('active');});
+});
 
-chats.push([])
-currentChat=chats.length-1
+// Upload Menu
+const uploadBtn=document.getElementById('upload-btn'), uploadMenu=document.getElementById('upload-menu');
+uploadBtn.addEventListener('click',()=>{uploadMenu.style.display=uploadMenu.style.display==='flex'?'none':'flex'; uploadMenu.style.flexDirection='column';});
 
-renderChatList()
-renderChat()
+// Command Palette Ctrl+K
+const commandPalette=document.getElementById('command-palette');
+document.addEventListener('keydown',e=>{if(e.ctrlKey&&e.key.toLowerCase()==='k'){e.preventDefault();commandPalette.style.display=commandPalette.style.display==='flex'?'none':'flex'; commandPalette.querySelector('input').focus();}});
 
+// Voice
+const voiceBtn=document.getElementById('voice-btn'); let recognition;
+if('webkitSpeechRecognition' in window){
+  recognition=new webkitSpeechRecognition(); recognition.continuous=false; recognition.lang='en-US'; recognition.interimResults=false;
+  recognition.onresult=function(e){ const transcript=e.results[0][0].transcript; document.getElementById('chat-input').value=transcript; sendMessageToOpenAI(transcript);}
+  recognition.onerror=function(e){ console.error(e);}
+}
+voiceBtn.addEventListener('click',()=>{recognition.start();});
+
+// Themes
+const themes={dark:{bg:'#101518',text:'#f1f5f9'},ocean:{bg:'#0f172a',text:'#38bdf8'},violet:{bg:'#1e293b',text:'#a78bfa'},green:{bg:'#0f172a',text:'#22c55e'},sunset:{bg:'#1e293b',text:'#f97316'}};
+function switchTheme(name){document.body.style.background=themes[name].bg;document.body.style.color=themes[name].text;}
+
+// Streaming AI
+async function sendMessageToOpenAI(prompt){
+  const ws=document.getElementById('chat-workspace');
+  const userMsg=document.createElement('div'); userMsg.className='chat-bubble self-end'; userMsg.textContent=prompt; ws.appendChild(userMsg);
+  ws.scrollTop=ws.scrollHeight;
+
+  const aiBubble=document.createElement('div'); aiBubble.className='chat-bubble self-start'; ws.appendChild(aiBubble); ws.scrollTop=ws.scrollHeight;
+
+  const es=new EventSource(`http://localhost:3001/stream?prompt=${encodeURIComponent(prompt)}`);
+  let text='';
+  es.onmessage=e=>{
+    if(e.data!==''){ const tokenData=JSON.parse(e.data); if(tokenData.choices&&tokenData.choices[0].delta&&tokenData.choices[0].delta.content){text+=tokenData.choices[0].delta.content; aiBubble.textContent=text+' ⏳'; ws.scrollTop=ws.scrollHeight;}}
+  };
+  es.addEventListener('done',()=>{aiBubble.textContent=text; es.close();});
 }
 
-function renderChatList(){
-
-const list=document.getElementById("chatList")
-list.innerHTML=""
-
-chats.forEach((c,i)=>{
-
-const div=document.createElement("div")
-
-div.className="p-2 glass rounded cursor-pointer"
-div.innerText="Chat "+(i+1)
-
-div.onclick=()=>{
-currentChat=i
-renderChat()
-}
-
-list.appendChild(div)
-
-})
-
-}
-
-function renderChat(){
-
-const chat=document.getElementById("chat")
-chat.innerHTML=""
-
-chats[currentChat].forEach(m=>{
-
-const div=document.createElement("div")
-div.className="message "+m.role
-div.innerText=m.text
-
-chat.appendChild(div)
-
-})
-
-chat.scrollTop=chat.scrollHeight
-
-}
-
-function addMessage(role,text){
-
-chats[currentChat].push({role,text})
-renderChat()
-
-}
-
-function enterSend(e){
-if(e.key==="Enter") sendMessage()
-}
-
-async function sendMessage(){
-
-const input=document.getElementById("input")
-
-if(!input.value)return
-
-const text=input.value
-
-addMessage("user",text)
-
-input.value=""
-
-document.getElementById("typing").classList.remove("hidden")
-
-const reply=await fakeAI(text)
-
-document.getElementById("typing").classList.add("hidden")
-
-addMessage("bot",reply)
-
-}
-
-async function fakeAI(prompt){
-
-await new Promise(r=>setTimeout(r,1000))
-
-return "AI response to: "+prompt
-
-}
-
-document.addEventListener("keydown",e=>{
-
-if(e.ctrlKey && e.key==="k"){
-e.preventDefault()
-document.getElementById("palette").classList.toggle("hidden")
-}
-
-})
-
-function openMarketplace(){document.getElementById("marketplace").classList.remove("hidden")}
-function closeMarketplace(){document.getElementById("marketplace").classList.add("hidden")}
-
-function openAgents(){document.getElementById("agents").classList.remove("hidden")}
-function closeAgents(){document.getElementById("agents").classList.add("hidden")}
-
-function openWorkflow(){document.getElementById("workflow").classList.remove("hidden")}
-function closeWorkflow(){document.getElementById("workflow").classList.add("hidden")}
-
-function openKnowledge(){document.getElementById("knowledge").classList.remove("hidden")}
-function closeKnowledge(){document.getElementById("knowledge").classList.add("hidden")}
-
-function openBilling(){document.getElementById("billing").classList.remove("hidden")}
-function closeBilling(){document.getElementById("billing").classList.add("hidden")}
-
-function openDashboard(){
-
-document.getElementById("dashboard").classList.remove("hidden")
-
-const ctx=document.getElementById("chart")
-
-new Chart(ctx,{
-type:"line",
-data:{
-labels:["Mon","Tue","Wed","Thu"],
-datasets:[{
-label:"Tokens",
-data:[100,300,250,500]
-}]
-}
-})
-
-}
-
-function closeDashboard(){document.getElementById("dashboard").classList.add("hidden")}
-
-newChat()
-
+// Send Button
+document.getElementById('send-btn').addEventListener('click',()=>{const input=document.getElementById('chat-input'); if(!input.value)return; sendMessageToOpenAI(input.value); input.value='';});
 </script>
-
 </body>
-  </html>
+    </html>
