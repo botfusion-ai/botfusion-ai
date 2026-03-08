@@ -1,624 +1,477 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Platform</title>
 
-<title>AI Workspace</title>
-
+<script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
-
 body{
-display:flex;
-height:100vh;
-background:#111;
+background:#0f172a;
 color:white;
-overflow:hidden;
+font-family:system-ui;
 }
 
-/* THEMES */
+.glass{
+background:rgba(255,255,255,0.05);
+backdrop-filter:blur(18px);
+border:1px solid rgba(255,255,255,0.1);
+}
 
-.theme-dark{background:#111;color:white}
-.theme-light{background:#f4f4f4;color:black}
-.theme-blue{background:#0f172a}
-.theme-green{background:#022c22}
-.theme-purple{background:#240046}
-
-/* SIDEBAR */
-
-.sidebar{
-width:270px;
-background:rgba(25,25,25,.9);
+.message{
 padding:12px;
-display:flex;
-flex-direction:column;
-border-right:1px solid rgba(255,255,255,.1);
-}
-
-.sidebar h2{
-margin-bottom:10px;
-}
-
-.search{
-padding:8px;
-border:none;
-border-radius:6px;
-margin-bottom:10px;
-}
-
-.history{
-flex:1;
-overflow:auto;
-}
-
-.chat-item{
-padding:8px;
-border-radius:6px;
-display:flex;
-justify-content:space-between;
-cursor:pointer;
-}
-
-.chat-item:hover{
-background:#333;
-}
-
-.pinned{color:gold}
-
-/* MAIN */
-
-.main{
-flex:1;
-display:flex;
-flex-direction:column;
-}
-
-/* HEADER */
-
-.header{
-display:flex;
-justify-content:space-between;
-padding:10px;
-background:#1a1a1a;
-}
-
-/* BUTTON */
-
-.btn{
-background:#333;
-border:none;
-padding:8px;
-cursor:pointer;
-border-radius:6px;
-display:flex;
-align-items:center;
-justify-content:center;
-transition:.2s;
-}
-
-.btn:hover{
-background:#555;
-}
-
-/* ICON */
-
-.icon{
-width:18px;
-height:18px;
-stroke:white;
-fill:none;
-stroke-width:2;
-}
-
-/* TABS */
-
-.tabs{
-display:flex;
-gap:6px;
-padding:6px;
-background:#1b1b1b;
-}
-
-/* WORKSPACE */
-
-.workspace{
-flex:1;
-overflow:auto;
-padding:20px;
-display:none;
-}
-
-.workspace.active{
-display:block;
-}
-
-/* CHAT */
-
-.chat{
-display:flex;
-flex-direction:column;
-gap:10px;
-}
-
-.msg{
-padding:12px 16px;
-border-radius:12px;
+border-radius:10px;
+margin:8px 0;
 max-width:70%;
 }
 
 .user{
-background:#2f6fff;
+background:#2563eb;
 margin-left:auto;
 }
 
-.ai{
-background:#2a2a2a;
-}
-
-/* INPUT */
-
-.input-bar{
-display:flex;
-padding:10px;
-gap:6px;
-background:#222;
-}
-
-.input-bar input{
-flex:1;
-padding:10px;
-border:none;
-border-radius:6px;
-}
-
-/* FILE PREVIEW */
-
-.preview{
-display:flex;
-gap:10px;
-margin-top:10px;
-flex-wrap:wrap;
-}
-
-.preview img{
-width:80px;
-border-radius:6px;
-}
-
-/* CODE */
-
-.code{
-background:black;
-padding:10px;
-border-radius:6px;
-font-family:monospace;
-position:relative;
-}
-
-.copy{
-position:absolute;
-top:4px;
-right:4px;
-background:#444;
-border:none;
-color:white;
-cursor:pointer;
-padding:2px 6px;
-}
-
-/* TYPING */
-
-.typing{
-display:flex;
-gap:4px;
+.bot{
+background:#1e293b;
 }
 
 .typing span{
-width:6px;
-height:6px;
-background:white;
-border-radius:50%;
-animation:blink 1s infinite;
+animation:blink 1.2s infinite;
 }
 
 .typing span:nth-child(2){animation-delay:.2s}
 .typing span:nth-child(3){animation-delay:.4s}
 
 @keyframes blink{
-0%,100%{opacity:.2}
+0%{opacity:.2}
 50%{opacity:1}
-}
-
-/* PANEL */
-
-.panel{
-position:fixed;
-right:-320px;
-top:0;
-width:320px;
-height:100%;
-background:#1e1e1e;
-padding:20px;
-transition:.3s;
-overflow:auto;
-}
-
-.panel.active{right:0}
-
-/* MOBILE */
-
-@media(max-width:800px){
-
-.sidebar{
-position:absolute;
-left:-270px;
-height:100%;
-z-index:5;
-transition:.3s;
-}
-
-.sidebar.active{left:0}
-
+100%{opacity:.2}
 }
 
 </style>
+
 </head>
 
-<body class="theme-dark">
-
-<!-- SVG ICON SYSTEM -->
-
-<svg style="display:none">
-
-<symbol id="menu" viewBox="0 0 24 24">
-<line x1="3" y1="6" x2="21" y2="6"/>
-<line x1="3" y1="12" x2="21" y2="12"/>
-<line x1="3" y1="18" x2="21" y2="18"/>
-</symbol>
-
-<symbol id="send" viewBox="0 0 24 24">
-<line x1="22" y1="2" x2="11" y2="13"/>
-<polygon points="22 2 15 22 11 13 2 9 22 2"/>
-</symbol>
-
-<symbol id="mic" viewBox="0 0 24 24">
-<rect x="9" y="2" width="6" height="12"/>
-<path d="M5 10a7 7 0 0 0 14 0"/>
-</symbol>
-
-</svg>
+<body class="h-screen flex overflow-hidden">
 
 <!-- SIDEBAR -->
 
-<div class="sidebar" id="sidebar">
+<div class="w-72 glass p-4 flex flex-col">
 
-<h2>AI Workspace</h2>
+<h1 class="text-xl font-bold mb-4">AI Workspace</h1>
 
-<input class="search" id="search" placeholder="Search chats">
+<button onclick="newChat()" class="bg-blue-600 p-2 rounded mb-3">
++ New Chat
+</button>
 
-<button class="btn" onclick="newChat()">New Chat</button>
+<div id="chatList" class="flex-1 overflow-y-auto space-y-2"></div>
 
-<div class="history" id="history"></div>
+<hr class="my-4 border-white/10">
 
-<button class="btn" onclick="toggleSettings()">Settings</button>
+<h2 class="text-sm opacity-60 mb-2">Agents</h2>
+
+<button onclick="openAgents()" class="p-2 glass rounded w-full text-left mb-2">
+Agent Manager
+</button>
+
+<button onclick="openWorkflow()" class="p-2 glass rounded w-full text-left">
+Workflow Builder
+</button>
+
+<hr class="my-4 border-white/10">
+
+<h2 class="text-sm opacity-60 mb-2">Resources</h2>
+
+<button onclick="openKnowledge()" class="p-2 glass rounded w-full text-left mb-2">
+Knowledge Base
+</button>
+
+<button onclick="openMarketplace()" class="p-2 glass rounded w-full text-left">
+Plugins
+</button>
 
 </div>
 
-<!-- MAIN -->
+<!-- MAIN AREA -->
 
-<div class="main">
+<div class="flex-1 flex flex-col">
 
-<div class="header">
+<!-- TOP BAR -->
 
-<button class="btn" onclick="toggleSidebar()">
-<svg class="icon"><use href="#menu"/></svg>
-</button>
+<div class="glass p-3 flex justify-between">
 
-<select>
-<option>Auto</option>
-<option>GPT-4</option>
-<option>Code</option>
-<option>Vision</option>
+<div class="flex gap-3 items-center">
+
+<select id="model" class="bg-black/30 p-2 rounded">
+<option>gpt-4o</option>
+<option>gpt-4-turbo</option>
+<option>claude-3</option>
 </select>
 
-<button class="btn" onclick="voice()">
-<svg class="icon"><use href="#mic"/></svg>
-</button>
+<input type="file" id="fileUpload">
 
 </div>
 
-<div class="tabs">
+<div class="flex gap-4">
 
-<button class="btn" onclick="tab('chat')">Chat</button>
-<button class="btn" onclick="tab('image')">Image</button>
-<button class="btn" onclick="tab('code')">Code</button>
-<button class="btn" onclick="tab('data')">Data</button>
-<button class="btn" onclick="tab('web')">Web</button>
+<button onclick="openDashboard()">Analytics</button>
+<button onclick="openBilling()">Billing</button>
+
+</div>
 
 </div>
 
 <!-- CHAT -->
 
-<div class="workspace active" id="chat">
+<div id="chat" class="flex-1 overflow-y-auto p-6"></div>
 
-<div class="chat" id="chatBox"></div>
-
-<div class="preview" id="preview"></div>
-
+<div id="typing" class="px-6 hidden">
+<div class="typing opacity-60">
+AI typing<span>.</span><span>.</span><span>.</span>
 </div>
-
-<!-- IMAGE -->
-
-<div class="workspace" id="image">
-<h3>Image Generator</h3>
-<input placeholder="Describe image...">
-</div>
-
-<!-- CODE -->
-
-<div class="workspace" id="code">
-<div class="code">
-console.log("AI code assistant")
-<button class="copy" onclick="copyCode(this)">copy</button>
-</div>
-</div>
-
-<!-- DATA -->
-
-<div class="workspace" id="data">
-
-<canvas id="chart"></canvas>
-
-</div>
-
-<!-- WEB -->
-
-<div class="workspace" id="web">
-
-<input placeholder="Search the web">
-
 </div>
 
 <!-- INPUT -->
 
-<div class="input-bar">
+<div class="glass p-4 flex gap-3">
 
-<input id="msg" placeholder="Ask anything">
+<input
+id="input"
+class="flex-1 bg-black/30 p-3 rounded"
+placeholder="Ask AI..."
+onkeydown="enterSend(event)"
+>
 
-<button class="btn" onclick="sendMsg()">
-<svg class="icon"><use href="#send"/></svg>
-</button>
-
-<input type="file" id="fileInput" hidden>
-
-<button class="btn" onclick="document.getElementById('fileInput').click()">
-📁
+<button onclick="sendMessage()" class="bg-blue-600 px-4 rounded">
+Send
 </button>
 
 </div>
 
 </div>
 
-<!-- SETTINGS -->
+<!-- COMMAND PALETTE -->
 
-<div class="panel" id="settingsPanel">
+<div id="palette" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center">
 
-<h3>Theme</h3>
+<div class="glass p-6 w-96 rounded">
 
-<select onchange="setTheme(this.value)">
-<option value="theme-dark">Dark</option>
-<option value="theme-light">Light</option>
-<option value="theme-blue">Blue</option>
-<option value="theme-green">Green</option>
-<option value="theme-purple">Purple</option>
-</select>
+<input
+placeholder="Search commands..."
+class="w-full bg-black/30 p-3 rounded"
+>
 
-<h3>Memory</h3>
+<div class="mt-4 text-sm opacity-70">
 
-<label>
-<input type="checkbox" id="memory"> Enable memory
-</label>
+<p>Open Marketplace</p>
+<p>Open Agents</p>
+<p>Open Analytics</p>
+<p>Open Billing</p>
 
-<h3>Language</h3>
+</div>
 
-<select id="lang"></select>
+</div>
 
-<button onclick="exportChat()">Export Chat</button>
+</div>
+
+<!-- PLUGIN MARKETPLACE -->
+
+<div id="marketplace" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center">
+
+<div class="glass p-6 w-[700px] rounded">
+
+<h2 class="text-xl mb-4">Plugin Marketplace</h2>
+
+<div class="grid grid-cols-3 gap-4">
+
+<div class="glass p-4 rounded">
+Slack
+<button class="block mt-2 text-sm bg-blue-600 px-2 rounded">Install</button>
+</div>
+
+<div class="glass p-4 rounded">
+Notion
+<button class="block mt-2 text-sm bg-blue-600 px-2 rounded">Install</button>
+</div>
+
+<div class="glass p-4 rounded">
+Zapier
+<button class="block mt-2 text-sm bg-blue-600 px-2 rounded">Install</button>
+</div>
+
+</div>
+
+<button onclick="closeMarketplace()" class="mt-4">Close</button>
+
+</div>
+
+</div>
+
+<!-- AGENTS -->
+
+<div id="agents" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center">
+
+<div class="glass p-6 w-[600px] rounded">
+
+<h2 class="text-xl mb-4">AI Agents</h2>
+
+<div class="space-y-3">
+
+<div class="glass p-3 rounded flex justify-between">
+Research Agent
+<button class="bg-blue-600 px-2 rounded text-sm">Edit</button>
+</div>
+
+<div class="glass p-3 rounded flex justify-between">
+Marketing Agent
+<button class="bg-blue-600 px-2 rounded text-sm">Edit</button>
+</div>
+
+</div>
+
+<button onclick="closeAgents()" class="mt-4">Close</button>
+
+</div>
+
+</div>
+
+<!-- ANALYTICS -->
+
+<div id="dashboard" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center">
+
+<div class="glass p-6 w-[700px] rounded">
+
+<h2 class="text-xl mb-4">Usage Analytics</h2>
+
+<canvas id="chart"></canvas>
+
+<button onclick="closeDashboard()" class="mt-4">Close</button>
+
+</div>
+
+</div>
+
+<!-- WORKFLOW -->
+
+<div id="workflow" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center">
+
+<div class="glass p-6 w-[700px] rounded">
+
+<h2 class="text-xl mb-4">Workflow Builder</h2>
+
+<div class="grid grid-cols-3 gap-3">
+
+<div class="glass p-3 rounded">User Input</div>
+<div class="glass p-3 rounded">AI Agent</div>
+<div class="glass p-3 rounded">API Call</div>
+
+</div>
+
+<button onclick="closeWorkflow()" class="mt-4">Close</button>
+
+</div>
+
+</div>
+
+<!-- KNOWLEDGE BASE -->
+
+<div id="knowledge" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center">
+
+<div class="glass p-6 w-[600px] rounded">
+
+<h2 class="text-xl mb-4">Vector Knowledge Base</h2>
+
+<input type="file" class="mb-3">
+
+<p class="text-sm opacity-70">
+Upload documents to build AI knowledge.
+</p>
+
+<button onclick="closeKnowledge()" class="mt-4">Close</button>
+
+</div>
+
+</div>
+
+<!-- BILLING -->
+
+<div id="billing" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center">
+
+<div class="glass p-6 w-[600px] rounded">
+
+<h2 class="text-xl mb-4">Plans</h2>
+
+<div class="grid grid-cols-3 gap-4">
+
+<div class="glass p-4 rounded">
+Free
+<p>$0</p>
+</div>
+
+<div class="glass p-4 rounded">
+Pro
+<p>$20/mo</p>
+</div>
+
+<div class="glass p-4 rounded">
+Team
+<p>$50/mo</p>
+</div>
+
+</div>
+
+<button onclick="closeBilling()" class="mt-4">Close</button>
+
+</div>
 
 </div>
 
 <script>
 
-/* SIDEBAR */
+let chats=[]
+let currentChat=0
 
-function toggleSidebar(){
-document.getElementById("sidebar").classList.toggle("active")
-}
+function newChat(){
 
-/* PANELS */
+chats.push([])
+currentChat=chats.length-1
 
-function toggleSettings(){
-document.getElementById("settingsPanel").classList.toggle("active")
-}
-
-/* TABS */
-
-function tab(id){
-
-document.querySelectorAll(".workspace")
-.forEach(e=>e.classList.remove("active"))
-
-document.getElementById(id).classList.add("active")
+renderChatList()
+renderChat()
 
 }
 
-/* CHAT */
+function renderChatList(){
 
-function sendMsg(){
+const list=document.getElementById("chatList")
+list.innerHTML=""
 
-let input=document.getElementById("msg")
+chats.forEach((c,i)=>{
+
+const div=document.createElement("div")
+
+div.className="p-2 glass rounded cursor-pointer"
+div.innerText="Chat "+(i+1)
+
+div.onclick=()=>{
+currentChat=i
+renderChat()
+}
+
+list.appendChild(div)
+
+})
+
+}
+
+function renderChat(){
+
+const chat=document.getElementById("chat")
+chat.innerHTML=""
+
+chats[currentChat].forEach(m=>{
+
+const div=document.createElement("div")
+div.className="message "+m.role
+div.innerText=m.text
+
+chat.appendChild(div)
+
+})
+
+chat.scrollTop=chat.scrollHeight
+
+}
+
+function addMessage(role,text){
+
+chats[currentChat].push({role,text})
+renderChat()
+
+}
+
+function enterSend(e){
+if(e.key==="Enter") sendMessage()
+}
+
+async function sendMessage(){
+
+const input=document.getElementById("input")
+
 if(!input.value)return
 
-addMsg("user",input.value)
+const text=input.value
 
-typing()
-
-saveChat()
+addMessage("user",text)
 
 input.value=""
 
-}
+document.getElementById("typing").classList.remove("hidden")
 
-function addMsg(role,text){
+const reply=await fakeAI(text)
 
-let div=document.createElement("div")
-div.className="msg "+role
-div.innerText=text
+document.getElementById("typing").classList.add("hidden")
 
-document.getElementById("chatBox").appendChild(div)
+addMessage("bot",reply)
 
 }
 
-/* AI TYPING */
+async function fakeAI(prompt){
 
-function typing(){
+await new Promise(r=>setTimeout(r,1000))
 
-let chat=document.getElementById("chatBox")
-
-let t=document.createElement("div")
-t.className="msg ai typing"
-t.innerHTML="<span></span><span></span><span></span>"
-
-chat.appendChild(t)
-
-setTimeout(()=>{
-
-t.className="msg ai"
-t.innerText="AI response example"
-
-saveChat()
-
-},1500)
+return "AI response to: "+prompt
 
 }
 
-/* SAVE CHAT */
+document.addEventListener("keydown",e=>{
 
-function saveChat(){
-
-localStorage.setItem(
-"chat",
-document.getElementById("chatBox").innerHTML
-)
-
+if(e.ctrlKey && e.key==="k"){
+e.preventDefault()
+document.getElementById("palette").classList.toggle("hidden")
 }
-
-window.onload=function(){
-
-let saved=localStorage.getItem("chat")
-
-if(saved)document.getElementById("chatBox").innerHTML=saved
-
-}
-
-/* FILE PREVIEW */
-
-document.getElementById("fileInput")
-.addEventListener("change",e=>{
-
-let file=e.target.files[0]
-
-let reader=new FileReader()
-
-reader.onload=function(){
-
-let img=document.createElement("img")
-img.src=reader.result
-
-document.getElementById("preview").appendChild(img)
-
-}
-
-reader.readAsDataURL(file)
 
 })
 
-/* COPY */
+function openMarketplace(){document.getElementById("marketplace").classList.remove("hidden")}
+function closeMarketplace(){document.getElementById("marketplace").classList.add("hidden")}
 
-function copyCode(btn){
+function openAgents(){document.getElementById("agents").classList.remove("hidden")}
+function closeAgents(){document.getElementById("agents").classList.add("hidden")}
 
-navigator.clipboard.writeText(
-btn.parentElement.innerText
-)
+function openWorkflow(){document.getElementById("workflow").classList.remove("hidden")}
+function closeWorkflow(){document.getElementById("workflow").classList.add("hidden")}
 
-}
+function openKnowledge(){document.getElementById("knowledge").classList.remove("hidden")}
+function closeKnowledge(){document.getElementById("knowledge").classList.add("hidden")}
 
-/* VOICE */
+function openBilling(){document.getElementById("billing").classList.remove("hidden")}
+function closeBilling(){document.getElementById("billing").classList.add("hidden")}
 
-function voice(){
-alert("Voice UI ready")
-}
+function openDashboard(){
 
-/* THEME */
+document.getElementById("dashboard").classList.remove("hidden")
 
-function setTheme(t){
-document.body.className=t
-localStorage.setItem("theme",t)
-}
+const ctx=document.getElementById("chart")
 
-document.body.className=
-localStorage.getItem("theme")||"theme-dark"
-
-/* LANGUAGES */
-
-let langs=[
-"English","Spanish","French","German","Hindi","Arabic","Chinese","Japanese","Russian","Portuguese",
-"Italian","Dutch","Greek","Turkish","Thai","Vietnamese","Indonesian","Malay","Polish","Swedish",
-"Danish","Finnish","Norwegian","Czech","Slovak","Hungarian","Romanian","Bulgarian","Ukrainian",
-"Serbian","Croatian","Slovenian","Estonian","Latvian","Lithuanian","Icelandic","Irish","Welsh"
-]
-
-let sel=document.getElementById("lang")
-
-langs.forEach(l=>{
-let o=document.createElement("option")
-o.text=l
-sel.appendChild(o)
-})
-
-/* EXPORT */
-
-function exportChat(){
-
-let text=document.getElementById("chatBox").innerText
-
-let blob=new Blob([text])
-
-let a=document.createElement("a")
-
-a.href=URL.createObjectURL(blob)
-a.download="chat.txt"
-a.click()
-
-}
-
-/* CHART */
-
-new Chart(document.getElementById("chart"),{
+new Chart(ctx,{
 type:"line",
 data:{
-labels:["Jan","Feb","Mar","Apr","May"],
+labels:["Mon","Tue","Wed","Thu"],
 datasets:[{
-label:"Data",
-data:[2,6,4,7,5]
+label:"Tokens",
+data:[100,300,250,500]
 }]
 }
 })
+
+}
+
+function closeDashboard(){document.getElementById("dashboard").classList.add("hidden")}
+
+newChat()
 
 </script>
 
