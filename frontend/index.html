@@ -1,390 +1,140 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Botfusion AI</title><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet"><style>
+<title>Botfusion AI</title>
 
-*{box-sizing:border-box;margin:0;padding:0;font-family:Inter}
+<style>
+body { margin:0; font-family:Arial; display:flex; height:100vh; background:#0f172a; color:white; }
+#sidebar { width:220px; background:#020617; padding:10px; }
+#chat { flex:1; padding:15px; overflow:auto; }
+.message { padding:10px; margin:5px; border-radius:8px; max-width:70%; }
+.user { background:#2563eb; margin-left:auto; }
+.bot { background:#1e293b; }
+#inputBox { display:flex; padding:10px; background:#020617; }
+input, select { padding:10px; margin-right:5px; }
+button { padding:10px; background:#22c55e; border:none; cursor:pointer; }
+</style>
+</head>
 
-:root{
---bg:#0f172a;
---panel:#1e293b;
---bubble:#334155;
---text:#e2e8f0;
---accent:#6366f1;
+<body>
+
+<div id="sidebar">
+  <h3>Modes</h3>
+  <select id="mode">
+    <option value="chat">Chat</option>
+    <option value="image">Image</option>
+    <option value="photo">Photo</option>
+    <option value="file">PDF</option>
+  </select>
+
+  <input type="file" id="fileInput">
+</div>
+
+<div style="flex:1; display:flex; flex-direction:column;">
+  <div id="chat"></div>
+
+  <div id="inputBox">
+    <input id="input" placeholder="Enter prompt..." />
+    <button onclick="send()">Send</button>
+  </div>
+</div>
+
+<script>
+const BASE_URL = "https://your-backend.onrender.com";
+const chatDiv = document.getElementById("chat");
+
+function addMessage(text, role) {
+  const div = document.createElement("div");
+  div.className = "message " + role;
+  div.innerText = text;
+  chatDiv.appendChild(div);
 }
 
-body.light{
---bg:#f1f5f9;
---panel:#ffffff;
---bubble:#e2e8f0;
---text:#0f172a;
+// 🚀 MAIN SWITCH
+async function send() {
+  const mode = document.getElementById("mode").value;
+
+  if (mode === "chat") chat();
+  if (mode === "image") generateImage();
+  if (mode === "photo") analyzeImage();
+  if (mode === "file") uploadPDF();
 }
 
-body{
-background:var(--bg);
-color:var(--text);
-height:100vh;
-overflow:hidden;
+// 💬 CHAT STREAM
+async function chat() {
+  const msg = input.value;
+  addMessage(msg, "user");
+
+  const res = await fetch(`${BASE_URL}/chat-stream`, {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({message:msg})
+  });
+
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+
+  let result = "";
+  const div = document.createElement("div");
+  div.className="message bot";
+  chatDiv.appendChild(div);
+
+  while(true){
+    const {done,value}=await reader.read();
+    if(done) break;
+    result+=decoder.decode(value);
+    div.innerText=result;
+  }
 }
 
-/* LOGIN */
+// 🎨 IMAGE
+async function generateImage() {
+  const prompt = input.value;
 
-#login{
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
-height:100vh;
-gap:25px;
+  const res = await fetch(`${BASE_URL}/generate-image`, {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({prompt})
+  });
+
+  const data = await res.json();
+
+  const img = document.createElement("img");
+  img.src = data.image;
+  img.style.maxWidth = "300px";
+  chatDiv.appendChild(img);
 }
 
-#login img{width:120px}
+// 📷 IMAGE ANALYSIS (needs URL)
+async function analyzeImage() {
+  const url = input.value;
 
-.loginBtn{
-background:var(--accent);
-border:none;
-padding:12px 22px;
-border-radius:10px;
-color:white;
-cursor:pointer;
+  const res = await fetch(`${BASE_URL}/analyze-image`, {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({image_url:url})
+  });
+
+  const data = await res.json();
+  addMessage(data.reply, "bot");
 }
 
-/* APP */
+// 📄 PDF
+async function uploadPDF() {
+  const file = document.getElementById("fileInput").files[0];
+  const form = new FormData();
+  form.append("file", file);
 
-#app{
-display:none;
-height:100vh;
-flex-direction:column;
+  const res = await fetch(`${BASE_URL}/upload-pdf`, {
+    method:"POST",
+    body:form
+  });
+
+  const data = await res.json();
+  addMessage(data.summary, "bot");
 }
+</script>
 
-/* HEADER */
-
-header{
-display:flex;
-justify-content:space-between;
-align-items:center;
-background:var(--panel);
-padding:12px 20px;
-}
-
-.logoArea{
-display:flex;
-align-items:center;
-gap:10px;
-}
-
-.logoArea img{width:28px}
-
-.iconBtn{
-background:none;
-border:none;
-color:var(--text);
-cursor:pointer;
-font-size:18px;
-}
-
-/* TOOLBAR */
-
-#tools{
-display:flex;
-gap:10px;
-padding:10px;
-justify-content:center;
-background:var(--panel);
-}
-
-.tool{
-padding:6px 12px;
-border-radius:8px;
-cursor:pointer;
-background:var(--bubble);
-}
-
-/* CHAT */
-
-#chat{
-flex:1;
-overflow:auto;
-padding:20px;
-max-width:850px;
-margin:auto;
-width:100%;
-}
-
-.message{
-margin-bottom:18px;
-animation:fade .3s ease;
-}
-
-.bubble{
-background:var(--bubble);
-padding:12px 16px;
-border-radius:14px;
-max-width:80%;
-}
-
-.user .bubble{
-background:var(--accent);
-color:white;
-margin-left:auto;
-}
-
-/* INPUT */
-
-.inputArea{
-display:flex;
-gap:10px;
-padding:12px;
-background:var(--panel);
-}
-
-input{
-flex:1;
-padding:12px;
-border-radius:10px;
-border:none;
-background:var(--bubble);
-color:var(--text);
-}
-
-.send{
-background:var(--accent);
-border:none;
-padding:10px 16px;
-border-radius:10px;
-color:white;
-cursor:pointer;
-}
-
-/* SIDEBAR */
-
-#sidebar{
-position:fixed;
-left:-260px;
-top:0;
-width:260px;
-height:100%;
-background:var(--panel);
-padding:20px;
-transition:.3s;
-z-index:100;
-}
-
-#sidebar.open{left:0}
-
-.menuItem{
-padding:10px 0;
-cursor:pointer;
-border-bottom:1px solid rgba(255,255,255,.05);
-}
-
-/* TYPING */
-
-.typing span{
-height:6px;
-width:6px;
-background:#888;
-border-radius:50%;
-display:inline-block;
-margin-right:3px;
-animation:bounce 1s infinite;
-}
-
-.typing span:nth-child(2){animation-delay:.2s}
-.typing span:nth-child(3){animation-delay:.4s}
-
-/* ANIM */
-
-@keyframes fade{
-from{opacity:0;transform:translateY(8px)}
-to{opacity:1}
-}
-
-@keyframes bounce{
-0%,80%,100%{transform:scale(0)}
-40%{transform:scale(1)}
-}
-
-</style></head><body><!-- LOGIN --><div id="login"><img src="logo.png"><h1>Botfusion AI</h1><button class="loginBtn" onclick="guestLogin()">Continue as Guest</button>
-
-<button class="loginBtn" onclick="alert('Google OAuth required')">Continue with Google</button>
-
-</div><!-- APP --><div id="app"><header><div class="logoArea"><button class="iconBtn" onclick="toggleSidebar()">☰</button>
-
-<img src="logo.png"><b>Botfusion AI</b>
-
-</div><div><button class="iconBtn" onclick="startVoice()">🎤</button>
-
-<button class="iconBtn" onclick="toggleTheme()">🌙</button>
-
-</div></header><!-- TOOL MODES --><div id="tools"><div class="tool" onclick="setMode('chat')">Chat</div>
-<div class="tool" onclick="setMode('image')">Image</div>
-<div class="tool" onclick="setMode('code')">Code</div>
-<div class="tool" onclick="setMode('search')">Search</div></div><!-- CHAT --><div id="chat"></div><!-- INPUT --><div class="inputArea"><input id="prompt" placeholder="Ask Botfusion AI..."><button class="send" onclick="send()">Send</button>
-
-</div></div><!-- SIDEBAR --><div id="sidebar"><h3>Menu</h3><div class="menuItem" onclick="newChat()">New Chat</div>
-<div class="menuItem" onclick="alert('Chat history stored locally')">Chat History</div>
-<div class="menuItem" onclick="showAccount()">Account</div>
-<div class="menuItem" onclick="clearChats()">Clear Chats</div>
-<div class="menuItem" onclick="logout()">Logout</div></div><script>
-
-const API_KEY="YOUR_API_KEY"
-
-let mode="chat"
-
-let messages=[]
-
-const chat=document.getElementById("chat")
-
-/* LOGIN */
-
-function guestLogin(){
-localStorage.setItem("user","guest")
-login.style.display="none"
-app.style.display="flex"
-}
-
-/* MODE */
-
-function setMode(m){
-mode=m
-}
-
-/* SIDEBAR */
-
-function toggleSidebar(){
-sidebar.classList.toggle("open")
-}
-
-/* THEME */
-
-function toggleTheme(){
-document.body.classList.toggle("light")
-}
-
-/* ADD MESSAGE */
-
-function addMessage(text,type){
-
-const msg=document.createElement("div")
-
-msg.className="message "+type
-
-msg.innerHTML=`<div class="bubble">${text}</div>`
-
-chat.appendChild(msg)
-
-chat.scrollTop=chat.scrollHeight
-
-return msg.querySelector(".bubble")
-
-}
-
-/* TYPING INDICATOR */
-
-function typing(){
-
-const msg=document.createElement("div")
-
-msg.className="message bot"
-
-msg.innerHTML=`<div class="bubble typing"><span></span><span></span><span></span></div>`
-
-chat.appendChild(msg)
-
-return msg
-
-}
-
-/* SEND */
-
-async function send(){
-
-const input=document.getElementById("prompt")
-
-const text=input.value
-
-if(!text)return
-
-addMessage(text,"user")
-
-messages.push({role:"user",content:text})
-
-input.value=""
-
-const typingBubble=typing()
-
-const res=await fetch("https://api.openai.com/v1/chat/completions",{
-
-method:"POST",
-
-headers:{
-"Content-Type":"application/json",
-"Authorization":"Bearer "+API_KEY
-},
-
-body:JSON.stringify({
-
-model:"gpt-4.1-mini",
-
-messages:messages
-
-})
-
-})
-
-const data=await res.json()
-
-typingBubble.remove()
-
-const reply=data.choices[0].message.content
-
-messages.push({role:"assistant",content:reply})
-
-addMessage(reply,"bot")
-
-}
-
-/* NEW CHAT */
-
-function newChat(){
-messages=[]
-chat.innerHTML=""
-}
-
-/* CLEAR */
-
-function clearChats(){
-localStorage.clear()
-}
-
-/* ACCOUNT */
-
-function showAccount(){
-alert("Logged in as "+(localStorage.getItem("user")||"guest"))
-}
-
-/* LOGOUT */
-
-function logout(){
-localStorage.clear()
-location.reload()
-}
-
-/* VOICE */
-
-function startVoice(){
-
-const rec=new webkitSpeechRecognition()
-
-rec.onresult=function(e){
-prompt.value=e.results[0][0].transcript
-}
-
-rec.start()
-
-}
-
-</script></body>
-  </html>
+</body>
+</html>
